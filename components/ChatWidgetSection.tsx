@@ -87,9 +87,16 @@ export function ChatWidgetSection() {
             type="button"
             onClick={() => {
               if (typeof window !== "undefined") {
-                const trigger = document.getElementById("zr-widget-btn") || document.getElementById("zr-chat-bubble");
-                if (trigger) {
-                  trigger.click();
+                const widgetBox = document.getElementById("zr-widget-box");
+                const widgetBtn = document.getElementById("zr-widget-btn") || document.getElementById("zr-chat-bubble");
+                if (widgetBox && widgetBox.style.display !== "flex") {
+                  if (widgetBtn) widgetBtn.click();
+                } else if (widgetBtn) {
+                  widgetBtn.click();
+                }
+                const inputField = document.getElementById("zr-input");
+                if (inputField) {
+                  setTimeout(() => inputField.focus(), 100);
                 }
               }
             }}

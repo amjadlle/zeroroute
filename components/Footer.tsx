@@ -1,5 +1,6 @@
-﻿import Image from "next/image";
+import Image from "next/image";
 import Link from "next/link";
+import { APP_VERSION } from "@/lib/version";
 
 export function Footer() {
   return (
@@ -15,7 +16,7 @@ export function Footer() {
           />
           <span className="font-bold text-sm text-slate-200">ZeroRoute</span>
           <span className="text-[10px] font-mono text-slate-400 font-normal">
-            v1.0.0 • MIT Licensed
+            {APP_VERSION} • MIT Licensed
           </span>
         </div>
         <div className="flex flex-wrap items-center justify-center sm:justify-end gap-x-5 gap-y-2 text-[11px] text-slate-400">

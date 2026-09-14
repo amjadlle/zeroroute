@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 export function TerminalFailover() {
   return (
@@ -32,7 +32,7 @@ export function TerminalFailover() {
 
           <div className="pt-2 text-slate-400 flex items-center gap-2">
             <span className="text-amber-400">▶</span> Attempting primary route:{" "}
-            <strong className="text-white">SambaNova (gemma-4-31B-it)</strong>...
+            <strong className="text-white">SambaNova (Meta-Llama-3.3-70B-Instruct)</strong>...
           </div>
 
           <div className="text-rose-400 bg-rose-500/10 border border-rose-500/20 p-2.5 rounded-lg">
@@ -42,7 +42,7 @@ export function TerminalFailover() {
 
           <div className="text-emerald-400 flex items-center gap-2">
             <span className="text-emerald-400 font-bold">⚡</span> Instant Failover ➔ Switched to{" "}
-            <strong className="text-white">Groq (gpt-oss-20b)</strong> in{" "}
+            <strong className="text-white">Groq (llama-3.3-70b-versatile)</strong> in{" "}
             <span className="bg-emerald-500/20 px-1.5 py-0.5 rounded text-emerald-300 font-bold">
               4.2ms
             </span>{" "}

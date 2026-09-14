@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { Check, X } from "lucide-react";
 
@@ -50,7 +50,7 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
               </li>
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Deploy to your own Cloudflare / Vercel / VPS</span>
+                <span>Deploy to your own Vercel / Docker / VPS</span>
               </li>
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />

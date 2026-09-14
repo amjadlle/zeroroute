@@ -1,4 +1,4 @@
-﻿import { Layers, ShieldCheck, Zap, Gauge, Key, Server } from "lucide-react";
+import { Layers, ShieldCheck, Zap, Gauge, Key, Server } from "lucide-react";
 
 export function Features() {
   const features = [
@@ -28,7 +28,7 @@ export function Features() {
       color: "blue",
       iconBg: "bg-blue-500/10 border-blue-500/20 text-blue-400",
       title: "Parallel Benchmark Suite",
-      description: "Race all 8 providers concurrently in real-time. Detect the fastest model and optimize your routing chain in 1-click.",
+      description: "Race all 9 multi-cloud providers concurrently in real-time. Detect the fastest model and optimize your routing chain in 1-click.",
     },
     {
       icon: Key,

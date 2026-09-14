@@ -1,7 +1,8 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { Zap, SlidersHorizontal, MessageSquare, ChevronRight } from "lucide-react";
+import { APP_VERSION } from "@/lib/version";
 
 interface HeroProps {
   onOpenCheckout: () => void;
@@ -20,7 +21,7 @@ export function Hero({ onOpenCheckout }: HeroProps) {
         >
           <span className="w-2 h-2 rounded-full bg-red-400 animate-ping" />
           <span className="px-1.5 py-0.5 rounded bg-red-500/20 text-[10px] font-mono text-red-300">
-            v1.0.0
+            {APP_VERSION}
           </span>
           <span>⚡ Multi-Cloud AI Gateway with Instant Failover</span>
           <ChevronRight className="w-3 h-3 opacity-70" />
@@ -62,13 +63,28 @@ export function Hero({ onOpenCheckout }: HeroProps) {
         </Link>
 
         {/* Live Chatbot Demo Trigger */}
-        <a
-          href="#widget"
+        <button
+          type="button"
+          onClick={() => {
+            if (typeof window !== "undefined") {
+              const widgetBox = document.getElementById("zr-widget-box");
+              const widgetBtn = document.getElementById("zr-widget-btn");
+              if (widgetBox && widgetBox.style.display !== "flex") {
+                if (widgetBtn) widgetBtn.click();
+              } else if (widgetBtn) {
+                widgetBtn.click();
+              }
+              const inputField = document.getElementById("zr-input");
+              if (inputField) {
+                setTimeout(() => inputField.focus(), 100);
+              }
+            }
+          }}
           className="inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/30 rounded-xl transition-all active:scale-95 cursor-pointer touch-manipulation min-h-[44px]"
         >
           <MessageSquare className="w-4 h-4 text-red-400" />
           <span>Test Chatbot Demo</span>
-        </a>
+        </button>
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 text-xs text-slate-400 font-medium pt-1">

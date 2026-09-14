@@ -397,35 +397,60 @@
     return msgDiv;
   }
 
+  var customTitle = scriptTag ? scriptTag.getAttribute("data-title") : null;
+  var customGreeting = scriptTag ? scriptTag.getAttribute("data-greeting") : null;
+  var customPromptsRaw = scriptTag ? scriptTag.getAttribute("data-prompts") : null;
+  var customColor = scriptTag ? scriptTag.getAttribute("data-color") : null;
+
+  if (customColor) {
+    widgetBtn.style.background = customColor;
+    var sendBtn = document.getElementById("zr-send-btn");
+    if (sendBtn) sendBtn.style.background = customColor;
+  }
+
   // Load Bot Configurations
   fetch(host + "/api/widget/config?bot_id=" + encodeURIComponent(botId))
     .then(function (res) { return res.json(); })
     .then(function (data) {
-      if (data && data.bot) {
-        botTitleElem.textContent = data.bot.botTitle || "ZeroRoute AI";
-        if (data.bot.greeting) {
-          appendMessage("assistant", data.bot.greeting);
-          chatHistory.push({ role: "assistant", content: data.bot.greeting });
-        }
-        if (Array.isArray(data.bot.prompts) && data.bot.prompts.length > 0) {
-          suggestionsContainer.innerHTML = "";
-          data.bot.prompts.forEach(function (promptText) {
-            var pill = document.createElement("button");
-            pill.className = "zr-pill";
-            pill.textContent = promptText;
-            pill.type = "button";
-            pill.addEventListener("click", function () {
-              sendMessage(promptText);
-              suggestionsContainer.style.display = "none";
-            });
-            suggestionsContainer.appendChild(pill);
+      var bot = (data && data.bot) || {};
+      var title = customTitle || bot.botTitle || "ZeroRoute AI";
+      var greeting = customGreeting || bot.greeting || "Hi! 👋 Welcome to ZeroRoute. How can I help you today?";
+      var promptList = [];
+      if (customPromptsRaw) {
+        promptList = customPromptsRaw.split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+      } else if (Array.isArray(bot.prompts) && bot.prompts.length > 0) {
+        promptList = bot.prompts;
+      } else {
+        promptList = ["Is it really 100% free?", "How does failover work?", "Show me curl example"];
+      }
+
+      botTitleElem.textContent = title;
+      if (greeting) {
+        appendMessage("assistant", greeting);
+        chatHistory.push({ role: "assistant", content: greeting });
+      }
+
+      if (promptList.length > 0) {
+        suggestionsContainer.innerHTML = "";
+        promptList.forEach(function (promptText) {
+          var pill = document.createElement("button");
+          pill.className = "zr-pill";
+          pill.textContent = promptText;
+          pill.type = "button";
+          pill.addEventListener("click", function () {
+            sendMessage(promptText);
+            suggestionsContainer.style.display = "none";
           });
-        }
+          suggestionsContainer.appendChild(pill);
+        });
       }
     })
     .catch(function (err) {
       console.warn("[ZeroRoute Widget] Failed to load config:", err);
-      appendMessage("assistant", "Hello! How can I assist you today?");
+      var title = customTitle || "ZeroRoute AI";
+      var greeting = customGreeting || "Hi! 👋 Welcome to ZeroRoute. How can I assist you today?";
+      botTitleElem.textContent = title;
+      appendMessage("assistant", greeting);
     });
 
   async function sendMessage(text) {
