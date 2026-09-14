@@ -1,0 +1,420 @@
+(function () {
+  "use strict";
+
+  // Prevent multiple initializations
+  if (window.__ZeroRouteWidgetLoaded) return;
+  window.__ZeroRouteWidgetLoaded = true;
+
+  // Find script element and extract bot ID and host
+  var scriptTag = document.currentScript || (function () {
+    var scripts = document.getElementsByTagName("script");
+    return scripts[scripts.length - 1];
+  })();
+
+  var botId = scriptTag ? scriptTag.getAttribute("data-bot-id") : null;
+  var customHost = scriptTag ? scriptTag.getAttribute("data-host") : null;
+  var host = customHost || (scriptTag && scriptTag.src ? new URL(scriptTag.src).origin : window.location.origin);
+
+  if (!botId) {
+    console.warn("[ZeroRoute Widget] Missing data-bot-id attribute on script tag.");
+    return;
+  }
+
+  // Inject CSS Styles
+  var style = document.createElement("style");
+  style.textContent = `
+    #zr-widget-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 2147483647;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    #zr-widget-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      box-shadow: 0 8px 24px rgba(239, 68, 68, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+    }
+    #zr-widget-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 12px 28px rgba(239, 68, 68, 0.6);
+    }
+    #zr-widget-btn svg {
+      width: 26px;
+      height: 26px;
+      fill: #ffffff;
+      transition: transform 0.2s ease;
+    }
+    #zr-widget-box {
+      position: absolute;
+      bottom: 72px;
+      right: 0;
+      width: 380px;
+      height: 560px;
+      max-height: calc(100vh - 100px);
+      max-width: calc(100vw - 32px);
+      background: #080a0f;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(239, 68, 68, 0.15);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      animation: zrFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes zrFadeIn {
+      from { opacity: 0; transform: translateY(16px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    #zr-header {
+      padding: 14px 18px;
+      background: rgba(12, 16, 26, 0.92);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    #zr-header .title {
+      font-weight: 700;
+      font-size: 14.5px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: -0.01em;
+    }
+    #zr-header .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #10b981;
+    }
+    #zr-header .close-btn {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    #zr-header .close-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    #zr-messages {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scroll-behavior: smooth;
+    }
+    .zr-msg {
+      max-width: 85%;
+      padding: 11px 15px;
+      font-size: 13.5px;
+      line-height: 1.55;
+      border-radius: 16px;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+    .zr-msg.bot {
+      align-self: flex-start;
+      background: #111622;
+      color: #e2e8f0;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-bottom-left-radius: 4px;
+    }
+    .zr-msg.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: #ffffff;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+    }
+    .zr-cursor {
+      display: inline-block;
+      width: 3px;
+      height: 14px;
+      background: #ef4444;
+      margin-left: 3px;
+      vertical-align: middle;
+      animation: zrBlink 0.8s infinite;
+    }
+    @keyframes zrBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    #zr-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 0 16px 12px 16px;
+    }
+    .zr-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #94a3b8;
+      font-size: 11.5px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .zr-pill:hover {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+    #zr-input-area {
+      padding: 12px 16px;
+      background: rgba(12, 16, 26, 0.95);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      gap: 8px;
+    }
+    #zr-input {
+      flex: 1;
+      background: #080a0f;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 10px 14px;
+      color: #ffffff;
+      font-size: 13.5px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    #zr-input:focus {
+      border-color: #ef4444;
+    }
+    #zr-send-btn {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      border: none;
+      border-radius: 12px;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #ffffff;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+    #zr-send-btn:hover {
+      transform: scale(1.05);
+    }
+    #zr-send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    #zr-footer {
+      font-size: 10px;
+      color: #64748b;
+      text-align: center;
+      padding: 6px 0 8px 0;
+      background: #080a0f;
+      border-top: 1px solid rgba(255, 255, 255, 0.03);
+    }
+    #zr-footer a {
+      color: #ef4444;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Widget Container
+  var container = document.createElement("div");
+  container.id = "zr-widget-container";
+
+  container.innerHTML = `
+    <div id="zr-widget-box">
+      <div id="zr-header">
+        <div class="title">
+          <div class="status-dot"></div>
+          <span id="zr-bot-title">AI Assistant</span>
+        </div>
+        <button class="close-btn" id="zr-close-btn" aria-label="Close chat">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="zr-messages"></div>
+      <div id="zr-suggestions"></div>
+      <form id="zr-input-area">
+        <input type="text" id="zr-input" placeholder="Type a message..." autocomplete="off" />
+        <button type="submit" id="zr-send-btn" aria-label="Send message">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+        </button>
+      </form>
+      <div id="zr-footer">
+        Powered by <a href="https://zeroroute.mapki.in" target="_blank" rel="noopener">ZeroRoute Multi-Cloud</a>
+      </div>
+    </div>
+    <button id="zr-widget-btn" aria-label="Open chat">
+      <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+    </button>
+  `;
+  document.body.appendChild(container);
+
+  var widgetBtn = document.getElementById("zr-widget-btn");
+  var widgetBox = document.getElementById("zr-widget-box");
+  var closeBtn = document.getElementById("zr-close-btn");
+  var messagesContainer = document.getElementById("zr-messages");
+  var suggestionsContainer = document.getElementById("zr-suggestions");
+  var inputForm = document.getElementById("zr-input-area");
+  var inputField = document.getElementById("zr-input");
+  var botTitleElem = document.getElementById("zr-bot-title");
+
+  var isOpen = false;
+  var chatHistory = [];
+
+  function toggleChat() {
+    isOpen = !isOpen;
+    widgetBox.style.display = isOpen ? "flex" : "none";
+    if (isOpen) {
+      inputField.focus();
+      scrollToBottom();
+    }
+  }
+
+  widgetBtn.addEventListener("click", toggleChat);
+  closeBtn.addEventListener("click", toggleChat);
+
+  function scrollToBottom() {
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+
+  function appendMessage(role, text) {
+    var msgDiv = document.createElement("div");
+    msgDiv.className = "zr-msg " + (role === "user" ? "user" : "bot");
+    msgDiv.textContent = text;
+    messagesContainer.appendChild(msgDiv);
+    scrollToBottom();
+    return msgDiv;
+  }
+
+  // Load Bot Configurations
+  fetch(host + "/api/widget/config?bot_id=" + encodeURIComponent(botId))
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      if (data && data.bot) {
+        botTitleElem.textContent = data.bot.botTitle || "ZeroRoute AI";
+        if (data.bot.greeting) {
+          appendMessage("assistant", data.bot.greeting);
+          chatHistory.push({ role: "assistant", content: data.bot.greeting });
+        }
+        if (Array.isArray(data.bot.prompts) && data.bot.prompts.length > 0) {
+          suggestionsContainer.innerHTML = "";
+          data.bot.prompts.forEach(function (promptText) {
+            var pill = document.createElement("button");
+            pill.className = "zr-pill";
+            pill.textContent = promptText;
+            pill.type = "button";
+            pill.addEventListener("click", function () {
+              sendMessage(promptText);
+              suggestionsContainer.style.display = "none";
+            });
+            suggestionsContainer.appendChild(pill);
+          });
+        }
+      }
+    })
+    .catch(function (err) {
+      console.warn("[ZeroRoute Widget] Failed to load config:", err);
+      appendMessage("assistant", "Hello! How can I assist you today?");
+    });
+
+  async function sendMessage(text) {
+    if (!text || !text.trim()) return;
+    var userText = text.trim();
+    inputField.value = "";
+
+    appendMessage("user", userText);
+    chatHistory.push({ role: "user", content: userText });
+
+    var botMsgElem = appendMessage("assistant", "Thinking...");
+
+    try {
+      var res = await fetch(host + "/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Bot-Id": botId
+        },
+        body: JSON.stringify({
+          stream: true,
+          messages: chatHistory
+        })
+      });
+
+      if (!res.ok) {
+        var errJson = await res.json().catch(function () { return {}; });
+        var errMsg = (errJson.error && errJson.error.message) || "Sorry, I am having trouble responding right now.";
+        botMsgElem.textContent = errMsg;
+        return;
+      }
+
+      if (res.body) {
+        var reader = res.body.getReader();
+        var decoder = new TextDecoder();
+        var buffer = "";
+        var currentText = "";
+        botMsgElem.innerHTML = '<span class="zr-cursor"></span>';
+
+        while (true) {
+          var chunk = await reader.read();
+          if (chunk.done) break;
+          buffer += decoder.decode(chunk.value, { stream: true });
+          var lines = buffer.split("\n");
+          buffer = lines.pop() || "";
+
+          for (var i = 0; i < lines.length; i++) {
+            var line = lines[i].trim();
+            if (line.startsWith("data:")) {
+              var jsonStr = line.slice(5).trim();
+              if (jsonStr === "[DONE]") break;
+              try {
+                var parsed = JSON.parse(jsonStr);
+                var content = parsed.choices && parsed.choices[0] && parsed.choices[0].delta && parsed.choices[0].delta.content;
+                if (content) {
+                  currentText += content;
+                  botMsgElem.textContent = currentText;
+                  var cursor = document.createElement("span");
+                  cursor.className = "zr-cursor";
+                  botMsgElem.appendChild(cursor);
+                  scrollToBottom();
+                }
+              } catch (e) {}
+            }
+          }
+        }
+        botMsgElem.textContent = currentText;
+        chatHistory.push({ role: "assistant", content: currentText });
+      }
+    } catch (err) {
+      console.error("[ZeroRoute Chat Error]:", err);
+      botMsgElem.textContent = "Unable to reach server. Please check your connection.";
+    }
+  }
+
+  inputForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    sendMessage(inputField.value);
+  });
+})();
