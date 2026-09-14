@@ -121,13 +121,12 @@
       scroll-behavior: smooth;
     }
     .zr-msg {
-      max-width: 85%;
+      max-width: 88%;
       padding: 11px 15px;
-      font-size: 13.5px;
+      font-size: 13px;
       line-height: 1.55;
       border-radius: 16px;
       word-break: break-word;
-      white-space: pre-wrap;
     }
     .zr-msg.bot {
       align-self: flex-start;
@@ -136,17 +135,63 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-bottom-left-radius: 4px;
     }
+    .zr-msg.bot strong {
+      color: #ffffff;
+      font-weight: 700;
+    }
+    .zr-msg.bot em {
+      color: #f1f5f9;
+      font-style: italic;
+    }
+    .zr-msg.bot a {
+      color: #f87171;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-weight: 600;
+      transition: color 0.15s;
+    }
+    .zr-msg.bot a:hover {
+      color: #fca5a5;
+    }
+    .zr-msg.bot p {
+      margin: 0 0 8px 0;
+    }
+    .zr-msg.bot p:last-child {
+      margin-bottom: 0;
+    }
     .zr-msg.user {
       align-self: flex-end;
       background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
       color: #ffffff;
       border-bottom-right-radius: 4px;
       box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+      white-space: pre-wrap;
+    }
+    .zr-inline-code {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fca5a5;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .zr-code-block {
+      background: #06080d;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 11.5px;
+      overflow-x: auto;
+      margin: 6px 0;
+      color: #e2e8f0;
+      white-space: pre-wrap;
     }
     .zr-cursor {
       display: inline-block;
-      width: 3px;
-      height: 14px;
+      width: 2px;
+      height: 13px;
       background: #ef4444;
       margin-left: 3px;
       vertical-align: middle;
@@ -292,6 +337,49 @@
   widgetBtn.addEventListener("click", toggleChat);
   closeBtn.addEventListener("click", toggleChat);
 
+  function escapeHtml(str) {
+    if (!str) return "";
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function renderMarkdown(rawText) {
+    if (!rawText) return "";
+    var escaped = escapeHtml(rawText);
+
+    // Code blocks ```code```
+    escaped = escaped.replace(/```([a-zA-Z0-9_-]*)\n?([\s\S]*?)```/g, function (m, lang, code) {
+      return '<pre class="zr-code-block"><code>' + code.trim() + '</code></pre>';
+    });
+
+    // Inline code `code`
+    escaped = escaped.replace(/`([^`]+)`/g, '<code class="zr-inline-code">$1</code>');
+
+    // Bold **text** or __text__
+    escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<strong class="zr-bold">$1</strong>');
+    escaped = escaped.replace(/__([^_]+)__/g, '<strong class="zr-bold">$1</strong>');
+
+    // Italic *text* or _text_
+    escaped = escaped.replace(/\*([^*]+)\*/g, '<em class="zr-italic">$1</em>');
+
+    // Links [text](url)
+    escaped = escaped.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="zr-link">$1</a>');
+
+    // Split paragraphs
+    var paragraphs = escaped.split(/\n\s*\n/);
+    if (paragraphs.length > 1) {
+      return paragraphs.map(function (p) {
+        return '<p>' + p.replace(/\n/g, '<br/>') + '</p>';
+      }).join('');
+    }
+
+    return escaped.replace(/\n/g, '<br/>');
+  }
+
   function scrollToBottom() {
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
   }
@@ -299,7 +387,11 @@
   function appendMessage(role, text) {
     var msgDiv = document.createElement("div");
     msgDiv.className = "zr-msg " + (role === "user" ? "user" : "bot");
-    msgDiv.textContent = text;
+    if (role === "user") {
+      msgDiv.textContent = text;
+    } else {
+      msgDiv.innerHTML = renderMarkdown(text);
+    }
     messagesContainer.appendChild(msgDiv);
     scrollToBottom();
     return msgDiv;
@@ -362,7 +454,7 @@
       if (!res.ok) {
         var errJson = await res.json().catch(function () { return {}; });
         var errMsg = (errJson.error && errJson.error.message) || "Sorry, I am having trouble responding right now.";
-        botMsgElem.textContent = errMsg;
+        botMsgElem.innerHTML = renderMarkdown(errMsg);
         return;
       }
 
@@ -390,22 +482,19 @@
                 var content = parsed.choices && parsed.choices[0] && parsed.choices[0].delta && parsed.choices[0].delta.content;
                 if (content) {
                   currentText += content;
-                  botMsgElem.textContent = currentText;
-                  var cursor = document.createElement("span");
-                  cursor.className = "zr-cursor";
-                  botMsgElem.appendChild(cursor);
+                  botMsgElem.innerHTML = renderMarkdown(currentText) + '<span class="zr-cursor"></span>';
                   scrollToBottom();
                 }
               } catch (e) {}
             }
           }
         }
-        botMsgElem.textContent = currentText;
+        botMsgElem.innerHTML = renderMarkdown(currentText);
         chatHistory.push({ role: "assistant", content: currentText });
       }
     } catch (err) {
       console.error("[ZeroRoute Chat Error]:", err);
-      botMsgElem.textContent = "Unable to reach server. Please check your connection.";
+      botMsgElem.innerHTML = renderMarkdown("Unable to reach server. Please check your connection.");
     }
   }
 

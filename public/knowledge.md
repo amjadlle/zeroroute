@@ -25,7 +25,7 @@ ZeroRoute is an open-source, $0/mo multi-cloud AI gateway that aggregates free-t
 Add a single script tag before `</body>`:
 ```html
 <script 
-  src="https://your-domain.com/widget.js" 
+  src="https://zeroroute.mapki.in/widget.js" 
   data-title="ZeroRoute AI" 
   data-greeting="Hi! How can I help you?"
   data-color="#ef4444"
@@ -33,21 +33,12 @@ Add a single script tag before `</body>`:
 </script>
 ```
 
-Optional widget attributes:
-- `data-persona="You are a helpful support agent."` (Inline prompt)
-- `data-persona-url="https://site.com/persona.md"` (Remote prompt file)
-- `data-knowledge="Hours: 9am-5pm. Email: contact@site.com"` (Inline facts)
-- `data-knowledge-url="https://site.com/knowledge.md"` (Remote knowledge file)
-- `data-key="your-router-key"` (If authentication is required)
-
-## Deployment Options
-- **Cloudflare Pages**: 1-click Edge deployment (`functions/[[path]].ts` + `public/`) with 100k free requests/day (no credit card required).
-- **Vercel**: 1-click Serverless edge deployment (`api/index.ts` + `vercel.json`).
-- **Render**: 1-click Web Service deployment (`render.yaml`).
-- **Docker / VPS**: `docker compose up -d` or `docker build -t zeroroute .` (AWS EC2, Azure VM, Oracle Cloud).
-- **Local Node.js**: `npm run build && npm start` (port 8787).
+## Deployment & Hosting
+- **Vercel**: Native Next.js 16 Serverless edge deployment (`https://zeroroute.mapki.in`).
+- **Docker / VPS**: `docker compose up -d` or `docker build -t zeroroute .` (AWS, Azure, DigitalOcean).
+- **Local Development**: `npm run dev` or `npm run build && npm start`.
 
 ## Links
-- **GitHub**: https://github.com/amjadlle/zeroroute
-- **Documentation**: https://github.com/amjadlle/zeroroute/blob/main/docs/ARCHITECTURE.md
+- **Official SaaS**: https://zeroroute.mapki.in
+- **GitHub Repository**: https://github.com/amjadlle/zeroroute
 - **License**: MIT License
