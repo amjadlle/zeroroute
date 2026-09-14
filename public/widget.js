@@ -11,14 +11,10 @@
     return scripts[scripts.length - 1];
   })();
 
-  var botId = scriptTag ? scriptTag.getAttribute("data-bot-id") : null;
+  var botId = scriptTag ? scriptTag.getAttribute("data-bot-id") : "demo";
+  if (!botId) botId = "demo";
   var customHost = scriptTag ? scriptTag.getAttribute("data-host") : null;
-  var host = customHost || (scriptTag && scriptTag.src ? new URL(scriptTag.src).origin : window.location.origin);
-
-  if (!botId) {
-    console.warn("[ZeroRoute Widget] Missing data-bot-id attribute on script tag.");
-    return;
-  }
+  var host = customHost || (scriptTag && scriptTag.src && scriptTag.src.startsWith("http") ? new URL(scriptTag.src).origin : (typeof window !== "undefined" ? window.location.origin : ""));
 
   // Inject CSS Styles
   var style = document.createElement("style");

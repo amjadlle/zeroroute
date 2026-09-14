@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { Copy, Check, Sparkles, MessageSquare } from "lucide-react";
@@ -87,8 +87,10 @@ export function ChatWidgetSection() {
             type="button"
             onClick={() => {
               if (typeof window !== "undefined") {
-                const trigger = document.getElementById("zr-chat-bubble");
-                if (trigger) trigger.click();
+                const trigger = document.getElementById("zr-widget-btn") || document.getElementById("zr-chat-bubble");
+                if (trigger) {
+                  trigger.click();
+                }
               }
             }}
             className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold bg-red-600 hover:bg-red-500 text-white rounded-xl shadow-lg shadow-red-500/25 transition-all active:scale-95 cursor-pointer"

@@ -20,6 +20,24 @@ export async function GET(request: Request) {
 
     const row = res.rows[0] as any;
     if (!row) {
+      if (botId === "demo" || botId === "zeroroute" || botId === "default") {
+        return NextResponse.json({
+          success: true,
+          bot: {
+            botTitle: "ZeroRoute AI Assistant",
+            botRole: "Customer Support & AI Specialist",
+            greeting: "Hi! 👋 Welcome to ZeroRoute. Ask me anything about multi-cloud routing, free AI tiers, or embedding our 1-line chatbot!",
+            prompts: ["Is it really 100% free?", "How does automatic failover work?", "How do I embed on my site?"],
+            company: "ZeroRoute",
+            status: "active"
+          }
+        }, {
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Cache-Control": "public, max-age=60, s-maxage=120"
+          }
+        });
+      }
       return NextResponse.json({ error: "Bot not found" }, { status: 404 });
     }
 
