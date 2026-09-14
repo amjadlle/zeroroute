@@ -1,4 +1,37 @@
 import { getDb } from "../db";
+import fs from "fs";
+import path from "path";
+
+let defaultKnowledgeCache: string | null = null;
+let defaultPersonaCache: string | null = null;
+
+export function getDefaultLandingKnowledge(): { knowledge: string; persona: string } {
+  if (defaultKnowledgeCache === null) {
+    try {
+      const p = path.join(process.cwd(), "public", "knowledge.md");
+      if (fs.existsSync(p)) {
+        defaultKnowledgeCache = fs.readFileSync(p, "utf-8");
+      }
+    } catch {}
+    if (!defaultKnowledgeCache) {
+      defaultKnowledgeCache = `# ZeroRoute Knowledge Base\nZeroRoute is an open-source, $0/mo multi-cloud AI gateway that aggregates free-tier API quotas from 8 cloud providers into one OpenAI-compatible endpoint with automatic failover and an embeddable 1-line website chatbot.`;
+    }
+  }
+
+  if (defaultPersonaCache === null) {
+    try {
+      const p = path.join(process.cwd(), "public", "persona.md");
+      if (fs.existsSync(p)) {
+        defaultPersonaCache = fs.readFileSync(p, "utf-8");
+      }
+    } catch {}
+    if (!defaultPersonaCache) {
+      defaultPersonaCache = `You are the official AI assistant for ZeroRoute. Be concise, direct, helpful, and friendly.`;
+    }
+  }
+
+  return { knowledge: defaultKnowledgeCache, persona: defaultPersonaCache };
+}
 
 export interface SystemPromptOptions {
   companyName?: string | null;

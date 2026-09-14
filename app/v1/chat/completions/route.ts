@@ -5,7 +5,7 @@ import { getDb } from "@/lib/db";
 import { isRateLimited } from "@/lib/auth/rate-limit";
 import { getEligibleProviders, TIMEOUT_MS, COOLDOWN_MS } from "@/lib/providers/state";
 import { responseCache } from "@/lib/providers/cache";
-import { buildDynamicSystemPrompt, retrieveKnowledgeContext } from "@/lib/providers/rag";
+import { buildDynamicSystemPrompt, retrieveKnowledgeContext, getDefaultLandingKnowledge } from "@/lib/providers/rag";
 import type { ChatRequest, ChatResponse } from "@/lib/providers/types";
 
 export const dynamic = "force-dynamic";
@@ -188,8 +188,16 @@ export async function POST(request: Request) {
   // 4. Dynamic System Prompt & RAG Context Injection
   const lastUserMsg = [...body.messages].reverse().find(m => m.role === "user")?.content || "";
   let ragContext = "";
+  let defaultKnowledge = "";
+  let defaultPersona = "";
+
   if (customerKey) {
     ragContext = await retrieveKnowledgeContext(customerKey, lastUserMsg, 2500);
+  } else {
+    const defaults = getDefaultLandingKnowledge();
+    defaultKnowledge = defaults.knowledge;
+    defaultPersona = defaults.persona;
+    ragContext = defaultKnowledge;
   }
 
   let promptList: string[] = [];
@@ -198,13 +206,13 @@ export async function POST(request: Request) {
   } catch {}
 
   const dynamicSystemPrompt = buildDynamicSystemPrompt({
-    companyName: customer?.company || customer?.name,
-    botTitle: customer?.bot_title,
-    botRole: customer?.bot_role,
-    tone: customer?.tone,
-    greeting: customer?.greeting,
-    prompts: promptList,
-    customPersona: customer?.persona,
+    companyName: customer?.company || customer?.name || "ZeroRoute",
+    botTitle: customer?.bot_title || "ZeroRoute AI Assistant",
+    botRole: customer?.bot_role || "ZeroRoute AI & Multi-Cloud Specialist",
+    tone: customer?.tone || "friendly, concise, and developer-focused",
+    greeting: customer?.greeting || "Hi! 👋 Welcome to ZeroRoute. How can I help you today?",
+    prompts: promptList.length > 0 ? promptList : ["Is it really 100% free?", "How does failover work?", "Show me curl example"],
+    customPersona: customer?.persona || defaultPersona,
     knowledgeContext: ragContext
   });
 
