@@ -79,9 +79,9 @@ let initialized = false;
 export const getDb = (): DatabaseAdapter => {
   if (activeAdapter) return activeAdapter;
 
-  const cfAccountId = process.env.CLOUDFLARE_ACCOUNT_ID || process.env.CF_ACCOUNT_ID;
-  const cfDatabaseId = process.env.CLOUDFLARE_D1_DATABASE_ID || process.env.CLOUDFLARE_D1_DATABASE_II || process.env.CF_D1_DATABASE_ID;
-  const cfD1Token = process.env.CLOUDFLARE_D1_TOKEN || process.env.CF_D1_TOKEN || process.env.CLOUDFLARE_API_TOKEN;
+  const cfAccountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+  const cfDatabaseId = process.env.CLOUDFLARE_D1_DATABASE_ID;
+  const cfD1Token = process.env.CLOUDFLARE_D1_TOKEN;
 
   // Use Cloudflare D1 when explicitly configured with a D1 token
   if ((process.env.USE_CLOUDFLARE_D1 === "true" || cfD1Token) && cfAccountId && cfDatabaseId && cfD1Token) {
