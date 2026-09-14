@@ -28,7 +28,10 @@ export const metadata: Metadata = {
   title: "ZeroRoute — $0/mo Multi-Cloud AI Gateway for Solo Founders & Startups",
   description: "Never pay for LLMs again. One OpenAI-compatible endpoint with automatic failover across 8 free cloud AI providers and a 1-line website chatbot widget.",
   icons: {
-    icon: "/favicon.png",
+    icon: [
+      { url: "/favicon.png", sizes: "any" },
+      { url: "/icon.png", type: "image/png" }
+    ],
     shortcut: "/logo.png",
     apple: "/apple-touch-icon.png",
   },
