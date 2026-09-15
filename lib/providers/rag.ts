@@ -81,6 +81,17 @@ export function buildDynamicSystemPrompt(options: SystemPromptOptions): string {
   return sections.join("\n\n");
 }
 
+interface DocCacheEntry {
+  docs: any[];
+  expiresAt: number;
+}
+const docCache = new Map<string, DocCacheEntry>();
+
+export function invalidateDocCache(customerKey?: string) {
+  if (customerKey) docCache.delete(customerKey);
+  else docCache.clear();
+}
+
 export async function retrieveKnowledgeContext(
   customerKey: string,
   userQuery: string,
@@ -89,13 +100,21 @@ export async function retrieveKnowledgeContext(
   if (!customerKey || !userQuery || !userQuery.trim()) return "";
 
   try {
-    const db = getDb();
-    const result = await db.execute({
-      sql: `SELECT title, content, type FROM knowledge_documents WHERE customer_key = ? ORDER BY created_at DESC LIMIT 50`,
-      args: [customerKey]
-    });
+    let rows: any[] = [];
+    const cached = docCache.get(customerKey);
+    if (cached && Date.now() < cached.expiresAt) {
+      rows = cached.docs;
+    } else {
+      const db = getDb();
+      const result = await db.execute({
+        sql: `SELECT title, content, type FROM knowledge_documents WHERE customer_key = ? ORDER BY created_at DESC LIMIT 50`,
+        args: [customerKey]
+      });
+      rows = result.rows || [];
+      docCache.set(customerKey, { docs: rows, expiresAt: Date.now() + 60_000 });
+    }
 
-    if (!result.rows || result.rows.length === 0) return "";
+    if (!rows || rows.length === 0) return "";
 
     const cleanTokens = userQuery
       .toLowerCase()
@@ -103,7 +122,7 @@ export async function retrieveKnowledgeContext(
       .split(/\s+/)
       .filter(t => t.length > 2);
 
-    const scoredDocs = result.rows.map((row: any) => {
+    const scoredDocs = rows.map((row: any) => {
       const content = String(row.content || "");
       const title = String(row.title || "");
       const lowerText = (title + " " + content).toLowerCase();
@@ -122,7 +141,7 @@ export async function retrieveKnowledgeContext(
       };
     });
 
-    scoredDocs.sort((a, b) => b.score - a.score);
+    scoredDocs.sort((a: { score: number }, b: { score: number }) => b.score - a.score);
 
     let collectedText = "";
     for (const doc of scoredDocs) {

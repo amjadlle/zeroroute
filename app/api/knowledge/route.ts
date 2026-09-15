@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, getCustomerByTokenOrKey } from "@/lib/auth/session";
 import { getDb, initDb } from "@/lib/db";
 
@@ -78,6 +78,11 @@ export async function POST(req: NextRequest) {
       args: [id, customer.key, title, type, content, content.length, source_url, now],
     });
 
+    try {
+      const { invalidateDocCache } = await import("@/lib/providers/rag");
+      invalidateDocCache(customer.key);
+    } catch {}
+
     return NextResponse.json({
       success: true,
       message: "Knowledge document added successfully!",
@@ -126,6 +131,11 @@ export async function DELETE(req: NextRequest) {
       sql: "DELETE FROM knowledge_documents WHERE id = ? AND customer_key = ?",
       args: [id, customer.key],
     });
+
+    try {
+      const { invalidateDocCache } = await import("@/lib/providers/rag");
+      invalidateDocCache(customer.key);
+    } catch {}
 
     return NextResponse.json({
       success: true,

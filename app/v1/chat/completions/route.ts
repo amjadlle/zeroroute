@@ -25,6 +25,12 @@ export async function OPTIONS(request: Request) {
   });
 }
 
+interface CustomerLookupEntry {
+  customer: any;
+  expiresAt: number;
+}
+const customerLookupCache = new Map<string, CustomerLookupEntry>();
+
 export async function POST(request: Request) {
   const startTime = Date.now();
   const origin = request.headers.get("origin") || request.headers.get("referer") || "Direct API";
@@ -58,31 +64,49 @@ export async function POST(request: Request) {
   let customerKey = bearerToken.startsWith("zr_live_") ? bearerToken : undefined;
 
   let customer: any = null;
+  const lookupIdentifier = customerKey || rawBotId || (bearerToken && bearerToken.length > 5 && !isMasterKey ? bearerToken : null);
 
-  // Resolve customer by key or bot ID
-  if (customerKey) {
-    const res = await db.execute({
-      sql: `SELECT * FROM customers WHERE key = ? LIMIT 1`,
-      args: [customerKey]
-    });
-    customer = res.rows[0] || null;
-  } else if (rawBotId) {
-    const res = await db.execute({
-      sql: `SELECT * FROM customers WHERE bot_id = ? LIMIT 1`,
-      args: [rawBotId]
-    });
-    customer = res.rows[0] || null;
-    if (customer) {
-      customerKey = customer.key;
+  if (lookupIdentifier) {
+    const cached = customerLookupCache.get(lookupIdentifier);
+    if (cached && Date.now() < cached.expiresAt) {
+      customer = cached.customer;
+      if (customer) customerKey = customer.key;
     }
-  } else if (bearerToken && bearerToken.length > 5 && !isMasterKey) {
-    const res = await db.execute({
-      sql: `SELECT * FROM customers WHERE key = ? LIMIT 1`,
-      args: [bearerToken]
-    });
-    customer = res.rows[0] || null;
+  }
+
+  // Resolve customer by key or bot ID if not in memory cache
+  if (!customer && lookupIdentifier) {
+    const db = getDb();
+    if (customerKey) {
+      const res = await db.execute({
+        sql: `SELECT * FROM customers WHERE key = ? LIMIT 1`,
+        args: [customerKey]
+      });
+      customer = res.rows[0] || null;
+    } else if (rawBotId) {
+      const res = await db.execute({
+        sql: `SELECT * FROM customers WHERE bot_id = ? LIMIT 1`,
+        args: [rawBotId]
+      });
+      customer = res.rows[0] || null;
+      if (customer) {
+        customerKey = customer.key;
+      }
+    } else if (bearerToken && bearerToken.length > 5 && !isMasterKey) {
+      const res = await db.execute({
+        sql: `SELECT * FROM customers WHERE key = ? LIMIT 1`,
+        args: [bearerToken]
+      });
+      customer = res.rows[0] || null;
+      if (customer) {
+        customerKey = customer.key;
+      }
+    }
+
     if (customer) {
-      customerKey = customer.key;
+      customerLookupCache.set(lookupIdentifier, { customer, expiresAt: Date.now() + 60_000 });
+      if (customer.key) customerLookupCache.set(customer.key, { customer, expiresAt: Date.now() + 60_000 });
+      if (customer.bot_id) customerLookupCache.set(customer.bot_id, { customer, expiresAt: Date.now() + 60_000 });
     }
   }
 
@@ -182,7 +206,7 @@ export async function POST(request: Request) {
     db.execute({
       sql: `UPDATE customers SET monthly_requests = monthly_requests + 1, updated_at = ? WHERE key = ?`,
       args: [Date.now(), customer.key]
-    }).catch(err => console.error("[DB Usage Update Error]:", err));
+    }).catch((err: unknown) => console.error("[DB Usage Update Error]:", err));
   }
 
   // 4. Dynamic System Prompt & RAG Context Injection
@@ -351,7 +375,7 @@ export async function POST(request: Request) {
                     0,
                     0
                   ]
-                }).catch(e => console.error("[Telemetry Log Error]:", e));
+                }).catch((e: unknown) => console.error("[Telemetry Log Error]:", e));
               } catch (err) {
                 console.error("[Stream Pipe Error]:", err);
                 controller.close();
@@ -427,7 +451,7 @@ export async function POST(request: Request) {
             result.usage?.completion_tokens || 0,
             result.usage?.total_tokens || 0
           ]
-        }).catch(e => console.error("[Telemetry Log Error]:", e));
+        }).catch((e: unknown) => console.error("[Telemetry Log Error]:", e));
 
         providerSuccess = true;
         return NextResponse.json(result, {

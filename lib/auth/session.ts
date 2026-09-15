@@ -26,10 +26,18 @@ export function isMasterAdminKey(token: string): boolean {
   return false;
 }
 
-export async function getCurrentUser(): Promise<Customer | null> {
-  await initDb();
-  const db = getDb();
+interface SessionCacheEntry {
+  customer: Customer;
+  expiresAt: number;
+}
+const sessionCache = new Map<string, SessionCacheEntry>();
 
+export function invalidateSessionCache(tokenOrKey?: string) {
+  if (tokenOrKey) sessionCache.delete(tokenOrKey);
+  else sessionCache.clear();
+}
+
+export async function getCurrentUser(): Promise<Customer | null> {
   const cookieStore = await cookies();
   const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
@@ -55,6 +63,15 @@ export async function getCurrentUser(): Promise<Customer | null> {
     } as Customer;
   }
 
+  // Check in-memory cache (30s TTL)
+  const cached = sessionCache.get(sessionToken);
+  if (cached && Date.now() < cached.expiresAt) {
+    return cached.customer;
+  }
+
+  await initDb();
+  const db = getDb();
+
   const result = await db.execute({
     sql: "SELECT * FROM customers WHERE session_token = ? LIMIT 1",
     args: [sessionToken],
@@ -64,7 +81,9 @@ export async function getCurrentUser(): Promise<Customer | null> {
     return null;
   }
 
-  return result.rows[0] as unknown as Customer;
+  const customer = result.rows[0] as unknown as Customer;
+  sessionCache.set(sessionToken, { customer, expiresAt: Date.now() + 30_000 });
+  return customer;
 }
 
 export async function getSessionFromCookie(): Promise<Customer | null> {
@@ -121,8 +140,6 @@ export async function resolveAuth(headerOrToken?: string): Promise<{
 
 export async function getCustomerByTokenOrKey(token: string): Promise<Customer | null> {
   if (!token) return null;
-  await initDb();
-  const db = getDb();
 
   if (isMasterAdminKey(token)) {
     return {
@@ -141,13 +158,23 @@ export async function getCustomerByTokenOrKey(token: string): Promise<Customer |
     } as Customer;
   }
 
+  const cached = sessionCache.get(token);
+  if (cached && Date.now() < cached.expiresAt) {
+    return cached.customer;
+  }
+
+  await initDb();
+  const db = getDb();
+
   const result = await db.execute({
     sql: "SELECT * FROM customers WHERE key = ? OR session_token = ? OR id = ? LIMIT 1",
     args: [token, token, token],
   });
 
   if (result.rows.length > 0) {
-    return result.rows[0] as unknown as Customer;
+    const customer = result.rows[0] as unknown as Customer;
+    sessionCache.set(token, { customer, expiresAt: Date.now() + 30_000 });
+    return customer;
   }
 
   return null;
