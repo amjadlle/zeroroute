@@ -112,6 +112,12 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
 
             <ul className="space-y-3 text-xs sm:text-sm text-slate-200 pt-4 border-t border-white/10">
               <li className="flex items-center gap-2.5">
+                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>
+                  <strong>10,000 Monthly AI Requests</strong> (~330 req/day included)
+                </span>
+              </li>
+              <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-red-400 shrink-0" />
                 <span>
                   <strong>Instant 1-Key Access</strong> (Zero setup or API keys needed)

@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS customers (
   status TEXT DEFAULT 'active',
   subscription_expires INTEGER,
   monthly_requests INTEGER DEFAULT 0,
-  monthly_limit INTEGER DEFAULT 2000,
+  monthly_limit INTEGER DEFAULT 10000,
   period_start INTEGER,
   period_end INTEGER,
   bot_id TEXT UNIQUE,

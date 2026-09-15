@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
           id, key, email, name, company, bot_id, status,
           subscription_expires, monthly_requests, monthly_limit,
           session_token, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, 0, 2000, ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, 0, 10000, ?, ?, ?)`,
         args: [
           id,
           key,
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
         status: "active",
         session_token: sessionToken,
         monthly_requests: 0,
-        monthly_limit: 2000,
+        monthly_limit: 10000,
         created_at: now,
         updated_at: now,
       } as any;

@@ -17,7 +17,7 @@ export function BillingModal({
   onClose,
   daysRemaining,
   monthlyRequests = 0,
-  monthlyLimit = 2000,
+  monthlyLimit = 10000,
   email,
 }: BillingModalProps) {
   useEffect(() => {

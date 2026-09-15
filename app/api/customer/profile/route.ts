@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
         subscription_expires: customer.subscription_expires,
         days_remaining: daysRemaining,
         monthly_requests: customer.monthly_requests || 0,
-        monthly_limit: customer.monthly_limit || 2000,
+        monthly_limit: customer.monthly_limit || 10000,
         bot_id: customer.bot_id || "",
         knowledge_docs_count: docCount,
         created_at: customer.created_at,

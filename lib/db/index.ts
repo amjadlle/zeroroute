@@ -137,7 +137,7 @@ export const initDb = async (): Promise<void> => {
           status TEXT DEFAULT 'active',
           subscription_expires INTEGER,
           monthly_requests INTEGER DEFAULT 0,
-          monthly_limit INTEGER DEFAULT 2000,
+          monthly_limit INTEGER DEFAULT 10000,
           period_start INTEGER,
           period_end INTEGER,
           bot_id TEXT UNIQUE,
@@ -208,6 +208,11 @@ export const initDb = async (): Promise<void> => {
       db.execute(`CREATE INDEX IF NOT EXISTS idx_knowledge_customer ON knowledge_documents(customer_key);`),
       db.execute(`CREATE INDEX IF NOT EXISTS idx_logs_customer ON request_logs(customer_key);`),
     ]);
+
+    // Auto-upgrade existing customers to 10,000 monthly limit
+    try {
+      await db.execute(`UPDATE customers SET monthly_limit = 10000 WHERE monthly_limit = 2000 OR monthly_limit IS NULL;`);
+    } catch {}
 
     initialized = true;
   })();

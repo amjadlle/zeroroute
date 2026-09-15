@@ -37,7 +37,7 @@ const FAQS: FAQItem[] = [
   {
     question: "How does the 3-day free trial work for Starter Pro?",
     answer:
-      "You get complete access to 2,000 monthly chat requests, hosted Cloudflare D1 SQL database, 5-in-1 live knowledge sync, and website chatbot widget for 3 full days completely free. You can cancel anytime before the trial ends without being charged.",
+      "You get complete access to 10,000 monthly chat requests, hosted Cloudflare D1 SQL database, 5-in-1 live knowledge sync, and website chatbot widget for 3 full days completely free. You can cancel anytime before the trial ends without being charged.",
   },
 ];
 

@@ -223,20 +223,20 @@ export function OverviewTab({
               Monthly Request Usage
             </span>
             <span className="text-xs font-mono text-slate-400">
-              {Math.round((monthlyRequests / (monthlyLimit || 2000)) * 100)}% Used
+              {Math.round((monthlyRequests / (monthlyLimit || 10000)) * 100)}% Used
             </span>
           </div>
 
           <div className="text-3xl font-extrabold text-white font-mono flex items-baseline gap-2">
             <span>{monthlyRequests}</span>
-            <span className="text-sm font-normal text-slate-500">/ {monthlyLimit} monthly requests</span>
+            <span className="text-sm font-normal text-slate-500">/ {monthlyLimit || 10000} monthly requests</span>
           </div>
 
           <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
             <div
               className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500"
               style={{
-                width: `${Math.min(100, Math.max(2, (monthlyRequests / (monthlyLimit || 2000)) * 100))}%`,
+                width: `${Math.min(100, Math.max(2, (monthlyRequests / (monthlyLimit || 10000)) * 100))}%`,
               }}
             />
           </div>

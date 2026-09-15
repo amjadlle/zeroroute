@@ -22,7 +22,7 @@ async function main() {
     "ALTER TABLE customers ADD COLUMN status TEXT DEFAULT 'active';",
     "ALTER TABLE customers ADD COLUMN subscription_expires INTEGER;",
     "ALTER TABLE customers ADD COLUMN monthly_requests INTEGER DEFAULT 0;",
-    "ALTER TABLE customers ADD COLUMN monthly_limit INTEGER DEFAULT 2000;",
+    "ALTER TABLE customers ADD COLUMN monthly_limit INTEGER DEFAULT 10000;",
   ];
 
   for (const sql of colsToAdd) {

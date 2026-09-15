@@ -86,7 +86,7 @@ export async function POST(request: Request) {
           activeBotId = `bot_${crypto.randomBytes(8).toString("hex")}`;
 
           await db.execute({
-            sql: `INSERT INTO customers (id, key, email, name, company, bot_id, status, subscription_expires, monthly_requests, monthly_limit, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, 0, 2000, ?, ?)`,
+            sql: `INSERT INTO customers (id, key, email, name, company, bot_id, status, subscription_expires, monthly_requests, monthly_limit, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, 0, 10000, ?, ?)`,
             args: [id, activeKey, customerEmail, customerName, customerCompany, activeBotId, expiresAt, now, now]
           });
         }

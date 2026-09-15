@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getDb, initDb } from "@/lib/db";
 import {
   generateSalt,
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
         ) VALUES (
           ?, ?, ?, ?, ?, ?, ?,
           'ZeroRoute AI', 'AI Assistant', 'helpful and concise', 'Hi there! How can I help you today?', '[]',
-          'active', ?, 0, 2000,
+          'active', ?, 0, 10000,
           ?, ?, ?, ?,
           ?, ?
         )

@@ -186,7 +186,7 @@ export async function POST(request: Request) {
     }
 
     const currentUsage = Number(customer.monthly_requests || 0);
-    const limit = Number(customer.monthly_limit || 2000);
+    const limit = Number(customer.monthly_limit || 10000);
 
     if (currentUsage >= limit) {
       return NextResponse.json(
