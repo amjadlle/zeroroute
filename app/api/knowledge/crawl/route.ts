@@ -59,26 +59,51 @@ export async function POST(req: NextRequest) {
 
     await initDb();
     const db = getDb();
-
-    const docId = `doc_crawl_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`;
     const now = Date.now();
 
-    await db.execute({
-      sql: `
-        INSERT INTO knowledge_documents (id, customer_key, title, type, content, char_count, source_url, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `,
-      args: [
-        docId,
-        targetKey,
-        crawlResult.title,
-        `web_${crawlResult.sourceType}`,
-        crawlResult.content,
-        crawlResult.charCount,
-        crawlResult.normalizedUrl,
-        now,
-      ],
+    // Check if a document with this source_url already exists for this bot/customer
+    const existing = await db.execute({
+      sql: `SELECT id FROM knowledge_documents WHERE customer_key = ? AND source_url = ? LIMIT 1`,
+      args: [targetKey, crawlResult.normalizedUrl],
     });
+
+    let docId: string;
+    if (existing.rows && existing.rows.length > 0) {
+      docId = (existing.rows[0] as any).id;
+      await db.execute({
+        sql: `
+          UPDATE knowledge_documents 
+          SET title = ?, type = ?, content = ?, char_count = ?, created_at = ?
+          WHERE id = ?
+        `,
+        args: [
+          crawlResult.title,
+          `web_${crawlResult.sourceType}`,
+          crawlResult.content,
+          crawlResult.charCount,
+          now,
+          docId,
+        ],
+      });
+    } else {
+      docId = `doc_crawl_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`;
+      await db.execute({
+        sql: `
+          INSERT INTO knowledge_documents (id, customer_key, title, type, content, char_count, source_url, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `,
+        args: [
+          docId,
+          targetKey,
+          crawlResult.title,
+          `web_${crawlResult.sourceType}`,
+          crawlResult.content,
+          crawlResult.charCount,
+          crawlResult.normalizedUrl,
+          now,
+        ],
+      });
+    }
 
     try {
       const { invalidateDocCache } = await import("@/lib/providers/rag");
@@ -87,7 +112,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Web page crawled and indexed into knowledge base successfully!",
+      message: existing.rows?.length ? "Knowledge source re-synced and updated successfully!" : "Web page crawled and indexed into knowledge base successfully!",
       document: {
         id: docId,
         title: crawlResult.title,

@@ -188,6 +188,34 @@ export function AdminKnowledgeTab({ customers = [] }: AdminKnowledgeTabProps) {
     }
   };
 
+  const [syncingDocId, setSyncingDocId] = useState<string | null>(null);
+
+  const handleSyncDoc = async (doc: KnowledgeDoc) => {
+    if (!doc.source_url) return;
+    setSyncingDocId(doc.id);
+    try {
+      const res = await fetch("/api/knowledge/crawl", {
+        method: "POST",
+        headers: getAdminHeaders(),
+        body: JSON.stringify({ 
+          url: doc.source_url,
+          target_key: selectedKey || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast("🔄 Knowledge synced & updated!");
+        await fetchDocs();
+      } else {
+        showToast(`❌ Sync failed: ${data.error}`);
+      }
+    } catch (e: any) {
+      showToast(`❌ Error: ${e.message}`);
+    } finally {
+      setSyncingDocId(null);
+    }
+  };
+
   const handleDeleteDoc = async (id: string) => {
     try {
       const res = await fetch(`/api/knowledge?id=${id}&target_key=${encodeURIComponent(selectedKey)}`, {
@@ -416,15 +444,30 @@ export function AdminKnowledgeTab({ customers = [] }: AdminKnowledgeTabProps) {
                       </div>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteDoc(doc.id)}
-                      className="p-2 min-w-[44px] min-h-[44px] text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors cursor-pointer shrink-0 flex items-center justify-center touch-manipulation"
-                      title="Delete document"
-                      aria-label="Delete document"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-1 shrink-0">
+                      {doc.source_url && (
+                        <button
+                          type="button"
+                          onClick={() => handleSyncDoc(doc)}
+                          disabled={syncingDocId === doc.id}
+                          className="p-2 min-w-[44px] min-h-[44px] text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-xl transition-colors cursor-pointer shrink-0 flex items-center justify-center touch-manipulation disabled:opacity-50"
+                          title="Re-sync from source URL"
+                          aria-label="Re-sync from source URL"
+                        >
+                          <RotateCw className={`w-4 h-4 ${syncingDocId === doc.id ? "animate-spin text-blue-400" : ""}`} />
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteDoc(doc.id)}
+                        className="p-2 min-w-[44px] min-h-[44px] text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors cursor-pointer shrink-0 flex items-center justify-center touch-manipulation"
+                        title="Delete document"
+                        aria-label="Delete document"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 ))}
 
