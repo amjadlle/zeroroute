@@ -185,7 +185,7 @@ export default function AppDashboard() {
 
       <div className="flex-1 max-w-[1700px] w-full mx-auto px-4 sm:px-8 py-6 space-y-6">
         {/* Navigation Tabs Bar */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-dark-border scrollbar-none text-xs font-semibold">
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-dark-border scrollbar-none text-xs font-semibold -mx-4 px-4 sm:mx-0 sm:px-0 touch-pan-x">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isSelected = activeTab === tab.id;
@@ -194,13 +194,13 @@ export default function AppDashboard() {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition-all whitespace-nowrap cursor-pointer ${
+                className={`flex items-center gap-2 px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all whitespace-nowrap cursor-pointer touch-manipulation shrink-0 ${
                   isSelected
                     ? "bg-red-600/15 text-red-400 border border-red-500/30 font-bold"
                     : "text-slate-400 hover:text-white hover:bg-white/5 border border-transparent"
                 }`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="w-4 h-4 shrink-0" />
                 <span>{tab.label}</span>
               </button>
             );

@@ -61,15 +61,16 @@ export function OverviewTab({
               <button
                 type="button"
                 onClick={() => setShowKey(!showKey)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
+                className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 transition-colors cursor-pointer touch-manipulation"
                 title="Toggle Visibility"
+                aria-label="Toggle Visibility"
               >
-                {showKey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
               <button
                 type="button"
                 onClick={copyApiKey}
-                className="px-3 py-1.5 rounded-xl bg-red-600/15 hover:bg-red-600/25 border border-red-500/30 text-red-300 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="px-3.5 py-2 min-h-[44px] rounded-xl bg-red-600/15 hover:bg-red-600/25 border border-red-500/30 text-red-300 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer touch-manipulation"
               >
                 {copiedKey ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copiedKey ? "Copied!" : "Copy Key"}</span>
@@ -82,12 +83,12 @@ export function OverviewTab({
           </div>
 
           <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-white/5">
-            <span>Pass in <code className="text-slate-400 font-mono text-[10px] bg-white/5 px-1 py-0.5 rounded">Authorization: Bearer &lt;key&gt;</code></span>
+            <span>Pass in <code className="text-slate-400 font-mono text-[10px] bg-white/5 px-1 py-0.5 rounded">Bearer &lt;key&gt;</code></span>
             <button
               type="button"
               disabled={rotatingKey}
               onClick={onRotateKey}
-              className="text-slate-400 hover:text-red-400 flex items-center gap-1.5 cursor-pointer transition-colors text-xs font-medium"
+              className="text-slate-400 hover:text-red-400 flex items-center gap-1.5 cursor-pointer transition-colors text-xs font-medium min-h-[44px] px-1 touch-manipulation"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${rotatingKey ? "animate-spin text-red-400" : ""}`} />
               <span>Rotate Key</span>
@@ -113,7 +114,7 @@ export function OverviewTab({
             <button
               type="button"
               onClick={copyBotId}
-              className="px-3 py-1.5 rounded-xl bg-blue-600/15 hover:bg-blue-600/25 border border-blue-500/30 text-blue-300 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="px-3.5 py-2 min-h-[44px] rounded-xl bg-blue-600/15 hover:bg-blue-600/25 border border-blue-500/30 text-blue-300 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer touch-manipulation"
             >
               {copiedBotId ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copiedBotId ? "Copied!" : "Copy Bot ID"}</span>
@@ -125,10 +126,10 @@ export function OverviewTab({
           </div>
 
           <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-white/5">
-            <span>Used in <code className="text-slate-400 font-mono text-[10px] bg-white/5 px-1 py-0.5 rounded">data-bot-id="{botId}"</code> tag</span>
+            <span>Used in <code className="text-slate-400 font-mono text-[10px] bg-white/5 px-1 py-0.5 rounded">data-bot-id="{botId}"</code></span>
             <span className="inline-flex items-center gap-1 text-emerald-400 text-[10px] font-mono">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Active &amp; Ready</span>
+              <span>Active</span>
             </span>
           </div>
         </div>
@@ -157,7 +158,7 @@ export function OverviewTab({
               setCopiedBotId(true);
               setTimeout(() => setCopiedBotId(false), 2000);
             }}
-            className="px-4 py-2 text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl shadow-md transition-all active:scale-95 cursor-pointer flex items-center gap-1.5"
+            className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl shadow-md transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 touch-manipulation"
           >
             {copiedBotId ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5" />}
             <span>{copiedBotId ? "Copied Script!" : "Copy Embed Script"}</span>

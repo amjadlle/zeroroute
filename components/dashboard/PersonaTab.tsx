@@ -72,7 +72,7 @@ export function PersonaTab({
               value={botTitle}
               onChange={(e) => setBotTitle(e.target.value)}
               placeholder="e.g. Mapki AI"
-              className="w-full bg-[#080a0f] border border-dark-border rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-600 focus:border-red-500/50 outline-none transition-all"
+              className="w-full bg-[#080a0f] border border-dark-border rounded-xl px-4 py-2.5 text-base sm:text-xs text-white placeholder-slate-600 focus:border-red-500/50 outline-none transition-all touch-manipulation"
             />
           </div>
           <div className="space-y-1.5">
@@ -82,7 +82,7 @@ export function PersonaTab({
               value={tone}
               onChange={(e) => setTone(e.target.value)}
               placeholder="e.g. helpful, friendly, and concise"
-              className="w-full bg-[#080a0f] border border-dark-border rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-600 focus:border-red-500/50 outline-none transition-all"
+              className="w-full bg-[#080a0f] border border-dark-border rounded-xl px-4 py-2.5 text-base sm:text-xs text-white placeholder-slate-600 focus:border-red-500/50 outline-none transition-all touch-manipulation"
             />
           </div>
         </div>
@@ -95,7 +95,7 @@ export function PersonaTab({
               value={botRole}
               onChange={(e) => setBotRole(e.target.value)}
               placeholder="e.g. AI Customer Support Specialist"
-              className="w-full bg-[#080a0f] border border-dark-border rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-600 focus:border-red-500/50 outline-none transition-all"
+              className="w-full bg-[#080a0f] border border-dark-border rounded-xl px-4 py-2.5 text-base sm:text-xs text-white placeholder-slate-600 focus:border-red-500/50 outline-none transition-all touch-manipulation"
             />
           </div>
           <div className="space-y-1.5">
@@ -105,7 +105,7 @@ export function PersonaTab({
               value={greeting}
               onChange={(e) => setGreeting(e.target.value)}
               placeholder="e.g. Hi there! How can I help you today?"
-              className="w-full bg-[#080a0f] border border-dark-border rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-600 focus:border-red-500/50 outline-none transition-all"
+              className="w-full bg-[#080a0f] border border-dark-border rounded-xl px-4 py-2.5 text-base sm:text-xs text-white placeholder-slate-600 focus:border-red-500/50 outline-none transition-all touch-manipulation"
             />
           </div>
         </div>
@@ -113,14 +113,14 @@ export function PersonaTab({
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <label className="text-xs font-semibold text-slate-300">Custom System Persona Instructions</label>
-            <span className="text-[11px] text-slate-500 font-mono">Injected dynamically into RAG system prompt</span>
+            <span className="text-[11px] text-slate-500 font-mono">Dynamic RAG Prompt</span>
           </div>
           <textarea
             rows={7}
             value={persona}
             onChange={(e) => setPersona(e.target.value)}
             placeholder="Provide specific instructions on how the assistant should respond, handle inquiries, qualify leads, and enforce brand guidelines."
-            className="w-full bg-[#080a0f] border border-dark-border rounded-xl p-4 text-xs text-white font-mono leading-relaxed placeholder-slate-600 focus:border-red-500/50 outline-none transition-all resize-y"
+            className="w-full bg-[#080a0f] border border-dark-border rounded-xl p-4 text-base sm:text-xs text-white font-mono leading-relaxed placeholder-slate-600 focus:border-red-500/50 outline-none transition-all resize-y touch-manipulation"
           />
         </div>
 
@@ -128,7 +128,7 @@ export function PersonaTab({
           <button
             type="submit"
             disabled={saving}
-            className="px-6 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-lg shadow-red-500/20 active:scale-95 cursor-pointer transition-all disabled:opacity-70 flex items-center gap-2"
+            className="w-full sm:w-auto px-6 py-3 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-lg shadow-red-500/20 active:scale-95 cursor-pointer transition-all disabled:opacity-70 flex items-center justify-center gap-2 touch-manipulation"
           >
             {saving ? (
               <>

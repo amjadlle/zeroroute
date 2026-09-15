@@ -177,7 +177,7 @@ curl ${hostUrl}/v1/chat/completions \\
             <button
               type="button"
               onClick={() => setGuideModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold bg-white/[0.05] hover:bg-white/[0.1] text-slate-200 hover:text-white border border-white/10 rounded-xl transition-all active:scale-95 shrink-0 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 min-h-[44px] text-xs font-semibold bg-white/[0.05] hover:bg-white/[0.1] text-slate-200 hover:text-white border border-white/10 rounded-xl transition-all active:scale-95 shrink-0 cursor-pointer touch-manipulation"
             >
               <BookOpen className="w-3.5 h-3.5 text-slate-400" />
               <span>Step-by-Step Guide</span>
@@ -186,7 +186,7 @@ curl ${hostUrl}/v1/chat/completions \\
             <button
               type="button"
               onClick={() => setShowLivePreview(!showLivePreview)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold bg-white/[0.05] hover:bg-white/[0.1] text-slate-200 hover:text-white border border-white/10 rounded-xl transition-all active:scale-95 shrink-0 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 min-h-[44px] text-xs font-semibold bg-white/[0.05] hover:bg-white/[0.1] text-slate-200 hover:text-white border border-white/10 rounded-xl transition-all active:scale-95 shrink-0 cursor-pointer touch-manipulation"
             >
               {showLivePreview ? <EyeOff className="w-3.5 h-3.5 text-slate-400" /> : <Eye className="w-3.5 h-3.5 text-slate-400" />}
               <span>{showLivePreview ? "Hide Preview" : "Live Preview"}</span>
@@ -195,7 +195,7 @@ curl ${hostUrl}/v1/chat/completions \\
             <button
               type="button"
               onClick={handleCopy}
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl shadow-md transition-all active:scale-95 shrink-0 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 min-h-[44px] text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl shadow-md transition-all active:scale-95 shrink-0 cursor-pointer touch-manipulation"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? "Copied!" : "Copy Code"}</span>
@@ -207,7 +207,7 @@ curl ${hostUrl}/v1/chat/completions \\
         <div className="flex flex-wrap gap-2">
           {[
             { id: "widget", label: "✨ 1-Line Website Widget" },
-            { id: "ai", label: "🤖 AI Agent Prompt (Claude Code / Cursor / Codex)" },
+            { id: "ai", label: "🤖 AI Agent Prompt" },
             { id: "js", label: "JavaScript / React" },
             { id: "py", label: "Python (OpenAI SDK)" },
             { id: "curl", label: "cURL Terminal" },
@@ -218,7 +218,7 @@ curl ${hostUrl}/v1/chat/completions \\
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveSnippet(tab.id as any)}
-                className={`px-3.5 py-1.5 text-xs rounded-xl font-semibold transition-all cursor-pointer ${
+                className={`px-3.5 py-2 min-h-[44px] text-xs rounded-xl font-semibold transition-all cursor-pointer touch-manipulation flex items-center shrink-0 ${
                   isSelected
                     ? "bg-red-600 text-white font-bold shadow-md shadow-red-600/25"
                     : "bg-[#080a0f] border border-dark-border text-slate-300 hover:text-white hover:bg-white/5"
@@ -238,7 +238,7 @@ curl ${hostUrl}/v1/chat/completions \\
                 <Sliders className="w-3.5 h-3.5 text-red-400" />
                 <span>Customize Live Widget Appearance:</span>
               </span>
-              <span className="text-[10px] text-slate-500 font-mono">Updates code below automatically</span>
+              <span className="text-[10px] text-slate-500 font-mono">Live Sync</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -248,7 +248,7 @@ curl ${hostUrl}/v1/chat/completions \\
                   type="text"
                   value={botTitle}
                   onChange={(e) => setBotTitle(e.target.value)}
-                  className="w-full px-3.5 py-2 text-xs bg-[#050608] border border-dark-border rounded-xl text-white focus:outline-none focus:border-red-500 font-sans"
+                  className="w-full px-3.5 py-2.5 text-base sm:text-xs bg-[#050608] border border-dark-border rounded-xl text-white focus:outline-none focus:border-red-500 font-sans touch-manipulation"
                 />
               </div>
 
@@ -259,13 +259,13 @@ curl ${hostUrl}/v1/chat/completions \\
                     type="color"
                     value={brandColor}
                     onChange={(e) => setBrandColor(e.target.value)}
-                    className="w-9 h-8 p-0.5 bg-[#050608] border border-dark-border rounded-xl cursor-pointer shrink-0"
+                    className="w-10 h-10 p-0.5 bg-[#050608] border border-dark-border rounded-xl cursor-pointer shrink-0 touch-manipulation"
                   />
                   <input
                     type="text"
                     value={brandColor}
                     onChange={(e) => setBrandColor(e.target.value)}
-                    className="flex-1 px-3.5 py-2 text-xs bg-[#050608] border border-dark-border rounded-xl text-white focus:outline-none focus:border-red-500 font-mono"
+                    className="flex-1 px-3.5 py-2.5 text-base sm:text-xs bg-[#050608] border border-dark-border rounded-xl text-white focus:outline-none focus:border-red-500 font-mono touch-manipulation"
                   />
                 </div>
               </div>
@@ -278,7 +278,7 @@ curl ${hostUrl}/v1/chat/completions \\
                   type="text"
                   value={greeting}
                   onChange={(e) => setGreeting(e.target.value)}
-                  className="w-full px-3.5 py-2 text-xs bg-[#050608] border border-dark-border rounded-xl text-white focus:outline-none focus:border-red-500 font-sans"
+                  className="w-full px-3.5 py-2.5 text-base sm:text-xs bg-[#050608] border border-dark-border rounded-xl text-white focus:outline-none focus:border-red-500 font-sans touch-manipulation"
                 />
               </div>
 
@@ -291,7 +291,7 @@ curl ${hostUrl}/v1/chat/completions \\
                   value={promptChips}
                   onChange={(e) => setPromptChips(e.target.value)}
                   placeholder="What are your services?,Pricing details,How to get started?"
-                  className="w-full px-3.5 py-2 text-xs bg-[#050608] border border-dark-border rounded-xl text-white focus:outline-none focus:border-red-500 font-sans"
+                  className="w-full px-3.5 py-2.5 text-base sm:text-xs bg-[#050608] border border-dark-border rounded-xl text-white focus:outline-none focus:border-red-500 font-sans touch-manipulation"
                 />
               </div>
             </div>
@@ -434,7 +434,7 @@ curl ${hostUrl}/v1/chat/completions \\
               <button
                 type="button"
                 onClick={() => setGuideModalOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer touch-manipulation shrink-0"
                 aria-label="Close guide modal"
               >
                 <X className="w-4 h-4" />
@@ -442,9 +442,9 @@ curl ${hostUrl}/v1/chat/completions \\
             </div>
 
             {/* Platform Selector Tabs */}
-            <div className="flex flex-wrap gap-2 overflow-x-auto pb-1 scrollbar-none">
+            <div className="flex flex-wrap gap-2 overflow-x-auto pb-1 scrollbar-none touch-pan-x">
               {[
-                { id: "agent", label: "🤖 Claude Code / Cursor" },
+                { id: "agent", label: "🤖 AI Agent" },
                 { id: "html", label: "🌐 HTML / Webflow" },
                 { id: "wp", label: "📦 WordPress" },
                 { id: "shopify", label: "🛍️ Shopify" },
@@ -457,7 +457,7 @@ curl ${hostUrl}/v1/chat/completions \\
                     key={p.id}
                     type="button"
                     onClick={() => setGuidePlatform(p.id as any)}
-                    className={`px-3 py-1.5 text-xs rounded-xl font-semibold transition-all shrink-0 cursor-pointer ${
+                    className={`px-3 py-2 min-h-[44px] text-xs rounded-xl font-semibold transition-all shrink-0 cursor-pointer touch-manipulation flex items-center ${
                       isSelected
                         ? "bg-red-600 text-white font-bold shadow-md shadow-red-600/25"
                         : "bg-[#080a0f] border border-dark-border text-slate-300 hover:text-white hover:bg-white/5"
@@ -555,8 +555,8 @@ curl ${hostUrl}/v1/chat/completions \\
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-between pt-3 border-t border-white/10">
-              <span className="text-[11px] text-slate-400">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-white/10">
+              <span className="text-[11px] text-slate-400 text-center sm:text-left">
                 Need help? Email{" "}
                 <a href="mailto:support@mapki.com" className="text-red-400 hover:underline">
                   support@mapki.com
@@ -566,7 +566,7 @@ curl ${hostUrl}/v1/chat/completions \\
               <button
                 type="button"
                 onClick={() => setGuideModalOpen(false)}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 text-white transition-all cursor-pointer"
+                className="w-full sm:w-auto px-5 py-2.5 min-h-[44px] rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 text-white transition-all cursor-pointer touch-manipulation flex items-center justify-center"
               >
                 Got it!
               </button>

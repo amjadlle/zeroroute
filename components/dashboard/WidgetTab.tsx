@@ -340,7 +340,7 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
           <button
             type="button"
             onClick={copyWidgetScript}
-            className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-white/5 hover:bg-white/10 text-white border border-white/10 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
+            className="w-full py-3 px-4 min-h-[44px] rounded-xl text-xs font-bold bg-white/5 hover:bg-white/10 text-white border border-white/10 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 touch-manipulation"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
             <span>{copied ? "Copied Script to Clipboard!" : "Copy Embed Script"}</span>
@@ -353,9 +353,9 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
             <button
               type="button"
               onClick={copyBotId}
-              className="text-red-400 hover:text-red-300 text-xs font-semibold flex items-center gap-1 cursor-pointer"
+              className="text-red-400 hover:text-red-300 text-xs font-semibold flex items-center gap-1 cursor-pointer min-h-[44px] px-2 touch-manipulation"
             >
-              {copiedBotId ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+              {copiedBotId ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copiedBotId ? "Copied!" : "Copy ID"}</span>
             </button>
           </div>
@@ -374,11 +374,11 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
       </div>
 
       {/* Right: Live Interactive Chat Simulator */}
-      <div className="lg:col-span-7 bg-[#080a0f] border border-dark-border rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[560px]">
+      <div className="lg:col-span-7 bg-[#080a0f] border border-dark-border rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[500px] sm:h-[560px]">
         {/* Chat Header */}
         <div className="px-4 py-3 bg-dark-card border-b border-dark-border flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-red-600/20 border border-red-500/30 flex items-center justify-center text-red-400 shadow-sm">
+            <div className="w-8 h-8 rounded-xl bg-red-600/20 border border-red-500/30 flex items-center justify-center text-red-400 shadow-sm shrink-0">
               <Bot className="w-4 h-4" />
             </div>
             <div>
@@ -390,7 +390,7 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
               </div>
               <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Multi-Cloud Failover Pool Online</span>
+                <span>Multi-Cloud Pool Online</span>
               </span>
             </div>
           </div>
@@ -398,8 +398,9 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
           <button
             type="button"
             onClick={clearChat}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors text-xs flex items-center gap-1 cursor-pointer"
+            className="p-2 min-w-[44px] min-h-[44px] rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-colors text-xs flex items-center justify-center gap-1 cursor-pointer touch-manipulation"
             title="Reset Simulator Chat"
+            aria-label="Clear chat"
           >
             <Trash2 className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Clear</span>
@@ -438,11 +439,11 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
 
                 {/* Assistant Message Quick Actions */}
                 {m.role === "assistant" && m.content && !chatStreaming && (
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity pl-1 pt-1 flex items-center gap-2 text-[10px] text-slate-500">
+                  <div className="opacity-0 group-hover:opacity-100 sm:opacity-0 focus-within:opacity-100 transition-opacity pl-1 pt-1 flex items-center gap-2 text-[10px] text-slate-500">
                     <button
                       type="button"
                       onClick={() => copyMessageContent(m.content, i)}
-                      className="hover:text-slate-300 flex items-center gap-1 cursor-pointer transition-colors"
+                      className="hover:text-slate-300 flex items-center gap-1 cursor-pointer transition-colors min-h-[32px] px-1 touch-manipulation"
                       title="Copy message text"
                     >
                       {isCopied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
@@ -458,14 +459,14 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
 
         {/* Suggested Chips */}
         {prompts && prompts.length > 0 && (
-          <div className="px-4 py-2 border-t border-white/5 flex gap-1.5 overflow-x-auto scrollbar-none bg-[#050608]/50">
+          <div className="px-3 sm:px-4 py-2 border-t border-white/5 flex gap-1.5 overflow-x-auto scrollbar-none bg-[#050608]/50 touch-pan-x">
             {prompts.map((p, idx) => (
               <button
                 key={idx}
                 type="button"
                 disabled={chatStreaming}
                 onClick={() => handleSendTestChat(p)}
-                className="px-3 py-1 rounded-full bg-white/5 hover:bg-red-500/15 hover:border-red-500/30 border border-white/10 text-[11px] text-slate-300 hover:text-red-300 whitespace-nowrap cursor-pointer transition-all active:scale-95 disabled:opacity-50"
+                className="px-3 py-1.5 min-h-[36px] rounded-full bg-white/5 hover:bg-red-500/15 hover:border-red-500/30 border border-white/10 text-[11px] text-slate-300 hover:text-red-300 whitespace-nowrap cursor-pointer transition-all active:scale-95 disabled:opacity-50 touch-manipulation shrink-0"
               >
                 {p}
               </button>
@@ -486,17 +487,17 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
             value={chatInput}
             onChange={(e) => setChatInput(e.target.value)}
             placeholder="Type a test message to stream through failover router…"
-            className="flex-1 bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none"
+            className="flex-1 bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl px-3.5 py-2.5 text-base sm:text-xs text-white placeholder-slate-500 outline-none touch-manipulation"
           />
           <button
             type="submit"
             disabled={!chatInput.trim() || chatStreaming}
-            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1.5 active:scale-95"
+            className="px-4 py-2.5 min-h-[44px] min-w-[44px] rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 touch-manipulation shrink-0"
           >
             {chatStreaming ? (
-              <Sparkles className="w-3.5 h-3.5 animate-spin" />
+              <Sparkles className="w-4 h-4 animate-spin" />
             ) : (
-              <Send className="w-3.5 h-3.5" />
+              <Send className="w-4 h-4" />
             )}
             <span className="hidden sm:inline">{chatStreaming ? "Streaming…" : "Send"}</span>
           </button>

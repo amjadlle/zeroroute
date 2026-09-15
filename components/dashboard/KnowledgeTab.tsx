@@ -94,16 +94,16 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
             Documents and live website URLs crawled here are automatically injected into AI prompts for accurate answers.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => {
               setMode("crawl");
               setModalOpen(true);
             }}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white/5 hover:bg-white/10 text-white border border-white/10 shadow-sm cursor-pointer transition-all"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-bold bg-white/5 hover:bg-white/10 text-white border border-white/10 shadow-sm cursor-pointer transition-all touch-manipulation"
           >
-            <Globe className="w-3.5 h-3.5 text-blue-400" />
+            <Globe className="w-3.5 h-3.5 text-blue-400 shrink-0" />
             <span>Crawl Website URL</span>
           </button>
           <button
@@ -112,9 +112,9 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
               setMode("text");
               setModalOpen(true);
             }}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-lg cursor-pointer transition-all"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-lg cursor-pointer transition-all touch-manipulation"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="w-3.5 h-3.5 shrink-0" />
             <span>Add Text Doc</span>
           </button>
         </div>
@@ -122,20 +122,20 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
 
       {/* Document List */}
       {docs.length === 0 ? (
-        <div className="p-12 text-center bg-dark-card border border-dark-border rounded-2xl space-y-3">
+        <div className="p-8 sm:p-12 text-center bg-dark-card border border-dark-border rounded-2xl space-y-3">
           <BookOpen className="w-10 h-10 text-slate-600 mx-auto" />
           <h4 className="text-sm font-bold text-white">No knowledge documents yet</h4>
           <p className="text-xs text-slate-400 max-w-sm mx-auto">
             Crawl your website or paste product FAQs to enable high-accuracy RAG for your assistant.
           </p>
-          <div className="flex items-center justify-center gap-3 pt-2">
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <button
               type="button"
               onClick={() => {
                 setMode("crawl");
                 setModalOpen(true);
               }}
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600/20 text-blue-300 border border-blue-500/30 hover:bg-blue-600/30 cursor-pointer"
+              className="px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold bg-blue-600/20 text-blue-300 border border-blue-500/30 hover:bg-blue-600/30 cursor-pointer touch-manipulation"
             >
               🌐 Crawl Website
             </button>
@@ -145,7 +145,7 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
                 setMode("text");
                 setModalOpen(true);
               }}
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-white/5 hover:bg-white/10 text-white border border-white/10 cursor-pointer"
+              className="px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold bg-white/5 hover:bg-white/10 text-white border border-white/10 cursor-pointer touch-manipulation"
             >
               + Add Text Manual
             </button>
@@ -158,19 +158,20 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
             return (
               <div key={d.id} className="p-4 bg-dark-card border border-dark-border rounded-2xl space-y-3 relative group hover:border-white/20 transition-all">
                 <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
                     {isWeb ? <Globe className="w-4 h-4 text-blue-400 shrink-0" /> : <FileText className="w-4 h-4 text-amber-400 shrink-0" />}
-                    <span className="text-xs font-bold text-white truncate max-w-[200px]" title={d.title}>
+                    <span className="text-xs font-bold text-white truncate max-w-[180px] sm:max-w-[240px]" title={d.title}>
                       {d.title}
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={() => onDeleteDoc(d.id)}
-                    className="p-1 rounded text-slate-500 hover:text-red-400 transition-colors cursor-pointer"
+                    className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-slate-500 hover:text-red-400 hover:bg-white/5 transition-colors cursor-pointer touch-manipulation shrink-0"
                     title="Delete Document"
+                    aria-label="Delete document"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
 
@@ -206,11 +207,11 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
           <div className="w-full max-w-lg bg-[#0c0e14] border border-white/10 rounded-2xl p-6 space-y-4 shadow-2xl">
             {/* Modal Tabs */}
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setMode("crawl")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  className={`px-3 py-2 min-h-[44px] rounded-xl text-xs font-bold transition-all cursor-pointer touch-manipulation ${
                     mode === "crawl"
                       ? "bg-blue-600/20 text-blue-300 border border-blue-500/30"
                       : "text-slate-400 hover:text-white"
@@ -221,7 +222,7 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
                 <button
                   type="button"
                   onClick={() => setMode("text")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  className={`px-3 py-2 min-h-[44px] rounded-xl text-xs font-bold transition-all cursor-pointer touch-manipulation ${
                     mode === "text"
                       ? "bg-red-600/20 text-red-300 border border-red-500/30"
                       : "text-slate-400 hover:text-white"
@@ -233,7 +234,8 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
               <button
                 type="button"
                 onClick={() => setModalOpen(false)}
-                className="text-xs text-slate-400 hover:text-white"
+                className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-sm text-slate-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors cursor-pointer touch-manipulation shrink-0"
+                aria-label="Close modal"
               >
                 ✕
               </button>
@@ -252,14 +254,14 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-slate-300 block">Public URL</label>
                   <div className="relative">
-                    <Globe className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Globe className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input
                       type="text"
                       required
                       value={crawlUrl}
                       onChange={(e) => setCrawlUrl(e.target.value)}
                       placeholder="riba.mapki.in, https://yourcompany.com/docs, or GitHub raw .md"
-                      className="w-full bg-[#080a0f] border border-dark-border rounded-xl pl-10 pr-3 py-2.5 text-xs text-white placeholder-slate-500 outline-none focus:border-blue-500/50"
+                      className="w-full bg-[#080a0f] border border-dark-border rounded-xl pl-10 pr-3 py-2.5 text-base sm:text-xs text-white placeholder-slate-500 outline-none focus:border-blue-500/50 touch-manipulation"
                     />
                   </div>
                   <div className="flex flex-wrap gap-1.5 pt-1 text-[10px] text-slate-500">
@@ -280,7 +282,7 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
                     value={crawlTitle}
                     onChange={(e) => setCrawlTitle(e.target.value)}
                     placeholder="Auto-detected from page if left blank"
-                    className="w-full bg-[#080a0f] border border-dark-border rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 outline-none"
+                    className="w-full bg-[#080a0f] border border-dark-border rounded-xl px-3 py-2.5 text-base sm:text-xs text-white placeholder-slate-500 outline-none touch-manipulation"
                   />
                 </div>
 
@@ -288,23 +290,23 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
                   <button
                     type="button"
                     onClick={() => setModalOpen(false)}
-                    className="px-3 py-1.5 rounded-xl text-xs text-slate-400 hover:text-white cursor-pointer"
+                    className="px-4 py-2.5 min-h-[44px] rounded-xl text-xs text-slate-400 hover:text-white cursor-pointer touch-manipulation"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={crawling}
-                    className="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
+                    className="px-5 py-2.5 min-h-[44px] rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer touch-manipulation"
                   >
                     {crawling ? (
                       <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <Loader2 className="w-4 h-4 animate-spin" />
                         <span>Crawling & Indexing…</span>
                       </>
                     ) : (
                       <>
-                        <Sparkles className="w-3.5 h-3.5" />
+                        <Sparkles className="w-4 h-4" />
                         <span>Crawl & Train RAG</span>
                       </>
                     )}
@@ -324,7 +326,7 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="e.g. Return Policy & FAQs"
-                    className="w-full bg-[#080a0f] border border-dark-border rounded-xl px-3 py-2 text-xs text-white outline-none"
+                    className="w-full bg-[#080a0f] border border-dark-border rounded-xl px-3 py-2.5 text-base sm:text-xs text-white outline-none touch-manipulation"
                   />
                 </div>
 
@@ -336,7 +338,7 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     placeholder="Paste FAQ questions, answers, product specs..."
-                    className="w-full bg-[#080a0f] border border-dark-border rounded-xl p-3 text-xs text-white font-mono leading-relaxed outline-none"
+                    className="w-full bg-[#080a0f] border border-dark-border rounded-xl p-3 text-base sm:text-xs text-white font-mono leading-relaxed outline-none touch-manipulation"
                   />
                 </div>
 
@@ -344,14 +346,14 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
                   <button
                     type="button"
                     onClick={() => setModalOpen(false)}
-                    className="px-3 py-1.5 rounded-xl text-xs text-slate-400 hover:text-white cursor-pointer"
+                    className="px-4 py-2.5 min-h-[44px] rounded-xl text-xs text-slate-400 hover:text-white cursor-pointer touch-manipulation"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={addingDoc}
-                    className="px-4 py-1.5 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-500 text-white disabled:opacity-50 cursor-pointer"
+                    className="px-5 py-2.5 min-h-[44px] rounded-xl text-xs font-bold bg-red-600 hover:bg-red-500 text-white disabled:opacity-50 cursor-pointer touch-manipulation"
                   >
                     {addingDoc ? "Saving…" : "Add to Knowledge Base"}
                   </button>
