@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { 
   Key, Copy, Check, Eye, EyeOff, RefreshCw, Bot, 
-  Mail, Calendar, Headphones, ExternalLink, Sparkles 
+  Mail, Calendar, Headphones, ExternalLink, Sparkles,
+  Code2, ArrowRight, Palette
 } from "lucide-react";
 
 interface OverviewTabProps {
@@ -14,6 +15,7 @@ interface OverviewTabProps {
   daysRemaining: number;
   onRotateKey: () => Promise<void>;
   rotatingKey: boolean;
+  onNavigateTab?: (tab: "overview" | "widget" | "knowledge" | "persona" | "docs") => void;
 }
 
 export function OverviewTab({
@@ -24,6 +26,7 @@ export function OverviewTab({
   daysRemaining,
   onRotateKey,
   rotatingKey,
+  onNavigateTab,
 }: OverviewTabProps) {
   const [showKey, setShowKey] = useState(false);
   const [copiedKey, setCopiedKey] = useState(false);
@@ -141,30 +144,29 @@ export function OverviewTab({
       {/* Quick Connect & 1-Line Embed Banner */}
       <div className="p-5 bg-gradient-to-r from-red-600/[0.08] via-rose-600/[0.04] to-blue-600/[0.04] border border-red-500/20 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg">
         <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-white">🚀 Quick 1-Line Chatbot Embed</span>
-            <span className="px-2 py-0.5 rounded text-[9px] font-mono bg-red-500/15 text-red-400 border border-red-500/30">
-              HTML / React / WordPress / Webflow
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-bold text-white flex items-center gap-1.5">
+              <Code2 className="w-4 h-4 text-red-400" />
+              <span>1-Line Chatbot Embed &amp; API Quickstart</span>
+            </span>
+            <span className="px-2 py-0.5 rounded text-[9px] font-mono bg-red-500/15 text-red-400 border border-red-500/30 flex items-center gap-1">
+              <Palette className="w-2.5 h-2.5" />
+              Customizable • HTML / React / WordPress / Shopify
             </span>
           </div>
-          <p className="text-[11px] text-slate-400">
-            Paste the script tag directly before <code className="text-red-400 font-mono text-[10px] bg-black/40 px-1 py-0.5 rounded">&lt;/body&gt;</code> on any webpage.
+          <p className="text-[11px] text-slate-400 max-w-2xl">
+            Configure brand colors, greeting message, logo, and quick-prompt chips with real-time code generator &amp; platform guides.
           </p>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
           <button
             type="button"
-            onClick={() => {
-              const scriptSnippet = `<script src="${typeof window !== "undefined" ? window.location.origin : "https://zeroroute.mapki.in"}/widget.js" data-bot-id="${botId}" defer></script>`;
-              navigator.clipboard.writeText(scriptSnippet);
-              setCopiedBotId(true);
-              setTimeout(() => setCopiedBotId(false), 2000);
-            }}
-            className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl shadow-md transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 touch-manipulation"
+            onClick={() => onNavigateTab ? onNavigateTab("docs") : undefined}
+            className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl shadow-md shadow-red-500/10 transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 touch-manipulation"
           >
-            {copiedBotId ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copiedBotId ? "Copied Script!" : "Copy Embed Script"}</span>
+            <span>Open API Quickstart &amp; Customizer</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>

@@ -218,6 +218,7 @@ export default function AppDashboard() {
             daysRemaining={profile?.days_remaining || 0}
             onRotateKey={handleRotateKey}
             rotatingKey={rotatingKey}
+            onNavigateTab={setActiveTab}
           />
         )}
 
