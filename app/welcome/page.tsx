@@ -281,7 +281,7 @@ function WelcomeContent() {
 
             <div className="flex items-center gap-2 text-xs font-mono text-slate-400 bg-[#080a0f] px-3.5 py-2 rounded-xl border border-dark-border">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>10,000 req/mo • 10 Cloud Failover</span>
+              <span>10,000 req/mo • 11 Pooled AI Clouds</span>
             </div>
           </div>
 

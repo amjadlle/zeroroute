@@ -26,7 +26,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: "ZeroRoute — $0/mo Multi-Cloud AI Gateway for Solo Founders & Startups",
-  description: "Never pay for LLMs again. One OpenAI-compatible endpoint with automatic failover across 8 free cloud AI providers and a 1-line website chatbot widget.",
+  description: "Never pay for LLMs again. One OpenAI-compatible endpoint with intelligent dynamic routing across 11 pooled AI cloud providers and a 1-line website chatbot widget.",
   icons: {
     icon: [
       { url: "/favicon.png", sizes: "any" },
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "ZeroRoute — $0/mo Multi-Cloud AI Gateway",
-    description: "Never pay for LLMs again. Automatic failover across 8 free AI providers (Mistral, Groq, Cohere, Cloudflare, SambaNova, Gemini, OpenRouter, NVIDIA). 100% free forever.",
+    description: "Never pay for LLMs again. Intelligent multi-cloud routing across 11 free AI providers (Groq, Cerebras, Mistral, Google Gemini, Cloudflare, SambaNova, NVIDIA, and more). 10,000 monthly requests included.",
     url: "https://zeroroute.mapki.in",
     siteName: "ZeroRoute",
     type: "website",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "ZeroRoute — $0/mo Multi-Cloud AI Gateway",
-    description: "Automatic failover across 8 free AI cloud providers. 0% downtime, 0 dependencies, 100% free forever.",
+    description: "Intelligent routing across 11 free AI cloud providers. 10,000 requests/month, zero token costs, 100% reliable.",
   },
 };
 

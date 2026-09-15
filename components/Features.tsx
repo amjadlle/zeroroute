@@ -13,8 +13,8 @@ export function Features() {
       icon: ShieldCheck,
       color: "emerald",
       iconBg: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400",
-      title: "Circuit Breaker Failover",
-      description: "When any provider rate limits (429) or throws a 500 error, ZeroRoute switches to the backup in <8ms and puts the failing provider on cooldown.",
+      title: "Zero-Downtime Smart Routing",
+      description: "ZeroRoute dynamically distributes requests across the fastest, healthiest clouds in <8ms with automatic real-time high-availability load balancing.",
     },
     {
       icon: Zap,
@@ -28,7 +28,7 @@ export function Features() {
       color: "blue",
       iconBg: "bg-blue-500/10 border-blue-500/20 text-blue-400",
       title: "Parallel Benchmark Suite",
-      description: "Race all 9 multi-cloud providers concurrently in real-time. Detect the fastest model and optimize your routing chain in 1-click.",
+      description: "Race all 11 multi-cloud providers concurrently in real-time. Detect the fastest model and optimize your routing chain in 1-click.",
     },
     {
       icon: Key,

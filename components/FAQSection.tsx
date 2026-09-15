@@ -12,12 +12,12 @@ const FAQS: FAQItem[] = [
   {
     question: "How does ZeroRoute provide free AI LLMs?",
     answer:
-      "Major AI inference cloud providers like Groq, Cerebras, SambaNova, Mistral, Cloudflare, and Google provide free developer tier quotas. ZeroRoute aggregates and load balances across all these free tiers into a single stable OpenAI-compatible gateway with automatic rate-limit failover.",
+      "Major AI inference cloud providers like Groq, Cerebras, SambaNova, Mistral, Cloudflare, and Google provide generous developer tier quotas. ZeroRoute aggregates and dynamically load balances across all these free tiers into a single stable OpenAI-compatible gateway with intelligent multi-cloud routing.",
   },
   {
-    question: "What happens when one provider hits rate limits (HTTP 429)?",
+    question: "How does ZeroRoute guarantee zero downtime with 11 pooled clouds?",
     answer:
-      "When a provider returns a 429 (Rate Limit) or 502 (Outage), ZeroRoute's intelligent routing engine catches the error and instantly cascades to the next best provider in under 8 milliseconds, ensuring your visitors never experience dropped chats or errors.",
+      "ZeroRoute's intelligent routing engine continuously monitors latency and availability across 11 AI cloud providers (Groq, Cerebras, SambaNova, Google Gemini, Mistral, Cloudflare, etc.). Every request is dynamically dispatched to the fastest available provider in under 8 milliseconds, ensuring your visitors enjoy instant, uninterrupted conversations.",
   },
   {
     question: "Can I embed the chatbot on my website without coding?",
@@ -59,7 +59,7 @@ export function FAQSection() {
           Got Questions? We&apos;ve Got Answers.
         </h2>
         <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-          Everything you need to know about the product, failover architecture, and pricing.
+          Everything you need to know about the product, multi-cloud architecture, and pricing.
         </p>
       </div>
 

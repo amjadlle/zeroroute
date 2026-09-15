@@ -131,13 +131,13 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="default",  # Automatically fails over across 10 free AI cloud providers with <8ms circuit breaker
+    model="default",  # Automatically routes across 11 AI cloud providers with <8ms dynamic load balancing
     messages=[{"role": "user", "content": "Hello ZeroRoute!"}]
 )
 
 print(response.choices[0].message.content)`,
 
-    curl: `# Direct cURL Inference with Multi-Cloud Failover
+    curl: `# Direct cURL Inference with Multi-Cloud Routing
 curl ${hostUrl}/v1/chat/completions \\
   -H "Authorization: Bearer ${effectiveKey}" \\
   -H "Content-Type: application/json" \\
@@ -557,7 +557,7 @@ curl ${hostUrl}/v1/chat/completions \\
                   <ol className="list-decimal list-inside space-y-2 text-slate-300 pl-1">
                     <li>Install the official client: <code className="text-red-400 bg-red-950/40 px-1 py-0.5 rounded font-mono">pip install openai</code>.</li>
                     <li>Set <code className="text-red-400 bg-red-950/40 px-1 py-0.5 rounded font-mono">base_url="{hostUrl}/v1"</code> and your API key.</li>
-                    <li>Set <code className="text-red-400 bg-red-950/40 px-1 py-0.5 rounded font-mono">model="default"</code> to automatically route across 10 multi-cloud AI failover providers.</li>
+                    <li>Set <code className="text-red-400 bg-red-950/40 px-1 py-0.5 rounded font-mono">model="default"</code> to automatically route across 11 multi-cloud AI providers with zero downtime.</li>
                     <li>Execute standard OpenAI API calls with zero latency overhead.</li>
                   </ol>
                 </div>

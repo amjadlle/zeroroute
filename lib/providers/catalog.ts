@@ -1403,7 +1403,7 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
           {
             id: "openrouter/free",
             name: "OpenRouter Free Auto-Router",
-            brain: "Auto-Failover Free Router",
+            brain: "Multi-Cloud Free Router",
             role: "Intelligent auto-cascading router choosing fastest available free model",
             rpm: "20 RPM",
             tpm: "—",
@@ -1910,7 +1910,7 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
     categories: [
       {
         name: "💬 Reasoning & Auto-Routing",
-        description: "Large context reasoning and heuristic auto-failover routing",
+        description: "Large context reasoning and intelligent multi-cloud routing",
         models: [
           {
             id: "qwen/qwen3.7-flash:free",
@@ -1931,7 +1931,7 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
             id: "auto:free",
             name: "Auto-Router Free",
             brain: "Dynamic Free Router",
-            role: "Heuristic auto-failover routing across healthiest free endpoints",
+            role: "Dynamic auto-routing across healthiest high-speed endpoints",
             rpm: "20 RPM",
             tpm: "—",
             rpd: "3,700 pts/day",

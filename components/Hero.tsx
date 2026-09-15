@@ -108,7 +108,7 @@ export function Hero({ onOpenCheckout }: HeroProps) {
         </div>
         <div className="p-4 rounded-2xl bg-dark-card/60 border border-dark-border text-center shadow-sm">
           <div className="text-2xl sm:text-3xl font-extrabold text-emerald-400 font-mono">&lt;8ms</div>
-          <div className="text-xs text-slate-400 mt-1 font-medium">Failover Speed</div>
+          <div className="text-xs text-slate-400 mt-1 font-medium">Routing Speed</div>
         </div>
         <div className="p-4 rounded-2xl bg-dark-card/60 border border-dark-border text-center shadow-sm">
           <div className="text-2xl sm:text-3xl font-extrabold text-red-400 font-mono">100+</div>

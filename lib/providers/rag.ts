@@ -14,7 +14,7 @@ export function getDefaultLandingKnowledge(): { knowledge: string; persona: stri
       }
     } catch {}
     if (!defaultKnowledgeCache) {
-      defaultKnowledgeCache = `# ZeroRoute Knowledge Base\nZeroRoute is an open-source, $0/mo multi-cloud AI gateway that aggregates free-tier API quotas from 8 cloud providers into one OpenAI-compatible endpoint with automatic failover and an embeddable 1-line website chatbot.`;
+      defaultKnowledgeCache = `# ZeroRoute Knowledge Base\nZeroRoute is an open-source multi-cloud AI gateway that aggregates quotas from 11 cloud providers into one OpenAI-compatible endpoint with intelligent dynamic routing and an embeddable 1-line website chatbot.`;
     }
   }
 

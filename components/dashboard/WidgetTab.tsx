@@ -279,7 +279,7 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
         await runTypewriterSimulation(fallbackReply, newHistory);
       }
     } catch {
-      const fallbackReply = `Connected to ${botTitle || "ZeroRoute AI"}. Inquiries are continuously backed by 10 multi-cloud AI providers with zero downtime failover.`;
+      const fallbackReply = `Connected to ${botTitle || "ZeroRoute AI"}. Inquiries are continuously backed by 11 pooled AI cloud providers with zero downtime.`;
       await runTypewriterSimulation(fallbackReply, newHistory);
     } finally {
       setChatStreaming(false);
@@ -516,7 +516,7 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
           <div className="flex items-center justify-between text-[11px] text-slate-500 px-1">
             <span className="flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Multi-Cloud AI Router with sub-8ms failover active</span>
+              <span>Multi-Cloud AI Router with sub-8ms intelligent routing active</span>
             </span>
             <span className="hidden sm:inline">Press Enter to send</span>
           </div>

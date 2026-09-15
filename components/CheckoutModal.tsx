@@ -75,7 +75,7 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
               Unlock ZeroRoute Cloud
             </h3>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Instant multi-cloud AI failover, embeddable website widget, and custom knowledge RAG ready in 60 seconds.
+              Instant multi-cloud AI routing, embeddable website widget, and custom knowledge RAG ready in 60 seconds.
             </p>
           </div>
 
@@ -108,7 +108,7 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                 <span>
-                  <strong>11 Cloud Failover</strong> (Gemini, Groq, Cloudflare &amp; more)
+                  <strong>11 Pooled AI Clouds</strong> (Gemini, Groq, Cloudflare &amp; more)
                 </span>
               </li>
               <li className="flex items-center gap-2.5">

@@ -177,7 +177,7 @@ export async function sendWelcomeCredentialsEmail(params: {
     <div class="logo">⚡ ZeroRoute Pro</div>
     <div class="badge">ACTIVE SUBSCRIPTION</div>
     <h2 style="color: #ffffff; margin-top: 0;">Welcome to ZeroRoute Cloud, ${name}!</h2>
-    <p>Your subscription is now active with high-availability 10-cloud failover and your custom embeddable AI chatbot widget.</p>
+    <p>Your subscription is now active with high-availability 11-cloud smart routing and your custom embeddable AI chatbot widget (10,000 monthly requests included).</p>
     
     <h4 style="color: #cbd5e1; margin-bottom: 4px;">Your Master Router API Key:</h4>
     <div class="key-box">${key}</div>

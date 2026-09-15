@@ -80,7 +80,7 @@ export function ChatWidgetSection() {
           <div>
             <h3 className="text-base font-bold text-white">Try the Embedded AI Chatbot</h3>
             <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
-              Test streaming speed, markdown formatting, and multi-cloud failover directly in this page.
+              Test streaming speed, markdown formatting, and intelligent multi-cloud routing directly on this page.
             </p>
           </div>
           <button

@@ -11,12 +11,12 @@ export function TerminalFailover() {
             <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block" />
             <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block" />
             <span className="text-xs text-slate-400 font-mono ml-2">
-              zeroroute — auto-failover engine
+              zeroroute — smart multi-cloud router
             </span>
           </div>
           <div className="text-[11px] font-mono text-emerald-400 flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span>circuit breaker active</span>
+            <span>smart routing active</span>
           </div>
         </div>
 
@@ -31,17 +31,11 @@ export function TerminalFailover() {
           </div>
 
           <div className="pt-2 text-slate-400 flex items-center gap-2">
-            <span className="text-amber-400">▶</span> Attempting primary route:{" "}
-            <strong className="text-white">SambaNova (Meta-Llama-3.3-70B-Instruct)</strong>...
-          </div>
-
-          <div className="text-rose-400 bg-rose-500/10 border border-rose-500/20 p-2.5 rounded-lg">
-            ⚠ HTTP 429: SambaNova rate limit exceeded (Quota exhausted). <br />
-            ↳ Auto-isolating SambaNova on 60s cooldown timer.
+            <span className="text-amber-400">▶</span> Evaluating 11 AI cloud endpoints for optimal throughput...
           </div>
 
           <div className="text-emerald-400 flex items-center gap-2">
-            <span className="text-emerald-400 font-bold">⚡</span> Instant Failover ➔ Switched to{" "}
+            <span className="text-emerald-400 font-bold">⚡</span> Dynamic Multi-Cloud Routing ➔ Selected{" "}
             <strong className="text-white">Groq (llama-3.3-70b-versatile)</strong> in{" "}
             <span className="bg-emerald-500/20 px-1.5 py-0.5 rounded text-emerald-300 font-bold">
               4.2ms

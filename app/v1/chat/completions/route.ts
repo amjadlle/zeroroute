@@ -235,7 +235,7 @@ export async function POST(request: Request) {
     botRole: customer?.bot_role || "ZeroRoute AI & Multi-Cloud Specialist",
     tone: customer?.tone || "friendly, concise, and developer-focused",
     greeting: customer?.greeting || "Hi! 👋 Welcome to ZeroRoute. How can I help you today?",
-    prompts: promptList.length > 0 ? promptList : ["Is it really 100% free?", "How does failover work?", "Show me curl example"],
+    prompts: promptList.length > 0 ? promptList : ["Is it really 100% free?", "How does multi-cloud routing work?", "Show me curl example"],
     customPersona: customer?.persona || defaultPersona,
     knowledgeContext: ragContext
   });

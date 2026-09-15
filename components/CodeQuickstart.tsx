@@ -1,4 +1,4 @@
-﻿export function CodeQuickstart() {
+export function CodeQuickstart() {
   return (
     <section id="quickstart" className="space-y-8 scroll-mt-20 max-w-4xl mx-auto">
       <div className="text-center space-y-3">
@@ -23,7 +23,7 @@
             {"    "}api_key=<span className="text-amber-300">&quot;your-router-key&quot;</span>{"\n"}
             ){"\n\n"}
             response = client.chat.completions.create({"\n"}
-            {"    "}model=<span className="text-emerald-300">&quot;default&quot;</span>,  <span className="text-slate-500"># Auto-routes to fastest free provider with failover!</span>{"\n"}
+            {"    "}model=<span className="text-emerald-300">&quot;default&quot;</span>,  <span className="text-slate-500"># Auto-routes across 11 AI clouds with zero downtime!</span>{"\n"}
             {"    "}messages=[&#123;<span className="text-emerald-300">&quot;role&quot;</span>: <span className="text-emerald-300">&quot;user&quot;</span>, <span className="text-emerald-300">&quot;content&quot;</span>: <span className="text-emerald-300">&quot;Hello!&quot;</span>&#125;]{"\n"}
             ){"\n\n"}
             <span className="text-cyan-400">print</span>(response.choices[0].message.content)
