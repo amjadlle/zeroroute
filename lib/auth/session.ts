@@ -49,7 +49,7 @@ export async function getCurrentUser(): Promise<Customer | null> {
   if (sessionToken.startsWith("zr_admin_")) {
     return {
       id: "admin_master",
-      key: process.env.ADMIN_KEY || process.env.ROUTER_API_KEY || "zr_admin_master",
+      key: process.env.ROUTER_API_KEY || process.env.ADMIN_KEY || "zr_admin_master",
       email: process.env.ADMIN_EMAIL || "admin@zeroroute.io",
       name: "ZeroRoute Admin",
       company: "ZeroRoute Master",

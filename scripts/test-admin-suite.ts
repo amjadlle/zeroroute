@@ -26,7 +26,7 @@ async function runAdminTests() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email: process.env.ADMIN_EMAIL || "admin@zeroroute.io",
-        password: process.env.ADMIN_PASSWORD || process.env.ADMIN_KEY || "admin1234",
+        password: process.env.ADMIN_PASSWORD || process.env.ROUTER_API_KEY || "admin1234",
       }),
     });
 

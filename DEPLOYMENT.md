@@ -18,8 +18,7 @@ NODE_ENV=production
 # Admin Access Credentials
 ADMIN_EMAIL=admin@zeroroute.io
 ADMIN_PASSWORD=your_secure_admin_password
-ADMIN_KEY=zr_admin_master_secret_key
-ROUTER_API_KEY=zr_admin_master_secret_key
+ROUTER_API_KEY=zr_live_master_secret_key
 
 # Dodo Payments Integration
 DODO_ENVIRONMENT=live_mode # or test_mode
