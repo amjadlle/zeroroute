@@ -510,6 +510,11 @@
     var userText = text.trim();
     inputField.value = "";
 
+    // Always remove quick starter questions once any message is sent
+    if (suggestionsWrapper) {
+      suggestionsWrapper.style.display = "none";
+    }
+
     appendMessage("user", userText);
     chatHistory.push({ role: "user", content: userText });
 
