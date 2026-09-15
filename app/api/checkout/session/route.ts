@@ -122,18 +122,6 @@ export async function GET(request: Request) {
         session_token: sessionToken,
       };
 
-      // Dispatch welcome credentials email
-      try {
-        const { sendWelcomeCredentialsEmail } = await import("@/lib/email");
-        await sendWelcomeCredentialsEmail({
-          email: customerEmail,
-          name: customerName,
-          key,
-          botId,
-        });
-      } catch (emailErr) {
-        console.warn("[DodoCheckout] Welcome email warning:", emailErr);
-      }
     } else {
       // Ensure status is active
       const sessionToken = `zr_sess_${crypto.randomBytes(24).toString("hex")}`;
@@ -143,6 +131,19 @@ export async function GET(request: Request) {
       });
       customer.session_token = sessionToken;
       customer.status = "active";
+    }
+
+    // Dispatch welcome credentials email upon successful checkout
+    try {
+      const { sendWelcomeCredentialsEmail } = await import("@/lib/email");
+      await sendWelcomeCredentialsEmail({
+        email: customer.email || customerEmail,
+        name: customer.name || customerName,
+        key: customer.key,
+        botId: customer.bot_id,
+      });
+    } catch (emailErr) {
+      console.warn("[DodoCheckout] Welcome email warning:", emailErr);
     }
 
     const response = NextResponse.json({

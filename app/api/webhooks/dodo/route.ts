@@ -46,6 +46,8 @@ export async function POST(request: Request) {
     const customerCompany = data.customer_business_name || data.customer?.business_name || data.metadata?.company || customerName;
 
     if (customerEmail) {
+      const { initDb } = await import("@/lib/db");
+      await initDb();
       const db = getDb();
       const existingRes = await db.execute({
         sql: `SELECT * FROM customers WHERE email = ? LIMIT 1`,
@@ -65,36 +67,44 @@ export async function POST(request: Request) {
         eventType.includes("subscription.updated")
       ) {
         const expiresAt = data.next_billing_date ? new Date(data.next_billing_date).getTime() : now + 30 * 24 * 60 * 60 * 1000;
+        let activeKey = "";
+        let activeBotId = "";
+        let activeName = customerName;
 
         if (existing) {
+          activeKey = existing.key || existing.api_key || `zr_live_${crypto.randomBytes(18).toString("hex")}`;
+          activeBotId = existing.bot_id || `bot_${crypto.randomBytes(8).toString("hex")}`;
+          activeName = existing.name || customerName;
+
           await db.execute({
-            sql: `UPDATE customers SET status = 'active', subscription_expires = ?, monthly_requests = 0, updated_at = ? WHERE email = ?`,
-            args: [expiresAt, now, customerEmail]
+            sql: `UPDATE customers SET status = 'active', subscription_expires = ?, key = ?, bot_id = ?, monthly_requests = 0, updated_at = ? WHERE email = ?`,
+            args: [expiresAt, activeKey, activeBotId, now, customerEmail]
           });
         } else {
           const id = crypto.randomUUID();
-          const key = `zr_live_${crypto.randomBytes(18).toString("hex")}`;
-          const botId = `bot_${crypto.randomBytes(8).toString("hex")}`;
+          activeKey = `zr_live_${crypto.randomBytes(18).toString("hex")}`;
+          activeBotId = `bot_${crypto.randomBytes(8).toString("hex")}`;
 
           await db.execute({
             sql: `INSERT INTO customers (id, key, email, name, company, bot_id, status, subscription_expires, monthly_requests, monthly_limit, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, 0, 2000, ?, ?)`,
-            args: [id, key, customerEmail, customerName, customerCompany, botId, expiresAt, now, now]
+            args: [id, activeKey, customerEmail, customerName, customerCompany, activeBotId, expiresAt, now, now]
           });
-
-          // Dispatch transactional welcome email
-          try {
-            const { sendWelcomeCredentialsEmail } = await import("@/lib/email");
-            await sendWelcomeCredentialsEmail({
-              email: customerEmail,
-              name: customerName,
-              key,
-              botId,
-            });
-          } catch (emailErr) {
-            console.warn("[DodoWebhook] Welcome email error:", emailErr);
-          }
         }
-        console.log(`[DodoWebhook] Activated subscriber: ${customerEmail}`);
+
+        // Dispatch transactional welcome email on activation
+        try {
+          const { sendWelcomeCredentialsEmail } = await import("@/lib/email");
+          await sendWelcomeCredentialsEmail({
+            email: customerEmail,
+            name: activeName,
+            key: activeKey,
+            botId: activeBotId,
+          });
+        } catch (emailErr) {
+          console.warn("[DodoWebhook] Welcome email error:", emailErr);
+        }
+
+        console.log(`[DodoWebhook] Activated subscriber & dispatched email: ${customerEmail}`);
       }
 
       // 2. Cancellation Events
