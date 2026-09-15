@@ -102,7 +102,13 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                 <span>
-                  <strong>10 Cloud Failover</strong> (Mistral, Groq, Cohere &amp; more)
+                  <strong>10,000 Monthly AI Requests</strong> (~330 chats/day included)
+                </span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                <span>
+                  <strong>11 Cloud Failover</strong> (Gemini, Groq, Cloudflare &amp; more)
                 </span>
               </li>
               <li className="flex items-center gap-2.5">

@@ -55,7 +55,8 @@ Whether you need a **1-line embeddable AI customer support chatbot** trained on 
 - **Subscriber Directory & Quota Management:** Monitor paying tenants, rotate API keys, inspect usage meters, and suspend/activate tenants.
 - **Live Gateway Traffic & Failover Log Inspector:** Inspect full user prompts, model responses, tokens, and multi-cloud failover trails.
 
-### 👤 5. Subscriber Console (`/app`)
+### 👤 5. Subscriber Console (`/app`) & 10,000 Monthly Quota
+- **10,000 Monthly AI Requests (~330 req/day):** Generous multi-cloud allocation per subscriber with automated monthly cycle resets.
 - **Self-Service Dashboard:** Rotate live API keys, customize AI persona/tone/greetings, manage knowledge docs, and copy integration code.
 - **Domain Whitelisting (CORS):** Lock down widget usage to authorized customer domains.
 - **Turnkey Subscription Billing:** Powered by Dodo Payments with automated activation, renewal, and cancellation webhooks.

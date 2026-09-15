@@ -6,8 +6,8 @@ export function Features() {
       icon: Layers,
       color: "red",
       iconBg: "bg-red-500/10 border-red-500/20 text-red-400",
-      title: "Stacked Free Quotas",
-      description: "Combine the free tiers of Groq, SambaNova, Mistral, Gemini, and NVIDIA NIM into millions of free tokens per day.",
+      title: "10,000 Requests/Mo Pool",
+      description: "Includes 10,000 monthly requests routed across Groq, Cloudflare, Gemini, Mistral, SambaNova & 6 more clouds with zero token overage fees.",
     },
     {
       icon: ShieldCheck,

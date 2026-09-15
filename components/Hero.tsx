@@ -23,7 +23,7 @@ export function Hero({ onOpenCheckout }: HeroProps) {
           <span className="px-1.5 py-0.5 rounded bg-red-500/20 text-[10px] font-mono text-red-300">
             {APP_VERSION}
           </span>
-          <span>⚡ Multi-Cloud AI Gateway with Instant Failover</span>
+          <span>⚡ NEW: 10,000 Monthly Requests Included • 11 AI Clouds</span>
           <ChevronRight className="w-3 h-3 opacity-70" />
         </a>
       </div>
@@ -38,7 +38,7 @@ export function Hero({ onOpenCheckout }: HeroProps) {
 
       {/* Spacious, Punchy Subtitle */}
       <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
-        Zero downtime AI routing across <strong className="text-slate-200">9 multi-cloud providers</strong> — Gemini, Groq, Cloudflare, Mistral, SambaNova, Cohere &amp; more. Auto-fails over in &lt;8ms with custom RAG knowledge and a <strong className="text-slate-200">1-line website AI chatbot</strong>.
+        Zero downtime AI routing across <strong className="text-slate-200">11 multi-cloud providers</strong> — Gemini, Groq, Cloudflare, Mistral, SambaNova, Cohere &amp; more. Includes <strong className="text-white">10,000 requests/month</strong>, custom RAG knowledge base, and a <strong className="text-slate-200">1-line website AI chatbot</strong>.
       </p>
 
       {/* Clean Action Buttons */}
@@ -90,8 +90,10 @@ export function Hero({ onOpenCheckout }: HeroProps) {
       <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 text-xs text-slate-400 font-medium pt-1">
         <span className="inline-flex items-center gap-1.5 text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span>3-Day Free Trial Included</span>
+          <span>10,000 Requests/Mo Included</span>
         </span>
+        <span className="text-slate-600">•</span>
+        <span>3-Day Free Trial</span>
         <span className="text-slate-600">•</span>
         <span>Instant Setup in 30s</span>
         <span className="text-slate-600">•</span>
@@ -101,19 +103,19 @@ export function Hero({ onOpenCheckout }: HeroProps) {
       {/* Quick Metrics Bar */}
       <div className="pt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto border-t border-dark-border/60">
         <div className="p-4 rounded-2xl bg-dark-card/60 border border-dark-border text-center shadow-sm">
-          <div className="text-2xl sm:text-3xl font-extrabold text-white font-mono">$0</div>
-          <div className="text-xs text-slate-400 mt-1 font-medium">Self-Hosted Cost</div>
+          <div className="text-2xl sm:text-3xl font-extrabold text-white font-mono">10,000</div>
+          <div className="text-xs text-slate-400 mt-1 font-medium">Monthly Requests</div>
         </div>
         <div className="p-4 rounded-2xl bg-dark-card/60 border border-dark-border text-center shadow-sm">
           <div className="text-2xl sm:text-3xl font-extrabold text-emerald-400 font-mono">&lt;8ms</div>
           <div className="text-xs text-slate-400 mt-1 font-medium">Failover Speed</div>
         </div>
         <div className="p-4 rounded-2xl bg-dark-card/60 border border-dark-border text-center shadow-sm">
-          <div className="text-2xl sm:text-3xl font-extrabold text-red-400 font-mono">100</div>
+          <div className="text-2xl sm:text-3xl font-extrabold text-red-400 font-mono">100+</div>
           <div className="text-xs text-slate-400 mt-1 font-medium">Fast Models</div>
         </div>
         <div className="p-4 rounded-2xl bg-dark-card/60 border border-dark-border text-center shadow-sm">
-          <div className="text-2xl sm:text-3xl font-extrabold text-amber-400 font-mono">9</div>
+          <div className="text-2xl sm:text-3xl font-extrabold text-amber-400 font-mono">11</div>
           <div className="text-xs text-slate-400 mt-1 font-medium">Cloud Providers</div>
         </div>
       </div>
