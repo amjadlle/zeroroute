@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser, getCustomerByTokenOrKey } from "@/lib/auth/session";
+import { getCurrentUser, getCustomerByTokenOrKey, ADMIN_EMAILS } from "@/lib/auth/session";
 import { getDb, initDb } from "@/lib/db";
 
 export async function GET(req: NextRequest) {
@@ -11,13 +11,6 @@ export async function GET(req: NextRequest) {
       const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : authHeader.trim();
       if (token) {
         customer = await getCustomerByTokenOrKey(token);
-      }
-    }
-
-    if (!customer) {
-      const urlKey = req.nextUrl.searchParams.get("key") || req.nextUrl.searchParams.get("token");
-      if (urlKey) {
-        customer = await getCustomerByTokenOrKey(urlKey);
       }
     }
 
@@ -48,6 +41,9 @@ export async function GET(req: NextRequest) {
     const expiresAt = Number(customer.subscription_expires || 0);
     const daysRemaining = expiresAt > now ? Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24)) : 0;
 
+    const emailLower = (customer.email || "").toLowerCase();
+    const isAdmin = ADMIN_EMAILS.includes(emailLower) || customer.id === "admin_master";
+
     return NextResponse.json({
       success: true,
       customer: {
@@ -71,6 +67,7 @@ export async function GET(req: NextRequest) {
         bot_id: customer.bot_id || "",
         knowledge_docs_count: docCount,
         created_at: customer.created_at,
+        is_admin: isAdmin,
       },
     });
   } catch (err: unknown) {

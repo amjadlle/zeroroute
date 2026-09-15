@@ -7,11 +7,12 @@ import { LogOut, CreditCard } from "lucide-react";
 interface DashboardHeaderProps {
   name?: string;
   email?: string;
+  isAdmin?: boolean;
   onLogout: () => void;
   onOpenBilling?: () => void;
 }
 
-export function DashboardHeader({ name, email, onLogout, onOpenBilling }: DashboardHeaderProps) {
+export function DashboardHeader({ name, email, isAdmin, onLogout, onOpenBilling }: DashboardHeaderProps) {
   return (
     <header className="sticky top-0 z-40 bg-[#080a0f]/90 backdrop-blur-xl border-b border-dark-border px-3 sm:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-2">
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -27,15 +28,17 @@ export function DashboardHeader({ name, email, onLogout, onOpenBilling }: Dashbo
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Master Admin Portal Switcher */}
-        <Link
-          href="/admin"
-          className="px-2.5 sm:px-3 py-1.5 min-h-[44px] rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-400 hover:text-red-300 border border-red-500/30 transition-all text-xs font-bold flex items-center gap-1.5 shadow-sm touch-manipulation whitespace-nowrap"
-        >
-          <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse shrink-0" />
-          <span>Admin</span>
-          <span className="hidden md:inline">Portal</span>
-        </Link>
+        {/* Master Admin Portal Switcher (Visible only to authorized Admins) */}
+        {isAdmin && (
+          <Link
+            href="/admin"
+            className="px-2.5 sm:px-3 py-1.5 min-h-[44px] rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-400 hover:text-red-300 border border-red-500/30 transition-all text-xs font-bold flex items-center gap-1.5 shadow-sm touch-manipulation whitespace-nowrap"
+          >
+            <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse shrink-0" />
+            <span>Admin</span>
+            <span className="hidden md:inline">Portal</span>
+          </Link>
+        )}
 
         {onOpenBilling && (
           <button

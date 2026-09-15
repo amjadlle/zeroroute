@@ -31,6 +31,7 @@ interface CustomerProfile {
   monthly_limit: number;
   bot_id: string;
   knowledge_docs_count: number;
+  is_admin?: boolean;
 }
 
 export default function AppDashboard() {
@@ -178,6 +179,7 @@ export default function AppDashboard() {
       <DashboardHeader
         name={profile?.name}
         email={profile?.email}
+        isAdmin={Boolean(profile?.is_admin)}
         onLogout={handleLogout}
         onOpenBilling={() => setBillingOpen(true)}
       />

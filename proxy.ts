@@ -9,8 +9,7 @@ export function proxy(request: NextRequest) {
 
   const isAdmin = Boolean(
     (sessionToken && sessionToken.startsWith("zr_admin_")) ||
-    roleCookie === "admin" ||
-    (queryKey && (queryKey.startsWith("zr_admin_") || queryKey === process.env.ADMIN_KEY))
+    (queryKey && (queryKey.startsWith("zr_admin_") || (Boolean(process.env.ADMIN_KEY) && queryKey === process.env.ADMIN_KEY)))
   );
 
   const isAuthenticated = Boolean(sessionToken || queryKey);
