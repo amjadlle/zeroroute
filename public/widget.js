@@ -510,9 +510,12 @@
     var userText = text.trim();
     inputField.value = "";
 
-    // Always remove quick starter questions once any message is sent
+    // Instantly remove quick starter questions once any message is sent
     if (suggestionsWrapper) {
       suggestionsWrapper.style.display = "none";
+      try {
+        suggestionsWrapper.remove();
+      } catch (e) {}
     }
 
     appendMessage("user", userText);
