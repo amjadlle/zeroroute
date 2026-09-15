@@ -92,7 +92,7 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                   <span className="text-xs text-slate-400">/mo</span>
                 </div>
                 <span className="text-[10px] font-semibold text-emerald-400 block">
-                  3 Days Free • ≈ ₹330/mo
+                  3 Days Free Trial • Cancel Anytime
                 </span>
               </div>
             </div>

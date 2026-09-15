@@ -107,7 +107,7 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
               </span>
             </div>
             <div className="text-[11px] text-slate-400 font-mono -mt-1">
-              ≈ ₹330/mo • Apple Pay, Google Pay, Cards &amp; UPI
+              Apple Pay, Google Pay, Cards &amp; UPI Supported
             </div>
 
             <ul className="space-y-3 text-xs sm:text-sm text-slate-200 pt-4 border-t border-white/10">
