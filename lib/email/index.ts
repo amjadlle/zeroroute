@@ -187,16 +187,48 @@ export async function sendWelcomeCredentialsEmail(params: {
 
     <p><a href="${targetLoginUrl}" class="btn">Open Subscriber Console</a></p>
 
+    <!-- Free Concierge Setup Box -->
+    <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 20px; margin: 24px 0;">
+      <div style="color: #34d399; font-weight: 700; font-size: 14px; margin-bottom: 6px;">
+        🎧 Need Help Setting Up? We'll Do It For Free!
+      </div>
+      <p style="font-size: 12px; color: #cbd5e1; margin: 0 0 14px 0; line-height: 1.5;">
+        Not sure how to add the chatbot to WordPress, Webflow, Shopify, or your website? Book a free 15-minute 1-on-1 onboarding call with our team or reply to this email, and we will personally configure and test your AI chatbot on your site at zero cost.
+      </p>
+      <div>
+        <a href="https://cal.com/mapki/zeroroute-setup" style="display: inline-block; padding: 10px 18px; background: #059669; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 12px; margin-right: 8px; margin-bottom: 6px;">
+          📅 Book a Free 1-on-1 Setup Call
+        </a>
+        <a href="mailto:mapkisolutions@gmail.com?subject=ZeroRoute%20Free%20Setup%20Assistance" style="display: inline-block; padding: 10px 18px; background: rgba(255,255,255,0.1); color: #f1f5f9; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 12px; border: 1px solid rgba(255,255,255,0.15); margin-bottom: 6px;">
+          ✉️ Email Support (mapkisolutions@gmail.com)
+        </a>
+      </div>
+    </div>
+
     <div class="footer">
       ZeroRoute Cloud AI Gateway • Zero Cost. Max Route.<br>
-      Need help? Reply directly to this email.
+      Direct Support: <a href="mailto:mapkisolutions@gmail.com" style="color: #94a3b8; text-decoration: underline;">mapkisolutions@gmail.com</a> • <a href="https://cal.com/mapki/zeroroute-setup" style="color: #94a3b8; text-decoration: underline;">Book a Setup Call</a>
     </div>
   </div>
 </body>
 </html>
 `;
 
-  const text = `Welcome to ZeroRoute Pro, ${name}!\n\nYour Master Router Key: ${key}\nYour Bot ID: ${botId}\n\nAccess your console: ${targetLoginUrl}`;
+  const text = `Welcome to ZeroRoute Pro, ${name}!
+
+Your Master Router Key: ${key}
+Your Bot ID: ${botId}
+
+Access your console: ${targetLoginUrl}
+
+---------------------------------------------------
+NEED HELP SETTING UP? WE'LL DO IT FOR FREE!
+---------------------------------------------------
+If you're not sure how to embed the widget into your website (WordPress, Webflow, Shopify, HTML/React), we'll do it for you 100% free!
+
+📅 Book a Free 1-on-1 Call: https://cal.com/mapki/zeroroute-setup
+✉️ Email Support: mapkisolutions@gmail.com
+---------------------------------------------------`;
 
   return sendEmail({
     to: email,
@@ -205,3 +237,4 @@ export async function sendWelcomeCredentialsEmail(params: {
     text,
   });
 }
+
