@@ -324,14 +324,14 @@ function OnboardingContent() {
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-slate-300">Company or Project Name *</label>
                   <div className="relative">
-                    <Building className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Building className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input
                       type="text"
                       required
                       value={company}
                       onChange={(e) => setCompany(e.target.value)}
                       placeholder="e.g. Acme Cloud"
-                      className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl pl-10 pr-3.5 py-2 text-sm text-white outline-none"
+                      className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl pl-10 pr-3.5 py-2.5 text-base sm:text-sm text-white outline-none touch-manipulation"
                     />
                   </div>
                 </div>
@@ -339,13 +339,13 @@ function OnboardingContent() {
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-slate-300">Website URL</label>
                   <div className="relative">
-                    <Globe className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Globe className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input
                       type="text"
                       value={website}
                       onChange={(e) => setWebsite(e.target.value)}
                       placeholder="yourcompany.com or https://..."
-                      className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl pl-10 pr-3.5 py-2 text-sm text-white outline-none"
+                      className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl pl-10 pr-3.5 py-2.5 text-base sm:text-sm text-white outline-none touch-manipulation"
                     />
                   </div>
                 </div>
@@ -359,7 +359,7 @@ function OnboardingContent() {
                     value={botTitle}
                     onChange={(e) => setBotTitle(e.target.value)}
                     placeholder="e.g. Acme Support AI"
-                    className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl px-3.5 py-2 text-sm text-white outline-none"
+                    className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl px-3.5 py-2.5 text-base sm:text-sm text-white outline-none touch-manipulation"
                   />
                 </div>
 
@@ -370,7 +370,7 @@ function OnboardingContent() {
                     value={botRole}
                     onChange={(e) => setBotRole(e.target.value)}
                     placeholder="e.g. Customer Success Specialist"
-                    className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl px-3.5 py-2 text-sm text-white outline-none"
+                    className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl px-3.5 py-2.5 text-base sm:text-sm text-white outline-none touch-manipulation"
                   />
                 </div>
               </div>
@@ -382,7 +382,7 @@ function OnboardingContent() {
                     type="color"
                     value={color}
                     onChange={(e) => setColor(e.target.value)}
-                    className="w-9 h-9 rounded-xl border border-dark-border bg-transparent cursor-pointer"
+                    className="w-10 h-10 p-0.5 rounded-xl border border-dark-border bg-transparent cursor-pointer touch-manipulation"
                   />
                   <span className="text-xs font-mono text-slate-400 uppercase">{color}</span>
                 </div>
@@ -407,7 +407,7 @@ function OnboardingContent() {
                   value={greeting}
                   onChange={(e) => setGreeting(e.target.value)}
                   placeholder="Hi there! How can I help you today?"
-                  className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl px-3.5 py-2 text-sm text-white outline-none"
+                  className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl px-3.5 py-2.5 text-base sm:text-sm text-white outline-none touch-manipulation"
                 />
               </div>
 
@@ -417,22 +417,23 @@ function OnboardingContent() {
                   {prompts.map((p, idx) => (
                     <span
                       key={idx}
-                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/[0.06] border border-white/10 text-xs text-slate-200"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.06] border border-white/10 text-xs text-slate-200"
                     >
                       <span>{p}</span>
                       <button
                         type="button"
                         onClick={() => removePrompt(idx)}
-                        className="text-slate-500 hover:text-red-400 cursor-pointer"
+                        className="p-1 text-slate-500 hover:text-red-400 cursor-pointer min-h-[32px] min-w-[32px] flex items-center justify-center touch-manipulation"
+                        aria-label="Remove prompt"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </span>
                   ))}
                 </div>
 
                 {prompts.length < 6 && (
-                  <div className="flex gap-2 pt-1">
+                  <div className="flex flex-col sm:flex-row gap-2 pt-1">
                     <input
                       type="text"
                       value={newPromptInput}
@@ -444,15 +445,15 @@ function OnboardingContent() {
                         }
                       }}
                       placeholder="Add a sample prompt..."
-                      className="flex-1 bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl px-3.5 py-1.5 text-xs text-white outline-none"
+                      className="flex-1 bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl px-3.5 py-2.5 text-base sm:text-xs text-white outline-none touch-manipulation"
                     />
                     <button
                       type="button"
                       onClick={addPrompt}
-                      className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                      className="px-4 py-2.5 min-h-[44px] bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1 cursor-pointer touch-manipulation shrink-0"
                     >
                       <Plus className="w-3.5 h-3.5" />
-                      <span>Add</span>
+                      <span>Add Prompt</span>
                     </button>
                   </div>
                 )}
@@ -465,7 +466,7 @@ function OnboardingContent() {
                   value={tone}
                   onChange={(e) => setTone(e.target.value)}
                   placeholder="helpful, friendly, and concise"
-                  className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl px-3.5 py-2 text-sm text-white outline-none"
+                  className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl px-3.5 py-2.5 text-base sm:text-sm text-white outline-none touch-manipulation"
                 />
               </div>
 
@@ -476,7 +477,7 @@ function OnboardingContent() {
                   value={persona}
                   onChange={(e) => setPersona(e.target.value)}
                   placeholder="Instructions guiding AI tone and boundaries..."
-                  className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl p-3 text-xs text-white outline-none"
+                  className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl p-3.5 text-base sm:text-xs text-white outline-none touch-manipulation"
                 />
               </div>
             </div>
@@ -493,11 +494,11 @@ function OnboardingContent() {
               </div>
 
               {/* Mode Toggle */}
-              <div className="flex items-center gap-2 border-b border-white/10 pb-3">
+              <div className="flex flex-wrap items-center gap-2 border-b border-white/10 pb-3">
                 <button
                   type="button"
                   onClick={() => setKnowledgeMode("crawl")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  className={`px-3 py-2 min-h-[44px] rounded-xl text-xs font-bold transition-all cursor-pointer touch-manipulation flex items-center ${
                     knowledgeMode === "crawl"
                       ? "bg-blue-600/20 text-blue-300 border border-blue-500/30"
                       : "text-slate-400 hover:text-white"
@@ -508,7 +509,7 @@ function OnboardingContent() {
                 <button
                   type="button"
                   onClick={() => setKnowledgeMode("text")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  className={`px-3 py-2 min-h-[44px] rounded-xl text-xs font-bold transition-all cursor-pointer touch-manipulation flex items-center ${
                     knowledgeMode === "text"
                       ? "bg-red-600/20 text-red-300 border border-red-500/30"
                       : "text-slate-400 hover:text-white"
@@ -521,25 +522,25 @@ function OnboardingContent() {
               {knowledgeMode === "crawl" && (
                 <div className="space-y-3">
                   <label className="text-xs font-semibold text-slate-300">Website or Documentation URL</label>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <div className="relative flex-1">
-                      <Globe className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <Globe className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                       <input
                         type="text"
                         value={knowledgeUrl}
                         onChange={(e) => setKnowledgeUrl(e.target.value)}
                         placeholder="riba.mapki.in, https://yourcompany.com/docs, or GitHub raw .md"
-                        className="w-full bg-[#080a0f] border border-dark-border focus:border-blue-500/50 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-white outline-none"
+                        className="w-full bg-[#080a0f] border border-dark-border focus:border-blue-500/50 rounded-xl pl-10 pr-3.5 py-2.5 text-base sm:text-xs text-white outline-none touch-manipulation"
                       />
                     </div>
                     <button
                       type="button"
                       onClick={handleCrawlInWizard}
                       disabled={crawlingUrl || !knowledgeUrl.trim()}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
+                      className="px-5 py-2.5 min-h-[44px] bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer touch-manipulation shrink-0"
                     >
-                      {crawlingUrl ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
-                      <span>{crawlingUrl ? "Crawling…" : "Crawl"}</span>
+                      {crawlingUrl ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                      <span>{crawlingUrl ? "Crawling…" : "Crawl & Index"}</span>
                     </button>
                   </div>
 
@@ -557,7 +558,7 @@ function OnboardingContent() {
                       value={knowledgeText}
                       onChange={(e) => setKnowledgeText(e.target.value)}
                       placeholder="Crawled content or additional notes will appear here..."
-                      className="w-full bg-[#080a0f] border border-dark-border rounded-xl p-3 text-xs text-white font-mono leading-relaxed outline-none"
+                      className="w-full bg-[#080a0f] border border-dark-border rounded-xl p-3 text-base sm:text-xs text-white font-mono leading-relaxed outline-none touch-manipulation"
                     />
                   </div>
                 </div>
@@ -576,7 +577,7 @@ function OnboardingContent() {
                     value={knowledgeText}
                     onChange={(e) => setKnowledgeText(e.target.value)}
                     placeholder={`Example:\nQ: What is our return policy?\nA: We offer a 30-day money-back guarantee.\n\nQ: How do I contact support?\nA: Email us at support@example.com or reach out via live chat.`}
-                    className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl p-3.5 text-xs text-white font-mono leading-relaxed outline-none"
+                    className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl p-3.5 text-base sm:text-xs text-white font-mono leading-relaxed outline-none touch-manipulation"
                   />
                 </div>
               )}
@@ -603,18 +604,19 @@ function OnboardingContent() {
                   Set Account Password <span className="text-slate-500">(For dashboard login)</span>
                 </label>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Create a password (min 6 chars)"
-                    className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl pl-10 pr-10 py-2.5 text-sm text-white placeholder-slate-500 outline-none"
+                    className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl pl-10 pr-12 py-2.5 text-base sm:text-sm text-white placeholder-slate-500 outline-none touch-manipulation"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 cursor-pointer"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-500 hover:text-slate-300 cursor-pointer touch-manipulation"
+                    aria-label="Toggle password visibility"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -628,13 +630,13 @@ function OnboardingContent() {
                   <button
                     type="button"
                     onClick={copyKey}
-                    className="text-red-400 hover:text-red-300 font-semibold flex items-center gap-1 cursor-pointer"
+                    className="text-red-400 hover:text-red-300 font-semibold flex items-center gap-1 cursor-pointer min-h-[44px] px-2 touch-manipulation"
                   >
                     {copiedKey ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copiedKey ? "Copied!" : "Copy Key"}</span>
                   </button>
                 </div>
-                <div className="font-mono text-xs text-slate-200 bg-[#080a0f] p-2.5 rounded-lg border border-dark-border break-all select-all">
+                <div className="font-mono text-xs text-slate-200 bg-[#080a0f] p-3 rounded-lg border border-dark-border break-all select-all">
                   {customerKey || "Generating key..."}
                 </div>
               </div>
@@ -646,7 +648,7 @@ function OnboardingContent() {
                   <button
                     type="button"
                     onClick={copyScript}
-                    className="text-red-400 hover:text-red-300 font-semibold flex items-center gap-1 cursor-pointer"
+                    className="text-red-400 hover:text-red-300 font-semibold flex items-center gap-1 cursor-pointer min-h-[44px] px-2 touch-manipulation"
                   >
                     {copiedScript ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copiedScript ? "Copied!" : "Copy HTML"}</span>
@@ -660,12 +662,12 @@ function OnboardingContent() {
           )}
 
           {/* Navigation Action Buttons */}
-          <div className="pt-4 border-t border-dark-border flex items-center justify-between">
+          <div className="pt-4 border-t border-dark-border flex items-center justify-between gap-3">
             {currentStep > 1 ? (
               <button
                 type="button"
                 onClick={handlePrevStep}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer"
+                className="flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer touch-manipulation"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Back</span>
@@ -678,7 +680,7 @@ function OnboardingContent() {
               <button
                 type="button"
                 onClick={handleNextStep}
-                className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-lg shadow-red-500/20 active:scale-95 transition-all cursor-pointer"
+                className="flex items-center justify-center gap-1.5 px-5 py-2.5 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-lg shadow-red-500/20 active:scale-95 transition-all cursor-pointer touch-manipulation"
               >
                 <span>Continue</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -688,7 +690,7 @@ function OnboardingContent() {
                 type="button"
                 onClick={handleFinishSetup}
                 disabled={loading}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-xl shadow-red-500/25 active:scale-95 transition-all cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
+                className="flex items-center justify-center gap-2 px-6 py-2.5 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-xl shadow-red-500/25 active:scale-95 transition-all cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed touch-manipulation"
               >
                 {loading ? (
                   <>
