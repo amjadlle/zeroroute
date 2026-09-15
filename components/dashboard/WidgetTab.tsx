@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Copy, Bot, Send, Check, Trash2, Sparkles, ShieldCheck } from "lucide-react";
+import { 
+  Copy, Bot, Send, Check, Sparkles, ShieldCheck, 
+  User, CornerDownLeft, RefreshCw 
+} from "lucide-react";
 
 interface WidgetTabProps {
   botTitle: string;
@@ -17,23 +20,23 @@ function FormattedMessage({ content }: { content: string }) {
   const lines = content.split("\n");
 
   return (
-    <div className="space-y-1.5 text-[13px] leading-relaxed select-text">
+    <div className="space-y-2 text-[13.5px] leading-relaxed select-text">
       {lines.map((line, idx) => {
         const trimmed = line.trim();
         if (!trimmed) {
-          return <div key={idx} className="h-1" />;
+          return <div key={idx} className="h-1.5" />;
         }
 
         // Horizontal divider: --- or ***
         if (trimmed === "---" || trimmed === "***") {
-          return <hr key={idx} className="border-white/10 my-2" />;
+          return <hr key={idx} className="border-white/10 my-3" />;
         }
 
         // Heading 3 / Section Header: ### ...
         if (trimmed.startsWith("### ")) {
           const headingText = trimmed.replace(/^###\s*/, "").replace(/\*\*/g, "");
           return (
-            <div key={idx} className="font-bold text-white text-[13.5px] pt-1.5 pb-0.5 border-b border-white/5 flex items-center gap-1.5">
+            <div key={idx} className="font-bold text-white text-[14px] pt-2 pb-0.5 border-b border-white/5 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
               <span>{headingText}</span>
             </div>
@@ -44,7 +47,7 @@ function FormattedMessage({ content }: { content: string }) {
         if (trimmed.startsWith("## ")) {
           const headingText = trimmed.replace(/^##\s*/, "").replace(/\*\*/g, "");
           return (
-            <div key={idx} className="font-extrabold text-white text-sm pt-2 pb-0.5 border-b border-white/10">
+            <div key={idx} className="font-extrabold text-white text-[15px] pt-2.5 pb-1 border-b border-white/10">
               {headingText}
             </div>
           );
@@ -56,9 +59,9 @@ function FormattedMessage({ content }: { content: string }) {
           const num = numberedMatch[1];
           const text = numberedMatch[2];
           return (
-            <div key={idx} className="flex items-start gap-2 pl-1 text-slate-200">
+            <div key={idx} className="flex items-start gap-2.5 pl-1 text-slate-200">
               <span className="font-mono font-bold text-red-400 text-xs shrink-0 mt-0.5">{num}.</span>
-              <div className="flex-1 leading-snug">{renderInlineStyles(text)}</div>
+              <div className="flex-1 leading-relaxed">{renderInlineStyles(text)}</div>
             </div>
           );
         }
@@ -67,9 +70,9 @@ function FormattedMessage({ content }: { content: string }) {
         if (trimmed.startsWith("- ") || trimmed.startsWith("* ") || trimmed.startsWith("• ")) {
           const bulletContent = trimmed.replace(/^[-*•]\s*/, "");
           return (
-            <div key={idx} className="flex items-start gap-2 pl-1 text-slate-200">
+            <div key={idx} className="flex items-start gap-2.5 pl-1 text-slate-200">
               <span className="text-red-400 font-bold shrink-0 mt-0.5">•</span>
-              <div className="flex-1 leading-snug">{renderInlineStyles(bulletContent)}</div>
+              <div className="flex-1 leading-relaxed">{renderInlineStyles(bulletContent)}</div>
             </div>
           );
         }
@@ -78,9 +81,9 @@ function FormattedMessage({ content }: { content: string }) {
         if (trimmed.startsWith("✅ ")) {
           const checkContent = trimmed.replace(/^✅\s*/, "");
           return (
-            <div key={idx} className="flex items-start gap-2 pl-1 text-slate-200">
+            <div key={idx} className="flex items-start gap-2.5 pl-1 text-slate-200">
               <span className="text-emerald-400 shrink-0 text-xs mt-0.5">✅</span>
-              <div className="flex-1 leading-snug">{renderInlineStyles(checkContent)}</div>
+              <div className="flex-1 leading-relaxed">{renderInlineStyles(checkContent)}</div>
             </div>
           );
         }
@@ -163,18 +166,10 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
   ]);
   const [chatInput, setChatInput] = useState("");
   const [chatStreaming, setChatStreaming] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [copiedBotId, setCopiedBotId] = useState(false);
   const [copiedMsgIdx, setCopiedMsgIdx] = useState<number | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const siteUrl = typeof window !== "undefined" ? window.location.origin : "https://zeroroute.mapki.in";
-  const embedScript = `<script 
-  src="${siteUrl}/widget.js" 
-  data-bot-id="${botId || "bot_live_demo"}" 
-  defer>
-</script>`;
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -184,10 +179,9 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
     scrollToBottom();
   }, [chatMessages, chatStreaming]);
 
-  // Smooth typewriter simulation fallback if offline/no keys
+  // Typewriter animation simulation fallback if needed
   const runTypewriterSimulation = async (fullText: string, currentHistory: { role: "user" | "assistant"; content: string }[]) => {
     let accumulated = "";
-    // Add initial placeholder for streaming
     setChatMessages([...currentHistory, { role: "assistant", content: "" }]);
 
     for (let i = 0; i < fullText.length; i += 3) {
@@ -233,7 +227,6 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
       });
 
       if (!res.ok || !res.body) {
-        // Fallback intelligent response with typewriter animation
         const fallbackReply = `I am ${botTitle || "ZeroRoute Assistant"}, powered by ZeroRoute's multi-cloud gateway. I have received your message: "${textToSend.trim()}". All requests route dynamically with sub-8ms latency across our provider pool!`;
         await runTypewriterSimulation(fallbackReply, newHistory);
         setChatStreaming(false);
@@ -246,7 +239,7 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
       let buffer = "";
       let streamedResponse = "";
 
-      // Add empty assistant response slot
+      // Add empty assistant response slot (shows animated Thinking state while content is empty)
       setChatMessages([...newHistory, { role: "assistant", content: "" }]);
 
       while (true) {
@@ -293,18 +286,6 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
     }
   };
 
-  const copyWidgetScript = () => {
-    navigator.clipboard.writeText(embedScript);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const copyBotId = () => {
-    navigator.clipboard.writeText(botId || "bot_live_demo");
-    setCopiedBotId(true);
-    setTimeout(() => setCopiedBotId(false), 2000);
-  };
-
   const copyMessageContent = (text: string, idx: number) => {
     navigator.clipboard.writeText(text);
     setCopiedMsgIdx(idx);
@@ -315,197 +296,231 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
     setChatMessages([
       { role: "assistant", content: greeting || "Hi there! 👋 How can I help you today?" },
     ]);
+    setTimeout(() => inputRef.current?.focus(), 100);
   };
 
+  const isInitialOnly = chatMessages.length === 1 && chatMessages[0].role === "assistant";
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start animate-in fade-in duration-200">
-      {/* Left: Settings & Embed Code */}
-      <div className="lg:col-span-5 space-y-4">
-        <div className="p-5 bg-dark-card border border-dark-border rounded-2xl space-y-4 shadow-lg">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-white">1-Line Embeddable Script</h3>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
-              HTML / React / Webflow
-            </span>
+    <div className="w-full bg-[#07090e] border border-dark-border rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[calc(100vh-210px)] min-h-[600px] max-h-[850px] animate-in fade-in duration-200">
+      {/* ChatGPT-Style Top Header Bar */}
+      <div className="px-5 py-3.5 bg-dark-card/90 backdrop-blur-md border-b border-dark-border flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-600/25 to-rose-600/10 border border-red-500/30 flex items-center justify-center text-red-400 shadow-md">
+            <Bot className="w-5 h-5" />
           </div>
-
-          <p className="text-xs text-slate-400 leading-relaxed">
-            Paste this snippet right before <code className="text-red-400 bg-red-500/10 px-1 py-0.5 rounded font-mono">&lt;/body&gt;</code> in your website or web application.
-          </p>
-
-          <pre className="p-3 bg-[#080a0f] border border-dark-border rounded-xl text-xs font-mono text-slate-300 overflow-x-auto leading-relaxed select-all">
-            <code>{embedScript}</code>
-          </pre>
-
-          <button
-            type="button"
-            onClick={copyWidgetScript}
-            className="w-full py-3 px-4 min-h-[44px] rounded-xl text-xs font-bold bg-white/5 hover:bg-white/10 text-white border border-white/10 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 touch-manipulation"
-          >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copied ? "Copied Script to Clipboard!" : "Copy Embed Script"}</span>
-          </button>
-        </div>
-
-        <div className="p-5 bg-dark-card border border-dark-border rounded-2xl space-y-3 shadow-lg">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-bold text-white">Public Bot ID:</span>
-            <button
-              type="button"
-              onClick={copyBotId}
-              className="text-red-400 hover:text-red-300 text-xs font-semibold flex items-center gap-1 cursor-pointer min-h-[44px] px-2 touch-manipulation"
-            >
-              {copiedBotId ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copiedBotId ? "Copied!" : "Copy ID"}</span>
-            </button>
-          </div>
-          <div className="font-mono text-xs text-slate-300 bg-[#080a0f] p-2.5 rounded-xl border border-dark-border break-all select-all">
-            {botId || "bot_live_demo"}
-          </div>
-          <p className="text-[11px] text-slate-500">
-            Safe for public client-side widget embeds. Master router secret keys remain private on your backend.
-          </p>
-        </div>
-
-        <div className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 text-xs text-slate-300 flex items-center gap-2.5">
-          <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>Real-time token streaming with sub-8ms failover circuit breaker is active.</span>
-        </div>
-      </div>
-
-      {/* Right: Live Interactive Chat Simulator */}
-      <div className="lg:col-span-7 bg-[#080a0f] border border-dark-border rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[500px] sm:h-[560px]">
-        {/* Chat Header */}
-        <div className="px-4 py-3 bg-dark-card border-b border-dark-border flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-red-600/20 border border-red-500/30 flex items-center justify-center text-red-400 shadow-sm shrink-0">
-              <Bot className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-white block">{botTitle || "ZeroRoute AI"}</span>
-                <span className="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
-                  Live Test
-                </span>
-              </div>
-              <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-white tracking-tight">{botTitle || "ZeroRoute AI"}</span>
+              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-mono flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Multi-Cloud Pool Online</span>
+                Live Playground
               </span>
             </div>
+            <span className="text-[11px] text-slate-400 flex items-center gap-1.5">
+              <span>Persona &amp; Knowledge Base Active</span>
+              <span className="text-slate-600">•</span>
+              <span className="font-mono text-slate-500 text-[10px]">ID: {botId}</span>
+            </span>
           </div>
+        </div>
 
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={clearChat}
-            className="p-2 min-w-[44px] min-h-[44px] rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-colors text-xs flex items-center justify-center gap-1 cursor-pointer touch-manipulation"
-            title="Reset Simulator Chat"
-            aria-label="Clear chat"
+            className="px-3 py-1.5 min-h-[36px] rounded-xl text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/5 transition-all text-xs flex items-center gap-1.5 cursor-pointer touch-manipulation active:scale-95"
+            title="Reset conversation"
           >
-            <Trash2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Clear</span>
+            <RefreshCw className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline font-medium">New Chat</span>
           </button>
         </div>
+      </div>
 
-        {/* Chat Messages */}
-        <div className="flex-1 p-4 overflow-y-auto space-y-3.5 text-xs leading-relaxed">
+      {/* Main Chat Scroll Container (Full Width / Max-W-4xl Centered) */}
+      <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 scrollbar-thin scrollbar-thumb-white/10">
+        <div className="max-w-4xl mx-auto space-y-6">
           {chatMessages.map((m, i) => {
             const isLastAssistant = i === chatMessages.length - 1 && m.role === "assistant";
             const isCopied = copiedMsgIdx === i;
+            const isThinking = isLastAssistant && chatStreaming && m.content === "";
 
             return (
               <div
                 key={i}
-                className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"} animate-in fade-in duration-150 group`}
+                className={`flex gap-3.5 ${m.role === "user" ? "justify-end" : "justify-start"} animate-in fade-in duration-200 group`}
               >
-                <div
-                  className={`max-w-[88%] p-3.5 rounded-2xl ${
-                    m.role === "user"
-                      ? "bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-tr-none shadow-md shadow-red-500/15"
-                      : "bg-dark-card border border-dark-border text-slate-200 rounded-tl-none shadow-sm"
-                  }`}
-                >
-                  {m.role === "assistant" ? (
-                    <div className="relative">
-                      <FormattedMessage content={m.content} />
-                      {isLastAssistant && chatStreaming && (
-                        <span className="inline-block w-2 h-4 bg-red-500 ml-1 translate-y-0.5 rounded-xs animate-pulse" />
-                      )}
+                {/* Assistant Avatar */}
+                {m.role === "assistant" && (
+                  <div className="w-8 h-8 rounded-xl bg-red-600/15 border border-red-500/25 flex items-center justify-center text-red-400 shrink-0 mt-0.5">
+                    <Bot className="w-4 h-4" />
+                  </div>
+                )}
+
+                {/* Message Body */}
+                <div className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"} max-w-[85%] sm:max-w-[78%]`}>
+                  {m.role === "user" ? (
+                    <div className="p-4 rounded-2xl rounded-tr-sm bg-gradient-to-r from-red-600 via-rose-600 to-red-500 text-white shadow-lg shadow-red-500/15">
+                      <p className="whitespace-pre-wrap text-[13.5px] leading-relaxed select-text font-normal">
+                        {m.content}
+                      </p>
                     </div>
                   ) : (
-                    <span className="whitespace-pre-wrap text-[13px]">{m.content}</span>
+                    <div className="p-4 rounded-2xl rounded-tl-sm bg-[#0c1018] border border-white/10 text-slate-200 shadow-md w-full">
+                      {isThinking ? (
+                        /* Thinking State Indicator */
+                        <div className="flex items-center gap-2.5 py-1 text-xs text-slate-300">
+                          <div className="w-5 h-5 rounded-lg bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-400">
+                            <Sparkles className="w-3.5 h-3.5 animate-spin" />
+                          </div>
+                          <span className="font-semibold text-slate-300">Thinking</span>
+                          <div className="flex items-center gap-1 pl-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-bounce [animation-delay:-0.3s]" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-bounce [animation-delay:-0.15s]" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-bounce" />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="relative">
+                          <FormattedMessage content={m.content} />
+                          {isLastAssistant && chatStreaming && (
+                            <span className="inline-block w-2 h-4 bg-red-400 ml-1 translate-y-0.5 rounded-xs animate-pulse" />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Assistant Actions Bar */}
+                  {m.role === "assistant" && m.content && !chatStreaming && (
+                    <div className="opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity pl-1 pt-1.5 flex items-center gap-3 text-[11px] text-slate-500">
+                      <button
+                        type="button"
+                        onClick={() => copyMessageContent(m.content, i)}
+                        className="hover:text-slate-200 flex items-center gap-1 cursor-pointer transition-colors min-h-[28px] px-1 touch-manipulation"
+                        title="Copy message text"
+                      >
+                        {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        <span>{isCopied ? "Copied" : "Copy"}</span>
+                      </button>
+                    </div>
                   )}
                 </div>
 
-                {/* Assistant Message Quick Actions */}
-                {m.role === "assistant" && m.content && !chatStreaming && (
-                  <div className="opacity-0 group-hover:opacity-100 sm:opacity-0 focus-within:opacity-100 transition-opacity pl-1 pt-1 flex items-center gap-2 text-[10px] text-slate-500">
-                    <button
-                      type="button"
-                      onClick={() => copyMessageContent(m.content, i)}
-                      className="hover:text-slate-300 flex items-center gap-1 cursor-pointer transition-colors min-h-[32px] px-1 touch-manipulation"
-                      title="Copy message text"
-                    >
-                      {isCopied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                      <span>{isCopied ? "Copied" : "Copy"}</span>
-                    </button>
+                {/* User Avatar */}
+                {m.role === "user" && (
+                  <div className="w-8 h-8 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center text-slate-200 shrink-0 mt-0.5">
+                    <User className="w-4 h-4" />
                   </div>
                 )}
               </div>
             );
           })}
+
+          {/* Initial State Big Prompt Cards */}
+          {isInitialOnly && prompts && prompts.length > 0 && (
+            <div className="pt-6 pb-2">
+              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-red-400" />
+                <span>Suggested Test Queries</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                {prompts.map((p, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    disabled={chatStreaming}
+                    onClick={() => handleSendTestChat(p)}
+                    className="p-3.5 rounded-xl bg-dark-card hover:bg-white/[0.07] border border-dark-border hover:border-red-500/40 text-left transition-all group cursor-pointer active:scale-98 disabled:opacity-50 touch-manipulation"
+                  >
+                    <span className="text-xs font-semibold text-slate-200 group-hover:text-red-300 block mb-1">
+                      {p}
+                    </span>
+                    <span className="text-[11px] text-slate-500 flex items-center gap-1">
+                      <span>Click to test</span>
+                      <CornerDownLeft className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div ref={messagesEndRef} />
         </div>
+      </div>
 
-        {/* Suggested Chips */}
-        {prompts && prompts.length > 0 && (
-          <div className="px-3 sm:px-4 py-2 border-t border-white/5 flex gap-1.5 overflow-x-auto scrollbar-none bg-[#050608]/50 touch-pan-x">
+      {/* Bottom Floating Prompt Chips Bar (when active conversation) */}
+      {!isInitialOnly && prompts && prompts.length > 0 && (
+        <div className="px-4 sm:px-6 py-2 border-t border-white/5 bg-[#050608]/70 backdrop-blur-sm">
+          <div className="max-w-4xl mx-auto flex items-center gap-2 overflow-x-auto scrollbar-none touch-pan-x">
+            <span className="text-[10px] font-semibold text-slate-500 uppercase shrink-0">Suggestions:</span>
             {prompts.map((p, idx) => (
               <button
                 key={idx}
                 type="button"
                 disabled={chatStreaming}
                 onClick={() => handleSendTestChat(p)}
-                className="px-3 py-1.5 min-h-[36px] rounded-full bg-white/5 hover:bg-red-500/15 hover:border-red-500/30 border border-white/10 text-[11px] text-slate-300 hover:text-red-300 whitespace-nowrap cursor-pointer transition-all active:scale-95 disabled:opacity-50 touch-manipulation shrink-0"
+                className="px-3 py-1 min-h-[32px] rounded-full bg-white/5 hover:bg-red-500/15 hover:border-red-500/30 border border-white/10 text-[11px] text-slate-300 hover:text-red-300 whitespace-nowrap cursor-pointer transition-all active:scale-95 disabled:opacity-50 touch-manipulation shrink-0"
               >
                 {p}
               </button>
             ))}
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Chat Input Bar */}
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSendTestChat();
-          }}
-          className="p-3 bg-dark-card border-t border-dark-border flex gap-2"
-        >
-          <input
-            type="text"
-            value={chatInput}
-            onChange={(e) => setChatInput(e.target.value)}
-            placeholder="Type a test message to stream through failover router…"
-            className="flex-1 bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl px-3.5 py-2.5 text-base sm:text-xs text-white placeholder-slate-500 outline-none touch-manipulation"
-          />
-          <button
-            type="submit"
-            disabled={!chatInput.trim() || chatStreaming}
-            className={`px-4 py-2.5 min-h-[44px] min-w-[44px] rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 touch-manipulation shrink-0 ${
-              !chatInput.trim() || chatStreaming
-                ? "bg-white/5 text-slate-500 border border-white/10 cursor-not-allowed"
-                : "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-lg shadow-red-500/25 active:scale-95 cursor-pointer"
-            }`}
+      {/* Bottom Input Area */}
+      <div className="p-4 sm:p-5 bg-dark-card border-t border-dark-border shrink-0">
+        <div className="max-w-4xl mx-auto space-y-2">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSendTestChat();
+            }}
+            className="flex items-center gap-2 bg-[#080a0f] border border-dark-border focus-within:border-red-500/50 rounded-2xl p-1.5 shadow-inner transition-colors"
           >
-            {chatStreaming ? (
-              <Sparkles className="w-4 h-4 animate-spin text-slate-400" />
-            ) : (
-              <Send className={`w-4 h-4 ${!chatInput.trim() ? "text-slate-500" : "text-white"}`} />
-            )}
-            <span className="inline font-bold">{chatStreaming ? "Streaming…" : "Send"}</span>
-          </button>
-        </form>
+            <input
+              ref={inputRef}
+              type="text"
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              placeholder="Ask anything or test chatbot knowledge (Press Enter to send)..."
+              disabled={chatStreaming}
+              className="flex-1 bg-transparent px-3.5 py-2.5 text-base sm:text-xs text-white placeholder-slate-500 outline-none touch-manipulation disabled:opacity-50"
+            />
+            <button
+              type="submit"
+              disabled={!chatInput.trim() || chatStreaming}
+              className={`px-4 py-2.5 min-h-[40px] rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 touch-manipulation shrink-0 ${
+                !chatInput.trim() || chatStreaming
+                  ? "bg-white/5 text-slate-600 border border-white/5 cursor-not-allowed"
+                  : "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-md shadow-red-500/20 active:scale-95 cursor-pointer"
+              }`}
+            >
+              {chatStreaming ? (
+                <>
+                  <Sparkles className="w-3.5 h-3.5 animate-spin text-red-300" />
+                  <span>Thinking...</span>
+                </>
+              ) : (
+                <>
+                  <Send className={`w-3.5 h-3.5 ${!chatInput.trim() ? "text-slate-600" : "text-white"}`} />
+                  <span className="font-bold hidden sm:inline">Send</span>
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="flex items-center justify-between text-[11px] text-slate-500 px-1">
+            <span className="flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Multi-Cloud AI Router with sub-8ms failover active</span>
+            </span>
+            <span className="hidden sm:inline">Press Enter to send</span>
+          </div>
+        </div>
       </div>
     </div>
   );
