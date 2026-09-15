@@ -376,18 +376,13 @@ curl ${hostUrl}/v1/chat/completions \\
 
                   {/* Starter Prompts */}
                   {cleanPrompts && (
-                    <div className="pt-2 space-y-1.5 pl-7">
+                    <div className="pt-2 space-y-1.5">
                       <span className="text-[9px] uppercase font-bold text-slate-500 tracking-wider block">Suggested Questions</span>
                       <div className="flex flex-wrap gap-1.5">
                         {cleanPrompts.split(",").map((chip, idx) => (
                           <span
                             key={idx}
-                            className="px-2 py-1 rounded-lg text-[10px] font-medium transition-all"
-                            style={{
-                              backgroundColor: `${brandColor}15`,
-                              color: brandColor,
-                              border: `1px solid ${brandColor}30`,
-                            }}
+                            className="px-2.5 py-1 rounded-xl text-[10.5px] font-medium bg-white/5 border border-white/10 text-slate-300"
                           >
                             {chip}
                           </span>
