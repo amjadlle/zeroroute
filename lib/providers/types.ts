@@ -1,4 +1,4 @@
-﻿export interface ChatMessage {
+export interface ChatMessage {
   role: 'system' | 'user' | 'assistant' | 'tool';
   content: string;
   name?: string;
@@ -79,6 +79,8 @@ export interface ProviderRuntimeState {
   cooldownUntil: number;
   lastLatencyMs?: number;
   lastError?: string;
+  rateLimits?: RateLimitTelemetry;
+  lastUsedAt?: number;
 }
 
 export interface Provider {

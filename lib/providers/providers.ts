@@ -178,7 +178,14 @@ async function* openAIStyleStream(
       // ignore JSON parse errors in malformed chunks
     }
   }
+
+  const telemetry = extractRateLimits(res);
+  if (telemetry) {
+    providerTelemetryMap.set(id, telemetry);
+  }
 }
+
+export const providerTelemetryMap = new Map<string, RateLimitTelemetry>();
 
 export const extractRateLimits = (res?: Response): RateLimitTelemetry | undefined => {
   if (!res || !res.headers) return undefined;
@@ -214,6 +221,9 @@ const normalize = (id: string, model: string, data: any, res?: Response): ChatRe
     content = "OK";
   }
   const telemetry = extractRateLimits(res);
+  if (telemetry) {
+    providerTelemetryMap.set(id, telemetry);
+  }
   return {
     id: data.id ?? `${id}-${Date.now()}`,
     object: "chat.completion",

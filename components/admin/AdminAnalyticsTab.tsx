@@ -7,7 +7,8 @@ import {
   RefreshCw,
   CheckCircle2,
   AlertTriangle,
-  Timer
+  Timer,
+  Activity
 } from "lucide-react";
 import { ProviderItem } from "./AdminProvidersTab";
 import { GlobalLogItem } from "./AdminLogsTab";
@@ -229,6 +230,47 @@ export function AdminAnalyticsTab({ providers, logs, onRefresh, loading }: Admin
                     </strong>
                   </div>
                 </div>
+
+                {/* Live Quota Telemetry (From Real Provider RateLimit Headers) */}
+                {p.rateLimits && (p.rateLimits.remainingRequests || p.rateLimits.remainingTokens || p.rateLimits.resetRequests) ? (
+                  <div className="p-2.5 rounded-xl bg-emerald-500/5 border border-emerald-500/20 space-y-1.5 font-mono text-[10.5px]">
+                    <div className="flex items-center justify-between text-emerald-400 font-bold">
+                      <span className="flex items-center gap-1">
+                        <Activity className="w-3 h-3 animate-pulse text-emerald-400" /> Live Remaining Quota:
+                      </span>
+                      {p.rateLimits.resetRequests && (
+                        <span className="text-[9.5px] text-slate-400 font-normal">
+                          Reset: {p.rateLimits.resetRequests}
+                        </span>
+                      )}
+                    </div>
+                    {p.rateLimits.remainingRequests && (
+                      <div className="flex items-center justify-between text-slate-300">
+                        <span>Requests Left:</span>
+                        <strong className="text-white font-bold">
+                          {p.rateLimits.remainingRequests}
+                          {p.rateLimits.limitRequests ? ` / ${p.rateLimits.limitRequests}` : ""}
+                        </strong>
+                      </div>
+                    )}
+                    {p.rateLimits.remainingTokens && (
+                      <div className="flex items-center justify-between text-slate-300">
+                        <span>Tokens Left (TPM):</span>
+                        <strong className="text-white font-bold">
+                          {p.rateLimits.remainingTokens}
+                          {p.rateLimits.limitTokens ? ` / ${p.rateLimits.limitTokens}` : ""}
+                        </strong>
+                      </div>
+                    )}
+                  </div>
+                ) : p.configured ? (
+                  <div className="p-2 rounded-xl bg-white/[0.02] border border-white/5 text-[10px] text-slate-500 font-mono flex items-center justify-between">
+                    <span className="flex items-center gap-1">
+                      <Activity className="w-3 h-3 text-slate-500" /> Live Quota Tracker:
+                    </span>
+                    <span className="text-slate-400">Syncs on next call</span>
+                  </div>
+                ) : null}
 
                 {inCooldown && (
                   <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-[10.5px] font-mono flex items-center gap-1.5 animate-pulse">

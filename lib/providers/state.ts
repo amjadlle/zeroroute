@@ -1,4 +1,4 @@
-import { providers, isProviderConfigured } from "./providers";
+import { providers, isProviderConfigured, providerTelemetryMap } from "./providers";
 import type { ProviderRuntimeState } from "./types";
 
 export const DEFAULT_PROVIDER_MODELS: Record<string, string[]> = {
@@ -108,9 +108,30 @@ export const getRuntimeProviders = (): ProviderRuntimeState[] =>
   Array.from(runtimeStateMap.values())
     .map(p => {
       p.configured = isProviderConfigured(p.id);
+      p.rateLimits = providerTelemetryMap.get(p.id) || p.rateLimits;
       return p;
     })
     .sort((a, b) => a.order - b.order);
+
+export function updateProviderTelemetry(
+  providerId: string,
+  telemetry?: any,
+  latencyMs?: number
+) {
+  const existing = runtimeStateMap.get(providerId);
+  if (existing) {
+    if (telemetry && Object.keys(telemetry).length > 0) {
+      existing.rateLimits = {
+        ...(existing.rateLimits || {}),
+        ...telemetry
+      };
+    }
+    if (typeof latencyMs === "number" && latencyMs > 0) {
+      existing.lastLatencyMs = latencyMs;
+    }
+    existing.lastUsedAt = Date.now();
+  }
+}
 
 export async function loadSavedProviderConfigs(): Promise<void> {
   try {

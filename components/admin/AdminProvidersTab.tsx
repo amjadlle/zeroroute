@@ -23,6 +23,8 @@ import {
 import { PROVIDER_PORTALS, PROVIDER_CATALOGS } from "@/lib/providers/catalog";
 import { ProviderModelCatalogModal } from "./ProviderModelCatalogModal";
 
+import { RateLimitTelemetry } from "@/lib/providers/types";
+
 export interface ProviderItem {
   id: string;
   name: string;
@@ -35,6 +37,8 @@ export interface ProviderItem {
   cooldownUntil: number;
   lastLatencyMs?: number;
   lastError?: string;
+  rateLimits?: RateLimitTelemetry;
+  lastUsedAt?: number;
 }
 
 interface BenchmarkResult {
