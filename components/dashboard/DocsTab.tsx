@@ -568,8 +568,8 @@ curl ${hostUrl}/v1/chat/completions \\
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-white/10">
               <span className="text-[11px] text-slate-400 text-center sm:text-left">
                 Need help? Email{" "}
-                <a href="mailto:support@mapki.com" className="text-red-400 hover:underline">
-                  support@mapki.com
+                <a href="mailto:mapkisolutions@gmail.com" className="text-red-400 hover:underline">
+                  mapkisolutions@gmail.com
                 </a>
               </span>
 

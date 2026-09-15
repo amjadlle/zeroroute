@@ -80,6 +80,18 @@ export async function POST(req: NextRequest) {
         created_at: now,
         updated_at: now,
       } as any;
+
+      try {
+        const { sendWelcomeCredentialsEmail } = await import("@/lib/email");
+        await sendWelcomeCredentialsEmail({
+          email: defaultEmail,
+          name: "Subscriber",
+          key,
+          botId,
+        });
+      } catch (emailErr) {
+        console.warn("[Onboarding] Welcome credentials email error:", emailErr);
+      }
     }
 
     const activeCust: any = customer;

@@ -96,6 +96,19 @@ export async function POST(req: NextRequest) {
       ],
     });
 
+    // Dispatch transactional welcome email
+    try {
+      const { sendWelcomeCredentialsEmail } = await import("@/lib/email");
+      await sendWelcomeCredentialsEmail({
+        email,
+        name: name || email.split("@")[0],
+        key: apiKey,
+        botId,
+      });
+    } catch (emailErr) {
+      console.warn("[Signup] Welcome credentials email error:", emailErr);
+    }
+
     const response = NextResponse.json({
       success: true,
       message: "Account created successfully!",
@@ -120,6 +133,17 @@ export async function POST(req: NextRequest) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 30 * 24 * 60 * 60, // 30 days
+      path: "/",
+    });
+
+    // Set client role cookie
+    response.cookies.set({
+      name: "zr_role",
+      value: "customer",
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 30 * 24 * 60 * 60,
       path: "/",
     });
 
