@@ -196,7 +196,7 @@ export default function AdminDashboardPage() {
 
         {/* Tab 5: Knowledge Base */}
         {activeTab === "knowledge" && (
-          <AdminKnowledgeTab />
+          <AdminKnowledgeTab customers={customersList} />
         )}
 
         {/* Tab 6: Subscribers & Bots Directory */}

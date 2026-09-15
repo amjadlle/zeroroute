@@ -13,8 +13,10 @@ import {
   Layers,
   Trash2,
   FileText,
-  Loader2
+  Loader2,
+  Bot
 } from "lucide-react";
+import { CustomerAdminItem } from "./AdminCustomersTab";
 
 interface KnowledgeDoc {
   id: string;
@@ -27,9 +29,21 @@ interface KnowledgeDoc {
   created_at: number;
 }
 
-export function AdminKnowledgeTab() {
+interface AdminKnowledgeTabProps {
+  customers?: CustomerAdminItem[];
+}
+
+export function AdminKnowledgeTab({ customers = [] }: AdminKnowledgeTabProps) {
+  const [selectedKey, setSelectedKey] = useState<string>("");
   const [docs, setDocs] = useState<KnowledgeDoc[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Set initial selected key if customers exist
+  useEffect(() => {
+    if (customers.length > 0 && !selectedKey) {
+      setSelectedKey(customers[0].key);
+    }
+  }, [customers, selectedKey]);
 
   // Manual Ingestion
   const [rawTitle, setRawTitle] = useState("");
@@ -61,7 +75,10 @@ export function AdminKnowledgeTab() {
   const fetchDocs = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/knowledge", {
+      const url = selectedKey 
+        ? `/api/knowledge?target_key=${encodeURIComponent(selectedKey)}`
+        : "/api/knowledge";
+      const res = await fetch(url, {
         headers: getAdminHeaders(),
       });
       const data = await res.json();
@@ -77,7 +94,7 @@ export function AdminKnowledgeTab() {
 
   useEffect(() => {
     fetchDocs();
-  }, []);
+  }, [selectedKey]);
 
   const handleSaveSnippet = async () => {
     if (!rawContent.trim()) {
@@ -93,6 +110,7 @@ export function AdminKnowledgeTab() {
           title: rawTitle.trim() || "Knowledge Snippet",
           content: rawContent.trim(),
           type: "manual_text",
+          target_key: selectedKey || undefined,
         }),
       });
       const data = await res.json();
@@ -122,7 +140,10 @@ export function AdminKnowledgeTab() {
       const res = await fetch("/api/knowledge/crawl", {
         method: "POST",
         headers: getAdminHeaders(),
-        body: JSON.stringify({ url: crawlUrl.trim() }),
+        body: JSON.stringify({ 
+          url: crawlUrl.trim(),
+          target_key: selectedKey || undefined,
+        }),
       });
       const data = await res.json();
       if (data.success) {
@@ -151,6 +172,7 @@ export function AdminKnowledgeTab() {
           title: file.name,
           content: text,
           type: "file_upload",
+          target_key: selectedKey || undefined,
         }),
       });
       const data = await res.json();
@@ -168,7 +190,7 @@ export function AdminKnowledgeTab() {
 
   const handleDeleteDoc = async (id: string) => {
     try {
-      const res = await fetch(`/api/knowledge?id=${id}`, {
+      const res = await fetch(`/api/knowledge?id=${id}&target_key=${encodeURIComponent(selectedKey)}`, {
         method: "DELETE",
         headers: getAdminHeaders(),
       });
@@ -220,6 +242,38 @@ export function AdminKnowledgeTab() {
             <span>Refresh Docs</span>
           </button>
         </div>
+
+        {/* Bot / Website Selector */}
+        {customers.length > 0 && (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-black/40 border border-white/10">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400">
+                <Bot className="w-4 h-4" />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-white block">Target Bot / Website Knowledge Base</label>
+                <p className="text-[11px] text-slate-400">
+                  Documents and crawled URLs below will be trained and indexed exclusively for this bot.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <select
+                value={selectedKey}
+                onChange={(e) => setSelectedKey(e.target.value)}
+                aria-label="Target Bot or Website"
+                className="w-full sm:w-72 bg-[#080a0f] border border-white/10 focus:border-red-500 rounded-xl px-3 py-2 text-xs text-white font-medium outline-none cursor-pointer"
+              >
+                {customers.map((c) => (
+                  <option key={c.key} value={c.key}>
+                    {c.company || c.name || "Bot"} ({c.bot_id || c.email})
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
 
         {/* 2-Column Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">

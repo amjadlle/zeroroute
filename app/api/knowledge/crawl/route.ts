@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { getDb, initDb } from "@/lib/db";
-import { getCurrentUser, getCustomerByTokenOrKey } from "@/lib/auth/session";
+import { getCurrentUser, getCustomerByTokenOrKey, resolveAuth } from "@/lib/auth/session";
 import { crawlSourceUrl } from "@/lib/crawler";
 
 export const dynamic = "force-dynamic";
@@ -9,22 +9,38 @@ export const dynamic = "force-dynamic";
 export async function POST(req: NextRequest) {
   try {
     let customer = await getCurrentUser();
+    const authHeader = req.headers.get("authorization") || "";
+    const auth = await resolveAuth(authHeader);
 
-    if (!customer) {
-      const authHeader = req.headers.get("authorization") || "";
-      const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : authHeader.trim();
-      if (token) {
-        customer = await getCustomerByTokenOrKey(token);
-      }
+    if (!customer && auth.customer) {
+      customer = auth.customer;
     }
 
-    if (!customer) {
+    if (!customer && !auth.isAdmin) {
       return NextResponse.json({ error: "Unauthorized. Please log in." }, { status: 401 });
     }
 
+    const isAdmin = auth.isAdmin || customer?.id === "admin_master";
     const body = await req.json();
     const rawUrl = (body.url || "").trim();
     const customTitle = body.title ? body.title.trim() : undefined;
+
+    let targetKey = customer?.key || "zr_admin_master";
+    if (isAdmin) {
+      if (body.target_key) {
+        targetKey = body.target_key;
+      } else if (body.bot_id) {
+        await initDb();
+        const db = getDb();
+        const res = await db.execute({
+          sql: "SELECT key FROM customers WHERE bot_id = ? LIMIT 1",
+          args: [body.bot_id],
+        });
+        if (res.rows.length > 0) {
+          targetKey = (res.rows[0] as any).key;
+        }
+      }
+    }
 
     if (!rawUrl) {
       return NextResponse.json({ error: "URL is required for crawling." }, { status: 400 });
@@ -54,7 +70,7 @@ export async function POST(req: NextRequest) {
       `,
       args: [
         docId,
-        customer.key,
+        targetKey,
         crawlResult.title,
         `web_${crawlResult.sourceType}`,
         crawlResult.content,
@@ -63,6 +79,11 @@ export async function POST(req: NextRequest) {
         now,
       ],
     });
+
+    try {
+      const { invalidateDocCache } = await import("@/lib/providers/rag");
+      invalidateDocCache(targetKey);
+    } catch {}
 
     return NextResponse.json({
       success: true,

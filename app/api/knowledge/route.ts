@@ -1,21 +1,50 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser, getCustomerByTokenOrKey } from "@/lib/auth/session";
+import { getCurrentUser, getCustomerByTokenOrKey, resolveAuth } from "@/lib/auth/session";
 import { getDb, initDb } from "@/lib/db";
+
+async function resolveTargetKey(req: NextRequest, body?: any): Promise<{ customerKey: string | null; isAdmin: boolean }> {
+  let customer = await getCurrentUser();
+  const authHeader = req.headers.get("authorization") || "";
+  const auth = await resolveAuth(authHeader);
+
+  if (!customer && auth.customer) {
+    customer = auth.customer;
+  }
+
+  if (!customer && !auth.isAdmin) {
+    return { customerKey: null, isAdmin: false };
+  }
+
+  const isAdmin = auth.isAdmin || customer?.id === "admin_master";
+
+  if (isAdmin) {
+    const { searchParams } = new URL(req.url);
+    const targetKey = searchParams.get("target_key") || body?.target_key;
+    const botId = searchParams.get("bot_id") || body?.bot_id;
+
+    if (targetKey) return { customerKey: targetKey, isAdmin: true };
+    if (botId) {
+      await initDb();
+      const db = getDb();
+      const res = await db.execute({
+        sql: "SELECT key FROM customers WHERE bot_id = ? LIMIT 1",
+        args: [botId],
+      });
+      if (res.rows.length > 0) {
+        return { customerKey: (res.rows[0] as any).key, isAdmin: true };
+      }
+    }
+  }
+
+  return { customerKey: customer?.key || "zr_admin_master", isAdmin };
+}
 
 // GET /api/knowledge -> List knowledge documents
 export async function GET(req: NextRequest) {
   try {
-    let customer = await getCurrentUser();
+    const { customerKey } = await resolveTargetKey(req);
 
-    if (!customer) {
-      const authHeader = req.headers.get("authorization") || "";
-      const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : authHeader.trim();
-      if (token) {
-        customer = await getCustomerByTokenOrKey(token);
-      }
-    }
-
-    if (!customer) {
+    if (!customerKey) {
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
 
@@ -24,7 +53,7 @@ export async function GET(req: NextRequest) {
 
     const result = await db.execute({
       sql: "SELECT * FROM knowledge_documents WHERE customer_key = ? ORDER BY created_at DESC",
-      args: [customer.key],
+      args: [customerKey],
     });
 
     return NextResponse.json({
@@ -40,21 +69,13 @@ export async function GET(req: NextRequest) {
 // POST /api/knowledge -> Add knowledge document
 export async function POST(req: NextRequest) {
   try {
-    let customer = await getCurrentUser();
+    const body = await req.json();
+    const { customerKey } = await resolveTargetKey(req, body);
 
-    if (!customer) {
-      const authHeader = req.headers.get("authorization") || "";
-      const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : authHeader.trim();
-      if (token) {
-        customer = await getCustomerByTokenOrKey(token);
-      }
-    }
-
-    if (!customer) {
+    if (!customerKey) {
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
 
-    const body = await req.json();
     const title = (body.title || "Knowledge Document").trim();
     const content = (body.content || "").trim();
     const type = body.type || "manual_text";
@@ -75,12 +96,12 @@ export async function POST(req: NextRequest) {
         INSERT INTO knowledge_documents (id, customer_key, title, type, content, char_count, source_url, created_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `,
-      args: [id, customer.key, title, type, content, content.length, source_url, now],
+      args: [id, customerKey, title, type, content, content.length, source_url, now],
     });
 
     try {
       const { invalidateDocCache } = await import("@/lib/providers/rag");
-      invalidateDocCache(customer.key);
+      invalidateDocCache(customerKey);
     } catch {}
 
     return NextResponse.json({
@@ -103,17 +124,9 @@ export async function POST(req: NextRequest) {
 // DELETE /api/knowledge -> Delete knowledge document
 export async function DELETE(req: NextRequest) {
   try {
-    let customer = await getCurrentUser();
+    const { customerKey, isAdmin } = await resolveTargetKey(req);
 
-    if (!customer) {
-      const authHeader = req.headers.get("authorization") || "";
-      const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : authHeader.trim();
-      if (token) {
-        customer = await getCustomerByTokenOrKey(token);
-      }
-    }
-
-    if (!customer) {
+    if (!customerKey) {
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
 
@@ -127,14 +140,21 @@ export async function DELETE(req: NextRequest) {
     await initDb();
     const db = getDb();
 
-    await db.execute({
-      sql: "DELETE FROM knowledge_documents WHERE id = ? AND customer_key = ?",
-      args: [id, customer.key],
-    });
+    if (isAdmin) {
+      await db.execute({
+        sql: "DELETE FROM knowledge_documents WHERE id = ?",
+        args: [id],
+      });
+    } else {
+      await db.execute({
+        sql: "DELETE FROM knowledge_documents WHERE id = ? AND customer_key = ?",
+        args: [id, customerKey],
+      });
+    }
 
     try {
       const { invalidateDocCache } = await import("@/lib/providers/rag");
-      invalidateDocCache(customer.key);
+      invalidateDocCache(customerKey);
     } catch {}
 
     return NextResponse.json({
