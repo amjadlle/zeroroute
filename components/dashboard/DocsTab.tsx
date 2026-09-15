@@ -347,7 +347,7 @@ curl ${hostUrl}/v1/chat/completions \\
                       <img
                         src={logoUrl}
                         alt=""
-                        className="w-7 h-7 rounded-full object-cover border border-white/20 shrink-0"
+                        className="h-7 w-auto max-w-[36px] object-contain shrink-0"
                       />
                     ) : null}
                     <div>
@@ -366,7 +366,7 @@ curl ${hostUrl}/v1/chat/completions \\
                       <img
                         src={logoUrl}
                         alt=""
-                        className="w-5 h-5 rounded-full object-cover border border-white/20 shrink-0 mt-0.5"
+                        className="h-5 w-auto max-w-[24px] object-contain shrink-0 mt-0.5"
                       />
                     ) : null}
                     <div className="bg-white/10 border border-white/10 text-slate-200 p-2.5 rounded-2xl text-[11px] leading-relaxed max-w-[85%]">

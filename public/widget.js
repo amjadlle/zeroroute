@@ -93,11 +93,13 @@
       gap: 10px;
     }
     #zr-header .zr-logo {
-      width: 28px;
       height: 28px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 1px solid rgba(255, 255, 255, 0.25);
+      width: auto;
+      max-width: 36px;
+      object-fit: contain;
+      border-radius: 0;
+      border: none;
+      background: transparent;
       flex-shrink: 0;
     }
     #zr-header .title-wrap {
