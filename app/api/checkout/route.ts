@@ -14,11 +14,19 @@ export async function GET(request: Request) {
   const staticBuyUrl = `https://${isLive ? "" : "test."}checkout.dodopayments.com/buy/${productId}?redirect_url=${encodeURIComponent(returnUrl)}&return_url=${encodeURIComponent(returnUrl)}`;
   const checkoutUrl = process.env.DODO_CHECKOUT_URL || staticBuyUrl;
 
-  return NextResponse.json({
-    checkout_url: checkoutUrl,
-    environment: process.env.DODO_ENVIRONMENT || "test_mode",
-    product_id: productId
-  });
+  const url = new URL(request.url);
+  const acceptHeader = request.headers.get("accept") || "";
+  const wantsJson = url.searchParams.get("format") === "json" || acceptHeader.includes("application/json");
+
+  if (wantsJson) {
+    return NextResponse.json({
+      checkout_url: checkoutUrl,
+      environment: process.env.DODO_ENVIRONMENT || "test_mode",
+      product_id: productId
+    });
+  }
+
+  return NextResponse.redirect(checkoutUrl, { status: 307 });
 }
 
 export async function POST(request: Request) {

@@ -31,8 +31,8 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  // 3. If already logged in, redirect /login or /signup to their respective dashboard
-  if ((pathname === "/login" || pathname === "/signup") && sessionToken) {
+  // 3. If already logged in, redirect /login to dashboard
+  if (pathname === "/login" && sessionToken) {
     const targetPath = isAdmin ? "/admin" : "/app";
     const targetUrl = new URL(targetPath, request.url);
     return NextResponse.redirect(targetUrl);

@@ -127,15 +127,15 @@ export default function LoginPage() {
           )}
         </button>
 
-        {/* Link to Signup */}
+        {/* Link to Free Trial Checkout */}
         <div className="pt-2 text-center text-xs text-slate-400">
           Don&apos;t have an account?{" "}
-          <Link
-            href="/signup"
+          <a
+            href="/api/checkout"
             className="text-white hover:text-red-400 font-bold underline underline-offset-4 transition-colors min-h-[44px] inline-flex items-center touch-manipulation"
           >
             Start 3-day free trial →
-          </Link>
+          </a>
         </div>
       </form>
     </AuthCard>
