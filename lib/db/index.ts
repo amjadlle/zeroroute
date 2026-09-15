@@ -107,134 +107,110 @@ export const getDb = (): DatabaseAdapter => {
   return activeAdapter;
 };
 
+let initPromise: Promise<void> | null = null;
+
 export const initDb = async (): Promise<void> => {
   if (initialized) return;
-  const db = getDb();
+  if (initPromise) return initPromise;
 
-  await db.execute(`
-    CREATE TABLE IF NOT EXISTS customers (
-      id TEXT PRIMARY KEY,
-      key TEXT UNIQUE NOT NULL,
-      email TEXT UNIQUE NOT NULL,
-      password_hash TEXT,
-      password_salt TEXT,
-      name TEXT,
-      company TEXT,
-      website TEXT,
-      bot_title TEXT DEFAULT 'ZeroRoute AI',
-      bot_role TEXT DEFAULT 'AI Assistant',
-      tone TEXT DEFAULT 'helpful and concise',
-      greeting TEXT DEFAULT 'Hi there! How can I help you today?',
-      prompts TEXT DEFAULT '[]',
-      persona TEXT,
-      status TEXT DEFAULT 'active',
-      subscription_expires INTEGER,
-      monthly_requests INTEGER DEFAULT 0,
-      monthly_limit INTEGER DEFAULT 2000,
-      period_start INTEGER,
-      period_end INTEGER,
-      bot_id TEXT UNIQUE,
-      allowed_domains TEXT DEFAULT '[]',
-      session_token TEXT,
-      created_at INTEGER NOT NULL,
-      updated_at INTEGER NOT NULL
-    );
-  `);
+  initPromise = (async () => {
+    const db = getDb();
 
-  await db.execute(`
-    CREATE INDEX IF NOT EXISTS idx_customers_email ON customers(email);
-  `);
+    // Run core table creation concurrently
+    await Promise.all([
+      db.execute(`
+        CREATE TABLE IF NOT EXISTS customers (
+          id TEXT PRIMARY KEY,
+          key TEXT UNIQUE NOT NULL,
+          email TEXT UNIQUE NOT NULL,
+          password_hash TEXT,
+          password_salt TEXT,
+          name TEXT,
+          company TEXT,
+          website TEXT,
+          bot_title TEXT DEFAULT 'ZeroRoute AI',
+          bot_role TEXT DEFAULT 'AI Assistant',
+          tone TEXT DEFAULT 'helpful and concise',
+          greeting TEXT DEFAULT 'Hi there! How can I help you today?',
+          prompts TEXT DEFAULT '[]',
+          persona TEXT,
+          status TEXT DEFAULT 'active',
+          subscription_expires INTEGER,
+          monthly_requests INTEGER DEFAULT 0,
+          monthly_limit INTEGER DEFAULT 2000,
+          period_start INTEGER,
+          period_end INTEGER,
+          bot_id TEXT UNIQUE,
+          allowed_domains TEXT DEFAULT '[]',
+          session_token TEXT,
+          created_at INTEGER NOT NULL,
+          updated_at INTEGER NOT NULL
+        );
+      `),
+      db.execute(`
+        CREATE TABLE IF NOT EXISTS auth_otps (
+          email TEXT PRIMARY KEY,
+          code TEXT NOT NULL,
+          expires_at INTEGER NOT NULL,
+          attempts INTEGER DEFAULT 0
+        );
+      `),
+      db.execute(`
+        CREATE TABLE IF NOT EXISTS knowledge_documents (
+          id TEXT PRIMARY KEY,
+          customer_key TEXT NOT NULL,
+          title TEXT NOT NULL,
+          type TEXT NOT NULL,
+          content TEXT NOT NULL,
+          char_count INTEGER NOT NULL,
+          source_url TEXT,
+          created_at INTEGER NOT NULL
+        );
+      `),
+      db.execute(`
+        CREATE TABLE IF NOT EXISTS request_logs (
+          id TEXT PRIMARY KEY,
+          customer_key TEXT NOT NULL,
+          timestamp INTEGER NOT NULL,
+          origin TEXT,
+          prompt_preview TEXT,
+          response_preview TEXT,
+          provider TEXT NOT NULL,
+          model TEXT NOT NULL,
+          latency_ms INTEGER NOT NULL,
+          status INTEGER NOT NULL,
+          is_stream INTEGER DEFAULT 0,
+          is_cache_hit INTEGER DEFAULT 0,
+          failovers TEXT DEFAULT '[]',
+          prompt_tokens INTEGER DEFAULT 0,
+          completion_tokens INTEGER DEFAULT 0,
+          total_tokens INTEGER DEFAULT 0
+        );
+      `),
+      db.execute(`
+        CREATE TABLE IF NOT EXISTS provider_configs (
+          id TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          enabled INTEGER DEFAULT 1,
+          priority INTEGER DEFAULT 1,
+          sort_order INTEGER DEFAULT 1,
+          primary_model TEXT NOT NULL,
+          models TEXT NOT NULL,
+          updated_at INTEGER NOT NULL
+        );
+      `),
+    ]);
 
-  await db.execute(`
-    CREATE INDEX IF NOT EXISTS idx_customers_key ON customers(key);
-  `);
+    // Create indexes concurrently
+    await Promise.allSettled([
+      db.execute(`CREATE INDEX IF NOT EXISTS idx_customers_email ON customers(email);`),
+      db.execute(`CREATE INDEX IF NOT EXISTS idx_customers_key ON customers(key);`),
+      db.execute(`CREATE INDEX IF NOT EXISTS idx_knowledge_customer ON knowledge_documents(customer_key);`),
+      db.execute(`CREATE INDEX IF NOT EXISTS idx_logs_customer ON request_logs(customer_key);`),
+    ]);
 
-  await db.execute(`
-    CREATE TABLE IF NOT EXISTS auth_otps (
-      email TEXT PRIMARY KEY,
-      code TEXT NOT NULL,
-      expires_at INTEGER NOT NULL,
-      attempts INTEGER DEFAULT 0
-    );
-  `);
+    initialized = true;
+  })();
 
-  await db.execute(`
-    CREATE TABLE IF NOT EXISTS knowledge_documents (
-      id TEXT PRIMARY KEY,
-      customer_key TEXT NOT NULL,
-      title TEXT NOT NULL,
-      type TEXT NOT NULL,
-      content TEXT NOT NULL,
-      char_count INTEGER NOT NULL,
-      source_url TEXT,
-      created_at INTEGER NOT NULL
-    );
-  `);
-
-  await db.execute(`
-    CREATE INDEX IF NOT EXISTS idx_knowledge_customer ON knowledge_documents(customer_key);
-  `);
-
-  await db.execute(`
-    CREATE TABLE IF NOT EXISTS request_logs (
-      id TEXT PRIMARY KEY,
-      customer_key TEXT NOT NULL,
-      timestamp INTEGER NOT NULL,
-      origin TEXT,
-      prompt_preview TEXT,
-      response_preview TEXT,
-      provider TEXT NOT NULL,
-      model TEXT NOT NULL,
-      latency_ms INTEGER NOT NULL,
-      status INTEGER NOT NULL,
-      is_stream INTEGER DEFAULT 0,
-      is_cache_hit INTEGER DEFAULT 0,
-      failovers TEXT DEFAULT '[]',
-      prompt_tokens INTEGER DEFAULT 0,
-      completion_tokens INTEGER DEFAULT 0,
-      total_tokens INTEGER DEFAULT 0
-    );
-  `);
-
-  await db.execute(`
-    CREATE INDEX IF NOT EXISTS idx_logs_customer ON request_logs(customer_key);
-  `);
-
-  await db.execute(`
-    CREATE TABLE IF NOT EXISTS provider_configs (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      enabled INTEGER DEFAULT 1,
-      priority INTEGER DEFAULT 1,
-      sort_order INTEGER DEFAULT 1,
-      primary_model TEXT NOT NULL,
-      models TEXT NOT NULL,
-      updated_at INTEGER NOT NULL
-    );
-  `);
-
-  // Safe automatic migration for existing Cloudflare D1 tables
-  try {
-    await db.execute(`ALTER TABLE provider_configs ADD COLUMN name TEXT DEFAULT '';`);
-  } catch {}
-  try {
-    await db.execute(`ALTER TABLE provider_configs ADD COLUMN priority INTEGER DEFAULT 1;`);
-  } catch {}
-  try {
-    await db.execute(`ALTER TABLE provider_configs ADD COLUMN sort_order INTEGER DEFAULT 1;`);
-  } catch {}
-  try {
-    await db.execute(`ALTER TABLE provider_configs ADD COLUMN primary_model TEXT DEFAULT '';`);
-  } catch {}
-  try {
-    await db.execute(`ALTER TABLE provider_configs ADD COLUMN models TEXT DEFAULT '[]';`);
-  } catch {}
-  try {
-    await db.execute(`ALTER TABLE provider_configs ADD COLUMN updated_at INTEGER DEFAULT 0;`);
-  } catch {}
-  try {
-    await db.execute(`ALTER TABLE provider_configs ADD COLUMN enabled INTEGER DEFAULT 1;`);
-  } catch {}
-
-  initialized = true;
+  return initPromise;
 };

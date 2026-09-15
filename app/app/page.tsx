@@ -89,8 +89,7 @@ export default function AppDashboard() {
   };
 
   useEffect(() => {
-    fetchProfile();
-    fetchDocs();
+    Promise.all([fetchProfile(), fetchDocs()]);
   }, []);
 
   const handleRotateKey = async () => {
