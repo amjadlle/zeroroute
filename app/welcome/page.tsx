@@ -354,7 +354,7 @@ function WelcomeContent() {
               <span className="text-sm sm:text-base font-bold text-white">Need Help Setting Up? We'll Do It For Free!</span>
               <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
                 <Sparkles className="w-3 h-3" />
-                100% Free Concierge
+                100% Free Setup &amp; Help
               </span>
             </div>
             <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">

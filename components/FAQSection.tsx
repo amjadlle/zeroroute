@@ -35,6 +35,11 @@ const FAQS: FAQItem[] = [
       "Yes! The core ZeroRoute proxy engine is 100% open source under the MIT License on GitHub. You can self-host it on your own Cloudflare Workers account for free or use our hosted ZeroRoute Cloud for instant managed setups.",
   },
   {
+    question: "What if I need help setting up or embedding the chatbot on my site?",
+    answer:
+      "We provide 100% free personal setup! If you're not sure how to add the script tag or configure documents for your website (WordPress, Shopify, Webflow, Next.js, or HTML), you can book a free 15-minute 1-on-1 call with our team or email us (mapkisolutions@gmail.com), and we will set up and test your chatbot for you for free.",
+  },
+  {
     question: "How does the 3-day free trial work for Starter Pro?",
     answer:
       "You get complete access to 10,000 monthly chat requests, hosted Cloudflare D1 SQL database, 5-in-1 live knowledge sync, and website chatbot widget for 3 full days completely free. You can cancel anytime before the trial ends without being charged.",
