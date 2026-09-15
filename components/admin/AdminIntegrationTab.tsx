@@ -123,11 +123,11 @@ print(response.choices[0].message.content)`;
             </p>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
             <button
               type="button"
               onClick={() => setShowGuideModal(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white border border-white/10 rounded-xl transition-all active:scale-95 cursor-pointer"
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 min-h-[44px] text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white border border-white/10 rounded-xl transition-all active:scale-95 cursor-pointer touch-manipulation flex-1 sm:flex-initial"
             >
               <BookOpen className="w-3.5 h-3.5 text-slate-400" />
               <span>Step-by-Step Guide</span>
@@ -135,7 +135,7 @@ print(response.choices[0].message.content)`;
             <button
               type="button"
               onClick={handleCopy}
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl shadow-md shadow-red-500/20 transition-all active:scale-95 cursor-pointer"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[44px] text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl shadow-md shadow-red-500/20 transition-all active:scale-95 cursor-pointer touch-manipulation flex-1 sm:flex-initial"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? "Copied Code!" : "Copy Code"}</span>
@@ -148,7 +148,7 @@ print(response.choices[0].message.content)`;
           <button
             type="button"
             onClick={() => setActiveFormat("widget")}
-            className={`px-3.5 py-1.5 text-xs rounded-xl font-bold transition-all cursor-pointer ${
+            className={`px-3.5 py-2 min-h-[44px] text-xs rounded-xl font-bold transition-all cursor-pointer touch-manipulation flex items-center ${
               activeFormat === "widget"
                 ? "bg-red-600 text-white shadow-md shadow-red-600/20"
                 : "bg-black/50 text-slate-300 hover:text-white border border-white/10"
@@ -159,7 +159,7 @@ print(response.choices[0].message.content)`;
           <button
             type="button"
             onClick={() => setActiveFormat("ai")}
-            className={`px-3.5 py-1.5 text-xs rounded-xl font-bold transition-all cursor-pointer ${
+            className={`px-3.5 py-2 min-h-[44px] text-xs rounded-xl font-bold transition-all cursor-pointer touch-manipulation flex items-center ${
               activeFormat === "ai"
                 ? "bg-red-600 text-white shadow-md shadow-red-600/20"
                 : "bg-black/50 text-slate-300 hover:text-white border border-white/10"
@@ -170,7 +170,7 @@ print(response.choices[0].message.content)`;
           <button
             type="button"
             onClick={() => setActiveFormat("js")}
-            className={`px-3.5 py-1.5 text-xs rounded-xl font-bold transition-all cursor-pointer ${
+            className={`px-3.5 py-2 min-h-[44px] text-xs rounded-xl font-bold transition-all cursor-pointer touch-manipulation flex items-center ${
               activeFormat === "js"
                 ? "bg-red-600 text-white shadow-md shadow-red-600/20"
                 : "bg-black/50 text-slate-300 hover:text-white border border-white/10"
@@ -181,7 +181,7 @@ print(response.choices[0].message.content)`;
           <button
             type="button"
             onClick={() => setActiveFormat("py")}
-            className={`px-3.5 py-1.5 text-xs rounded-xl font-bold transition-all cursor-pointer ${
+            className={`px-3.5 py-2 min-h-[44px] text-xs rounded-xl font-bold transition-all cursor-pointer touch-manipulation flex items-center ${
               activeFormat === "py"
                 ? "bg-red-600 text-white shadow-md shadow-red-600/20"
                 : "bg-black/50 text-slate-300 hover:text-white border border-white/10"
@@ -192,7 +192,7 @@ print(response.choices[0].message.content)`;
           <button
             type="button"
             onClick={() => setActiveFormat("curl")}
-            className={`px-3.5 py-1.5 text-xs rounded-xl font-bold transition-all cursor-pointer ${
+            className={`px-3.5 py-2 min-h-[44px] text-xs rounded-xl font-bold transition-all cursor-pointer touch-manipulation flex items-center ${
               activeFormat === "curl"
                 ? "bg-red-600 text-white shadow-md shadow-red-600/20"
                 : "bg-black/50 text-slate-300 hover:text-white border border-white/10"
@@ -220,7 +220,7 @@ print(response.choices[0].message.content)`;
                   type="text"
                   value={botTitle}
                   onChange={(e) => setBotTitle(e.target.value)}
-                  className="w-full px-3.5 py-2 text-xs bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-red-500"
+                  className="w-full px-3.5 py-2.5 text-base sm:text-xs bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-red-500 min-h-[44px]"
                 />
               </div>
 
@@ -231,13 +231,13 @@ print(response.choices[0].message.content)`;
                     type="color"
                     value={accentColor}
                     onChange={(e) => setAccentColor(e.target.value)}
-                    className="w-9 h-9 p-0.5 bg-black/50 border border-white/10 rounded-xl cursor-pointer shrink-0"
+                    className="w-11 h-11 p-0.5 bg-black/50 border border-white/10 rounded-xl cursor-pointer shrink-0 touch-manipulation min-w-[44px] min-h-[44px]"
                   />
                   <input
                     type="text"
                     value={accentColor}
                     onChange={(e) => setAccentColor(e.target.value)}
-                    className="flex-1 px-3.5 py-2 text-xs bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-red-500 font-mono"
+                    className="flex-1 px-3.5 py-2.5 text-base sm:text-xs bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-red-500 font-mono min-h-[44px]"
                   />
                 </div>
               </div>
@@ -250,7 +250,7 @@ print(response.choices[0].message.content)`;
                   type="text"
                   value={greeting}
                   onChange={(e) => setGreeting(e.target.value)}
-                  className="w-full px-3.5 py-2 text-xs bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-red-500"
+                  className="w-full px-3.5 py-2.5 text-base sm:text-xs bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-red-500 min-h-[44px]"
                 />
               </div>
 
@@ -262,7 +262,7 @@ print(response.choices[0].message.content)`;
                   type="text"
                   value={starterPrompts}
                   onChange={(e) => setStarterPrompts(e.target.value)}
-                  className="w-full px-3.5 py-2 text-xs bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-red-500"
+                  className="w-full px-3.5 py-2.5 text-base sm:text-xs bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-red-500 min-h-[44px]"
                 />
               </div>
             </div>
@@ -277,8 +277,8 @@ print(response.choices[0].message.content)`;
 
       {/* Step-by-Step Guide Modal */}
       {showGuideModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-[#090d16] border border-white/10 rounded-2xl p-6 sm:p-8 max-w-xl w-full space-y-4 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-[#090d16] border border-white/10 rounded-2xl p-5 sm:p-8 max-w-xl w-full space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <h3 className="font-bold text-sm text-white flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-red-500" />
@@ -287,7 +287,8 @@ print(response.choices[0].message.content)`;
               <button
                 type="button"
                 onClick={() => setShowGuideModal(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-white"
+                className="p-2 min-w-[44px] min-h-[44px] rounded-xl text-slate-400 hover:text-white hover:bg-white/5 flex items-center justify-center touch-manipulation cursor-pointer"
+                aria-label="Close guide"
               >
                 <X className="w-4 h-4" />
               </button>

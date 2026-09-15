@@ -322,13 +322,13 @@ export function ProviderModelCatalogModal({
         )}
 
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[#050608]/90">
+        <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-white/10 bg-[#050608]/90">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400">
+            <div className="w-9 h-9 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400 shrink-0">
               <Layers className="w-5 h-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="text-base font-bold text-white">{provider.name} Model Catalog & Quotas</h2>
                 <a
                   href={portalUrl}
@@ -347,14 +347,15 @@ export function ProviderModelCatalogModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all cursor-pointer"
+            className="p-2 min-w-[44px] min-h-[44px] rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all cursor-pointer flex items-center justify-center touch-manipulation"
+            aria-label="Close catalog modal"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Modal Scrollable Body */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-5 scrollbar-thin scrollbar-thumb-white/10">
+        <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5 scrollbar-thin scrollbar-thumb-white/10">
           
           {/* Top Capacity & Quota Info Banner */}
           {catalogData && (
@@ -373,7 +374,7 @@ export function ProviderModelCatalogModal({
                   type="button"
                   onClick={handleBenchmarkAll}
                   disabled={benchmarkingAll || allCatalogModels.length === 0}
-                  className="px-3.5 py-1.5 text-xs font-bold bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl shadow-md shadow-emerald-600/20 transition-all active:scale-95 flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
+                  className="px-4 py-2 min-h-[44px] text-xs font-bold bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl shadow-md shadow-emerald-600/20 transition-all active:scale-95 flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer touch-manipulation w-full sm:w-auto"
                 >
                   {benchmarkingAll ? (
                     <>
@@ -413,7 +414,7 @@ export function ProviderModelCatalogModal({
                 return (
                   <div
                     key={m}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono shadow-sm transition-all ${
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono shadow-sm transition-all min-h-[38px] ${
                       isPrimary
                         ? "bg-red-500/15 text-red-300 border border-red-500/40 font-bold"
                         : "bg-[#0b101c] text-slate-300 border border-white/10"
@@ -436,8 +437,9 @@ export function ProviderModelCatalogModal({
                           type="button"
                           disabled={Boolean(savingAction)}
                           onClick={() => handleMoveModel(idx, -1)}
-                          className="p-1 text-slate-400 hover:text-emerald-300 hover:bg-white/10 rounded transition-colors disabled:opacity-20 cursor-pointer"
+                          className="p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center text-slate-400 hover:text-emerald-300 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-20 cursor-pointer touch-manipulation"
                           title="Promote / Move Left"
+                          aria-label="Move model left"
                         >
                           <ChevronLeft className="w-3.5 h-3.5" />
                         </button>
@@ -447,8 +449,9 @@ export function ProviderModelCatalogModal({
                           type="button"
                           disabled={Boolean(savingAction)}
                           onClick={() => handleMoveModel(idx, 1)}
-                          className="p-1 text-slate-400 hover:text-emerald-300 hover:bg-white/10 rounded transition-colors disabled:opacity-20 cursor-pointer"
+                          className="p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center text-slate-400 hover:text-emerald-300 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-20 cursor-pointer touch-manipulation"
                           title="Demote / Move Right"
+                          aria-label="Move model right"
                         >
                           <ChevronRight className="w-3.5 h-3.5" />
                         </button>
@@ -458,10 +461,11 @@ export function ProviderModelCatalogModal({
                           type="button"
                           disabled={Boolean(savingAction)}
                           onClick={() => handleRemoveFromChain(m)}
-                          className="p-1 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded transition-colors ml-0.5 disabled:opacity-20 cursor-pointer"
+                          className="p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors ml-0.5 disabled:opacity-20 cursor-pointer touch-manipulation"
                           title="Remove from active chain"
+                          aria-label="Remove model from chain"
                         >
-                          <Trash2 className="w-3 h-3" />
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       )}
                     </div>
@@ -483,7 +487,7 @@ export function ProviderModelCatalogModal({
                   type="button"
                   disabled={Boolean(savingAction)}
                   onClick={handleApplySmartRecommendation}
-                  className="px-3.5 py-1.5 text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-black rounded-xl shadow-md shadow-emerald-500/20 transition-all active:scale-95 flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
+                  className="px-4 py-2 min-h-[44px] text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-black rounded-xl shadow-md shadow-emerald-500/20 transition-all active:scale-95 flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer touch-manipulation w-full sm:w-auto"
                 >
                   {savingAction === "smart-recommendation" ? (
                     <>
@@ -617,12 +621,12 @@ export function ProviderModelCatalogModal({
                           </div>
 
                           {/* Action Buttons */}
-                          <div className="flex items-center justify-between gap-2 pt-1">
+                          <div className="flex items-center justify-between gap-2 pt-1 flex-wrap">
                             <button
                               type="button"
                               onClick={() => handleTestModel(m.id)}
                               disabled={isTesting || Boolean(savingAction)}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 min-h-[44px] rounded-xl text-xs font-semibold bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 transition-all active:scale-95 cursor-pointer disabled:opacity-50 touch-manipulation flex-1 sm:flex-initial"
                             >
                               {isTesting ? (
                                 <Loader2 className="w-3.5 h-3.5 animate-spin text-red-400" />
@@ -632,7 +636,7 @@ export function ProviderModelCatalogModal({
                               <span>{isTesting ? "Testing…" : "Test Ping"}</span>
                             </button>
 
-                            <div className="flex items-center gap-1.5">
+                            <div className="flex items-center gap-1.5 flex-wrap flex-1 sm:flex-initial justify-end">
                               {inChain ? (
                                 <>
                                   {!isPrimary && (
@@ -640,7 +644,7 @@ export function ProviderModelCatalogModal({
                                       type="button"
                                       disabled={Boolean(savingAction)}
                                       onClick={() => handleSetPrimary(m.id)}
-                                      className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 transition-all disabled:opacity-50 cursor-pointer"
+                                      className="inline-flex items-center justify-center gap-1 px-3.5 py-2 min-h-[44px] text-xs font-semibold rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 transition-all disabled:opacity-50 cursor-pointer touch-manipulation flex-1 sm:flex-initial"
                                     >
                                       {isSettingPrimary ? (
                                         <Loader2 className="w-3 h-3 animate-spin" />
@@ -652,7 +656,7 @@ export function ProviderModelCatalogModal({
                                     type="button"
                                     disabled={Boolean(savingAction)}
                                     onClick={() => handleRemoveFromChain(m.id)}
-                                    className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 transition-all disabled:opacity-50 cursor-pointer"
+                                    className="inline-flex items-center justify-center gap-1 px-3.5 py-2 min-h-[44px] text-xs font-semibold rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 transition-all disabled:opacity-50 cursor-pointer touch-manipulation flex-1 sm:flex-initial"
                                   >
                                     {isRemovingThis ? (
                                       <Loader2 className="w-3 h-3 animate-spin" />
@@ -666,7 +670,7 @@ export function ProviderModelCatalogModal({
                                     type="button"
                                     disabled={Boolean(savingAction)}
                                     onClick={() => handleSetPrimary(m.id)}
-                                    className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition-all disabled:opacity-50 cursor-pointer"
+                                    className="inline-flex items-center justify-center gap-1 px-3.5 py-2 min-h-[44px] text-xs font-semibold rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition-all disabled:opacity-50 cursor-pointer touch-manipulation flex-1 sm:flex-initial"
                                   >
                                     {isSettingPrimary ? (
                                       <Loader2 className="w-3 h-3 animate-spin" />
@@ -677,7 +681,7 @@ export function ProviderModelCatalogModal({
                                     type="button"
                                     disabled={Boolean(savingAction)}
                                     onClick={() => handleAddToChain(m.id)}
-                                    className="inline-flex items-center gap-1 px-3.5 py-1.5 text-xs font-bold rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-md shadow-red-500/20 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                                    className="inline-flex items-center justify-center gap-1 px-4 py-2 min-h-[44px] text-xs font-bold rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-md shadow-red-500/20 transition-all active:scale-95 disabled:opacity-50 cursor-pointer touch-manipulation flex-1 sm:flex-initial"
                                   >
                                     {isAddingToChain ? (
                                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -723,7 +727,7 @@ export function ProviderModelCatalogModal({
                                       m.id
                                     )
                                   }
-                                  className="px-2 py-0.5 text-[10px] rounded bg-black/40 hover:bg-black/60 border border-white/10 text-slate-300 hover:text-white transition-all flex items-center gap-1 cursor-pointer"
+                                  className="px-2.5 py-1 min-h-[36px] text-[10px] rounded-lg bg-black/40 hover:bg-black/60 border border-white/10 text-slate-300 hover:text-white transition-all flex items-center gap-1 cursor-pointer touch-manipulation"
                                 >
                                   {copiedKey === m.id ? (
                                     <>
@@ -783,20 +787,20 @@ export function ProviderModelCatalogModal({
             <label className="text-xs font-bold text-slate-300 block">
               Or Enter Any Custom / Fine-Tuned Model Identifier
             </label>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               <input
                 type="text"
                 value={customModelInput}
                 onChange={(e) => setCustomModelInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleAddCustomModel()}
                 placeholder="e.g. meta-llama/llama-guard-4-12b or your-fine-tuned-model"
-                className="flex-1 px-4 py-2.5 text-xs font-mono bg-black/50 border border-white/10 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:border-red-500 transition-all"
+                className="flex-1 px-4 py-2.5 text-base sm:text-xs font-mono bg-black/50 border border-white/10 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:border-red-500 transition-all min-h-[44px]"
               />
               <button
                 type="button"
                 disabled={Boolean(savingAction)}
                 onClick={handleAddCustomModel}
-                className="px-4 py-2.5 text-xs font-bold bg-white/10 hover:bg-white/15 border border-white/10 text-white rounded-xl transition-all active:scale-95 flex items-center gap-1.5 shrink-0 disabled:opacity-50 cursor-pointer"
+                className="px-5 py-2.5 min-h-[44px] text-xs font-bold bg-white/10 hover:bg-white/15 border border-white/10 text-white rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50 cursor-pointer touch-manipulation"
               >
                 {savingAction === "add-custom" ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />

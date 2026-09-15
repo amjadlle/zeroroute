@@ -124,7 +124,7 @@ export function AdminCustomersTab({ customers, onRefresh }: AdminCustomersTabPro
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search email, company, key…"
-            className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder-slate-500 outline-none transition-all"
+            className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 rounded-xl pl-10 pr-4 py-2 text-base sm:text-xs text-white placeholder-slate-500 outline-none transition-all min-h-[44px]"
           />
         </div>
       </div>
@@ -146,7 +146,7 @@ export function AdminCustomersTab({ customers, onRefresh }: AdminCustomersTabPro
               {/* Row Top: Info & Status */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-bold text-sm text-white">{c.name || "Subscriber"}</span>
                     <span className="text-xs text-slate-400 font-mono">({c.email})</span>
                     {c.company && (
@@ -182,16 +182,17 @@ export function AdminCustomersTab({ customers, onRefresh }: AdminCustomersTabPro
                 {/* Master Key Card */}
                 <div className="space-y-1.5">
                   <label className="text-[11px] font-semibold text-slate-400 block">Master Subscriber Key</label>
-                  <div className="flex items-center gap-2 bg-[#080a0f] border border-white/5 rounded-xl px-3 py-2 text-xs font-mono text-slate-300">
+                  <div className="flex items-center gap-2 bg-[#080a0f] border border-white/5 rounded-xl px-3 py-2 text-xs font-mono text-slate-300 min-h-[44px]">
                     <Key className="w-3.5 h-3.5 text-red-400 shrink-0" />
                     <span className="truncate flex-1">{maskedKey}</span>
                     <button
                       type="button"
                       onClick={() => toggleRevealKey(c.id)}
-                      className="text-slate-500 hover:text-white"
+                      className="text-slate-500 hover:text-white p-2 min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation"
                       title={isRevealed ? "Hide key" : "Reveal key"}
+                      aria-label={isRevealed ? "Hide key" : "Reveal key"}
                     >
-                      {isRevealed ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                      {isRevealed ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
                 </div>
@@ -216,12 +217,12 @@ export function AdminCustomersTab({ customers, onRefresh }: AdminCustomersTabPro
               </div>
 
               {/* Row Bottom: Actions */}
-              <div className="pt-2 border-t border-white/5 flex items-center justify-end gap-2 text-xs">
+              <div className="pt-2 border-t border-white/5 flex items-center justify-end gap-2 text-xs flex-wrap">
                 <button
                   type="button"
                   disabled={isLoading}
                   onClick={() => handleRotateKey(c)}
-                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/5 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  className="px-3.5 py-2 min-h-[44px] rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/5 transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 touch-manipulation flex-1 sm:flex-initial"
                 >
                   <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
                   <span>Rotate Key</span>
@@ -231,7 +232,7 @@ export function AdminCustomersTab({ customers, onRefresh }: AdminCustomersTabPro
                   type="button"
                   disabled={isLoading}
                   onClick={() => handleToggleStatus(c)}
-                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/5 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  className="px-3.5 py-2 min-h-[44px] rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/5 transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 touch-manipulation flex-1 sm:flex-initial"
                 >
                   {c.status === "active" ? (
                     <>
@@ -250,7 +251,7 @@ export function AdminCustomersTab({ customers, onRefresh }: AdminCustomersTabPro
                   type="button"
                   disabled={isLoading}
                   onClick={() => handleDeleteCustomer(c)}
-                  className="px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  className="px-3.5 py-2 min-h-[44px] rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 touch-manipulation flex-1 sm:flex-initial"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span>Delete</span>

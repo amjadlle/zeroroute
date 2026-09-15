@@ -173,7 +173,7 @@ export function AdminAnalyticsTab({ providers, logs, onRefresh, loading }: Admin
             type="button"
             onClick={onRefresh}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 rounded-xl transition-all cursor-pointer disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[44px] text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 rounded-xl transition-all cursor-pointer disabled:opacity-50 touch-manipulation w-full sm:w-auto"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-red-400" : ""}`} />
             <span>Refresh Quotas</span>

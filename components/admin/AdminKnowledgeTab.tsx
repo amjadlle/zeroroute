@@ -216,7 +216,7 @@ export function AdminKnowledgeTab() {
             type="button"
             onClick={fetchDocs}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white border border-white/10 rounded-xl transition-all cursor-pointer shrink-0 disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[44px] text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white border border-white/10 rounded-xl transition-all cursor-pointer shrink-0 disabled:opacity-50 touch-manipulation w-full sm:w-auto"
           >
             <RotateCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-red-400" : ""}`} />
             <span>Refresh Docs</span>
@@ -239,7 +239,7 @@ export function AdminKnowledgeTab() {
             </div>
 
             {/* Dropzone */}
-            <label className="border-2 border-dashed border-white/10 hover:border-red-500/50 bg-black/40 hover:bg-red-500/[0.02] rounded-2xl p-7 text-center transition-all cursor-pointer block space-y-3">
+            <label className="border-2 border-dashed border-white/10 hover:border-red-500/50 bg-black/40 hover:bg-red-500/[0.02] rounded-2xl p-7 text-center transition-all cursor-pointer block space-y-3 touch-manipulation">
               <input
                 type="file"
                 accept=".md,.txt,.json,.markdown"
@@ -272,7 +272,7 @@ export function AdminKnowledgeTab() {
                   type="button"
                   onClick={handleSaveSnippet}
                   disabled={savingSnippet}
-                  className="px-3.5 py-1.5 text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl shadow-md shadow-red-500/20 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 min-h-[44px] text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl shadow-md shadow-red-500/20 transition-all active:scale-95 cursor-pointer disabled:opacity-50 touch-manipulation w-full sm:w-auto"
                 >
                   {savingSnippet ? "Indexing…" : "Save Snippet →"}
                 </button>
@@ -283,14 +283,14 @@ export function AdminKnowledgeTab() {
                 value={rawTitle}
                 onChange={(e) => setRawTitle(e.target.value)}
                 placeholder="Document Title (e.g. Refund Policy, Company Pricing)"
-                className="w-full px-3.5 py-2 text-xs bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-red-500"
+                className="w-full px-3.5 py-2.5 text-base sm:text-xs bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-red-500"
               />
               <textarea
                 rows={3}
                 value={rawContent}
                 onChange={(e) => setRawContent(e.target.value)}
                 placeholder="Paste knowledge content, company policies, or service specs here..."
-                className="w-full px-3.5 py-2.5 text-xs bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-red-500 font-mono resize-y leading-relaxed"
+                className="w-full px-3.5 py-2.5 text-base sm:text-xs bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-red-500 font-mono resize-y leading-relaxed"
               />
             </div>
           </div>
@@ -315,13 +315,13 @@ export function AdminKnowledgeTab() {
                   onChange={(e) => setCrawlUrl(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleCrawlUrl()}
                   placeholder="e.g. https://mapki.in/docs or https://mapki.in/pricing"
-                  className="flex-1 px-3.5 py-2.5 text-xs bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-red-500"
+                  className="flex-1 px-3.5 py-2.5 text-base sm:text-xs bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-red-500"
                 />
                 <button
                   type="button"
                   onClick={handleCrawlUrl}
                   disabled={crawling}
-                  className="px-5 py-2.5 text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl transition-all active:scale-95 shadow-lg shadow-red-500/20 shrink-0 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  className="px-5 py-2.5 min-h-[44px] text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl transition-all active:scale-95 shadow-lg shadow-red-500/20 shrink-0 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 touch-manipulation"
                 >
                   {crawling ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
                   <span>{crawling ? "Crawling…" : "Crawl URL"}</span>
@@ -367,8 +367,9 @@ export function AdminKnowledgeTab() {
                     <button
                       type="button"
                       onClick={() => handleDeleteDoc(doc.id)}
-                      className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer shrink-0"
+                      className="p-2 min-w-[44px] min-h-[44px] text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors cursor-pointer shrink-0 flex items-center justify-center touch-manipulation"
                       title="Delete document"
+                      aria-label="Delete document"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

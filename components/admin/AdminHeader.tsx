@@ -67,7 +67,7 @@ export function AdminHeader({
           <div className="flex items-center gap-2 sm:gap-3">
             <Link
               href="/app"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 rounded-xl transition-all shadow-sm"
+              className="hidden md:inline-flex items-center gap-1.5 px-3 py-2 min-h-[44px] text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 rounded-xl transition-all shadow-sm touch-manipulation"
             >
               <span>Subscriber View (/app)</span>
             </Link>
@@ -75,7 +75,7 @@ export function AdminHeader({
             <Link
               href="/"
               target="_blank"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 rounded-xl transition-all shadow-sm"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 min-h-[44px] text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 rounded-xl transition-all shadow-sm touch-manipulation"
             >
               <Globe className="w-3.5 h-3.5" />
               <span>Public Site</span>
@@ -85,28 +85,30 @@ export function AdminHeader({
               href="https://buymeacoffee.com/amjadlle"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-[#FFDD00] hover:bg-[#FFEA47] text-zinc-950 rounded-xl transition-all active:scale-95 shadow-md shadow-amber-500/20 whitespace-nowrap cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-2 min-h-[44px] text-xs font-bold bg-[#FFDD00] hover:bg-[#FFEA47] text-zinc-950 rounded-xl transition-all active:scale-95 shadow-md shadow-amber-500/20 whitespace-nowrap cursor-pointer touch-manipulation"
               title="Buy Me a Coffee"
             >
               <span>☕</span>
-              <span className="hidden sm:inline">Buy Me a Coffee</span>
+              <span className="hidden sm:inline">Coffee</span>
             </a>
 
             <button
               type="button"
               onClick={onOpenKeysModal}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl shadow-md shadow-red-500/25 transition-all active:scale-95 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[44px] text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl shadow-md shadow-red-500/25 transition-all active:scale-95 cursor-pointer touch-manipulation"
             >
-              <KeyRound className="w-3.5 h-3.5" />
+              <KeyRound className="w-3.5 h-3.5 shrink-0" />
               <span>API Keys</span>
             </button>
 
             <button
               type="button"
               onClick={onLogout}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer"
+              className="flex items-center justify-center gap-1.5 p-2.5 min-w-[44px] min-h-[44px] rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer touch-manipulation"
+              title="Sign Out"
+              aria-label="Sign Out"
             >
-              <LogOut className="w-3.5 h-3.5 text-slate-400" />
+              <LogOut className="w-4 h-4 text-slate-400 shrink-0" />
               <span className="hidden sm:inline">Sign Out</span>
             </button>
           </div>

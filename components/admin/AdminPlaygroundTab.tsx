@@ -236,7 +236,7 @@ export function AdminPlaygroundTab({ providers }: AdminPlaygroundTabProps) {
               <button
                 type="button"
                 onClick={() => setShowPersona(!showPersona)}
-                className="text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer min-h-[44px] touch-manipulation"
               >
                 <Sparkles className="w-3.5 h-3.5 text-red-400" />
                 <span>Customize AI Persona & Brand (Optional)</span>
@@ -253,7 +253,7 @@ export function AdminPlaygroundTab({ providers }: AdminPlaygroundTabProps) {
                         value={companyName}
                         onChange={(e) => setCompanyName(e.target.value)}
                         placeholder="e.g. Mapki Solutions"
-                        className="w-full px-3 py-1.5 text-xs bg-black/50 border border-white/10 rounded-lg text-white focus:outline-none focus:border-red-500"
+                        className="w-full px-3 py-2 text-base sm:text-xs bg-black/50 border border-white/10 rounded-lg text-white focus:outline-none focus:border-red-500"
                       />
                     </div>
                     <div>
@@ -263,7 +263,7 @@ export function AdminPlaygroundTab({ providers }: AdminPlaygroundTabProps) {
                         value={botRole}
                         onChange={(e) => setBotRole(e.target.value)}
                         placeholder="e.g. Sales Assistant"
-                        className="w-full px-3 py-1.5 text-xs bg-black/50 border border-white/10 rounded-lg text-white focus:outline-none focus:border-red-500"
+                        className="w-full px-3 py-2 text-base sm:text-xs bg-black/50 border border-white/10 rounded-lg text-white focus:outline-none focus:border-red-500"
                       />
                     </div>
                     <div>
@@ -271,7 +271,7 @@ export function AdminPlaygroundTab({ providers }: AdminPlaygroundTabProps) {
                       <select
                         value={tone}
                         onChange={(e) => setTone(e.target.value)}
-                        className="w-full px-2.5 py-1.5 text-xs bg-black/50 border border-white/10 rounded-lg text-white focus:outline-none focus:border-red-500"
+                        className="w-full px-2.5 py-2 text-base sm:text-xs bg-black/50 border border-white/10 rounded-lg text-white focus:outline-none focus:border-red-500 cursor-pointer min-h-[44px] sm:min-h-0"
                       >
                         <option value="Friendly & Professional">Friendly & Professional</option>
                         <option value="Direct & Technical">Direct & Technical</option>
@@ -281,12 +281,12 @@ export function AdminPlaygroundTab({ providers }: AdminPlaygroundTabProps) {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between gap-2 pt-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1">
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
                         onClick={handleGeneratePersona}
-                        className="px-3 py-1.5 text-xs font-bold bg-red-600 hover:bg-red-500 text-white rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
+                        className="px-3.5 py-2 min-h-[44px] text-xs font-bold bg-red-600 hover:bg-red-500 text-white rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation flex-1 sm:flex-initial"
                       >
                         <Wand2 className="w-3.5 h-3.5" />
                         <span>Auto-Generate</span>
@@ -295,7 +295,7 @@ export function AdminPlaygroundTab({ providers }: AdminPlaygroundTabProps) {
                         type="button"
                         onClick={handleSavePersona}
                         disabled={savingPersona}
-                        className="px-3 py-1.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                        className="px-3.5 py-2 min-h-[44px] text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 touch-manipulation flex-1 sm:flex-initial"
                       >
                         <Cloud className="w-3.5 h-3.5" />
                         <span>Save to Cloud</span>
@@ -309,7 +309,7 @@ export function AdminPlaygroundTab({ providers }: AdminPlaygroundTabProps) {
                     value={systemPersona}
                     onChange={(e) => setSystemPersona(e.target.value)}
                     placeholder="Persona prompt will generate here, or enter your own..."
-                    className="w-full p-2.5 text-xs bg-black/60 border border-white/10 rounded-lg text-slate-200 focus:outline-none focus:border-red-500 font-mono resize-none"
+                    className="w-full p-2.5 text-base sm:text-xs bg-black/60 border border-white/10 rounded-lg text-slate-200 focus:outline-none focus:border-red-500 font-mono resize-none leading-relaxed"
                   />
                 </div>
               )}
@@ -323,7 +323,7 @@ export function AdminPlaygroundTab({ providers }: AdminPlaygroundTabProps) {
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder="Ask anything to test failover and latency…"
-                className="w-full p-3.5 text-xs bg-black/50 border border-white/10 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-red-500 font-mono resize-none"
+                className="w-full p-3.5 text-base sm:text-xs bg-black/50 border border-white/10 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-red-500 font-mono resize-none leading-relaxed"
               />
             </div>
           </div>
@@ -336,7 +336,7 @@ export function AdminPlaygroundTab({ providers }: AdminPlaygroundTabProps) {
                 <button
                   type="button"
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className={`w-full px-3 py-2 text-xs bg-black/50 border rounded-xl text-slate-200 font-mono flex items-center justify-between gap-2 transition-all cursor-pointer ${
+                  className={`w-full px-3 py-2 min-h-[44px] text-xs bg-black/50 border rounded-xl text-slate-200 font-mono flex items-center justify-between gap-2 transition-all cursor-pointer touch-manipulation ${
                     dropdownOpen
                       ? "border-red-500 ring-1 ring-red-500/30 shadow-lg shadow-red-500/10"
                       : "border-white/10 hover:border-white/20"
@@ -368,7 +368,7 @@ export function AdminPlaygroundTab({ providers }: AdminPlaygroundTabProps) {
 
                 {/* Custom Popover Dropdown Menu */}
                 {dropdownOpen && (
-                  <div className="absolute left-0 right-0 bottom-full mb-2 z-50 bg-[#090d16]/98 backdrop-blur-2xl border border-white/15 rounded-xl shadow-2xl shadow-black/90 p-1.5 flex flex-col animate-in fade-in zoom-in-95 duration-150">
+                  <div className="absolute left-0 right-0 bottom-full mb-2 z-50 bg-[#090d16]/98 backdrop-blur-2xl border border-white/15 rounded-xl shadow-2xl shadow-black/90 p-1.5 flex flex-col animate-in fade-in zoom-in-95 duration-150 max-w-full">
                     {/* Search filter input */}
                     <div className="px-2.5 py-1.5 border-b border-white/10 mb-1 flex items-center gap-2 bg-black/60 rounded-lg">
                       <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
@@ -377,14 +377,14 @@ export function AdminPlaygroundTab({ providers }: AdminPlaygroundTabProps) {
                         value={searchFilter}
                         onChange={(e) => setSearchFilter(e.target.value)}
                         placeholder="Search provider or model..."
-                        className="w-full text-xs bg-transparent text-white placeholder-slate-500 focus:outline-none font-mono"
+                        className="w-full text-base sm:text-xs bg-transparent text-white placeholder-slate-500 focus:outline-none font-mono py-1"
                         autoFocus
                       />
                       {searchFilter && (
                         <button
                           type="button"
                           onClick={() => setSearchFilter("")}
-                          className="text-slate-400 hover:text-white text-xs px-1"
+                          className="text-slate-400 hover:text-white text-xs px-2 py-1 min-w-[36px] min-h-[36px] flex items-center justify-center touch-manipulation"
                         >
                           ✕
                         </button>
@@ -402,7 +402,7 @@ export function AdminPlaygroundTab({ providers }: AdminPlaygroundTabProps) {
                             setDropdownOpen(false);
                             setSearchFilter("");
                           }}
-                          className={`w-full text-left px-2.5 py-2 rounded-lg text-xs font-mono transition-colors flex items-center justify-between gap-2 cursor-pointer ${
+                          className={`w-full text-left px-2.5 py-2 min-h-[40px] rounded-lg text-xs font-mono transition-colors flex items-center justify-between gap-2 cursor-pointer touch-manipulation ${
                             selectedTarget === "auto"
                               ? "bg-red-500/20 text-white border border-red-500/40"
                               : "text-slate-200 hover:bg-white/[0.08] hover:text-white"
@@ -449,7 +449,7 @@ export function AdminPlaygroundTab({ providers }: AdminPlaygroundTabProps) {
                                       setDropdownOpen(false);
                                       setSearchFilter("");
                                     }}
-                                    className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-mono transition-colors flex items-center justify-between gap-2 cursor-pointer ${
+                                    className={`w-full text-left px-2.5 py-2 min-h-[38px] rounded-lg text-xs font-mono transition-colors flex items-center justify-between gap-2 cursor-pointer touch-manipulation ${
                                       isSelected
                                         ? "bg-red-500/20 text-white border border-red-500/40 font-semibold"
                                         : "text-slate-300 hover:bg-white/[0.08] hover:text-white"
@@ -472,12 +472,12 @@ export function AdminPlaygroundTab({ providers }: AdminPlaygroundTabProps) {
                 )}
               </div>
 
-              <label className="inline-flex items-center gap-1.5 cursor-pointer text-xs font-medium text-slate-300 shrink-0 px-2.5 py-2 bg-black/40 border border-white/10 rounded-xl hover:border-white/20 transition-colors select-none">
+              <label className="inline-flex items-center gap-1.5 cursor-pointer text-xs font-medium text-slate-300 shrink-0 px-3 py-2 min-h-[44px] bg-black/40 border border-white/10 rounded-xl hover:border-white/20 transition-colors select-none touch-manipulation">
                 <input
                   type="checkbox"
                   checked={isStream}
                   onChange={(e) => setIsStream(e.target.checked)}
-                  className="w-3.5 h-3.5 rounded bg-black/50 border-white/10 text-red-600 focus:ring-red-500 cursor-pointer"
+                  className="w-4 h-4 rounded bg-black/50 border-white/10 text-red-600 focus:ring-red-500 cursor-pointer"
                 />
                 <span>Stream</span>
               </label>
@@ -487,9 +487,9 @@ export function AdminPlaygroundTab({ providers }: AdminPlaygroundTabProps) {
               type="button"
               onClick={handleRunTest}
               disabled={loading}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2 text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl shadow-md shadow-red-500/20 active:scale-95 transition-all cursor-pointer disabled:opacity-50 shrink-0 h-[38px]"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2 min-h-[44px] text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl shadow-md shadow-red-500/20 active:scale-95 transition-all cursor-pointer disabled:opacity-50 shrink-0 touch-manipulation"
             >
-              {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5 fill-white" />}
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4 fill-white" />}
               <span>{loading ? "Routing Request…" : "Send Request"}</span>
             </button>
           </div>
@@ -505,7 +505,7 @@ export function AdminPlaygroundTab({ providers }: AdminPlaygroundTabProps) {
 
             <div className="flex items-center gap-2">
               {outputMeta && (
-                <span className="px-2 py-0.5 rounded text-[10.5px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <span className="px-2 py-0.5 rounded text-[10.5px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 truncate max-w-[200px]">
                   ⚡ {outputMeta.latencyMs}ms ({outputMeta.provider}/{outputMeta.model})
                 </span>
               )}
@@ -514,10 +514,11 @@ export function AdminPlaygroundTab({ providers }: AdminPlaygroundTabProps) {
                 type="button"
                 onClick={handleCopy}
                 disabled={!outputText}
-                className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer disabled:opacity-30"
+                className="p-2.5 min-w-[44px] min-h-[44px] rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer disabled:opacity-30 flex items-center justify-center touch-manipulation"
                 title="Copy Response"
+                aria-label="Copy Response"
               >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
               </button>
 
               <button
@@ -527,10 +528,11 @@ export function AdminPlaygroundTab({ providers }: AdminPlaygroundTabProps) {
                   setOutputMeta(null);
                 }}
                 disabled={!outputText}
-                className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer disabled:opacity-30"
+                className="p-2.5 min-w-[44px] min-h-[44px] rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer disabled:opacity-30 flex items-center justify-center touch-manipulation"
                 title="Clear Output"
+                aria-label="Clear Output"
               >
-                <Trash2 className="w-3.5 h-3.5" />
+                <Trash2 className="w-4 h-4" />
               </button>
             </div>
           </div>

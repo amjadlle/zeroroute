@@ -80,12 +80,12 @@ export function AdminLogsTab({ logs, onRefresh, loading }: AdminLogsTabProps) {
 
         <div className="flex items-center gap-2.5 flex-wrap w-full sm:w-auto justify-start sm:justify-end">
           {/* Origin Filter */}
-          <div className="flex items-center gap-1.5 bg-black/40 border border-white/10 px-3 py-1.5 rounded-xl text-xs">
-            <Filter className="w-3.5 h-3.5 text-slate-400" />
+          <div className="flex items-center gap-1.5 bg-black/40 border border-white/10 px-3 py-1.5 rounded-xl text-xs min-h-[44px]">
+            <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             <select
               value={originFilter}
               onChange={(e) => setOriginFilter(e.target.value)}
-              className="bg-transparent text-slate-200 focus:outline-none cursor-pointer"
+              className="bg-transparent text-slate-200 focus:outline-none cursor-pointer text-base sm:text-xs min-h-[40px] sm:min-h-0"
             >
               <option value="all" className="bg-[#090d16]">🌐 All Origins ({logs.length})</option>
               {uniqueOrigins.map((orig) => (
@@ -100,7 +100,7 @@ export function AdminLogsTab({ logs, onRefresh, loading }: AdminLogsTabProps) {
             type="button"
             onClick={onRefresh}
             disabled={loading}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white/5 hover:bg-white/10 text-white border border-white/10 transition-all cursor-pointer disabled:opacity-50"
+            className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-white/5 hover:bg-white/10 text-white border border-white/10 transition-all cursor-pointer disabled:opacity-50 min-h-[44px] touch-manipulation flex-1 sm:flex-initial"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-red-400" : "text-slate-400"}`} />
             <span>Refresh</span>
@@ -110,7 +110,7 @@ export function AdminLogsTab({ logs, onRefresh, loading }: AdminLogsTabProps) {
 
       {/* Logs Table */}
       <div className="bg-[#090d16] border border-white/10 rounded-2xl overflow-hidden backdrop-blur-xl">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 touch-pan-x">
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-white/10 bg-black/40 text-slate-400 font-mono">
@@ -142,7 +142,7 @@ export function AdminLogsTab({ logs, onRefresh, loading }: AdminLogsTabProps) {
                   <tr
                     key={log.id}
                     onClick={() => setSelectedLog(log)}
-                    className="hover:bg-white/[0.04] transition-colors cursor-pointer group"
+                    className="hover:bg-white/[0.04] transition-colors cursor-pointer group touch-manipulation"
                   >
                     <td className="py-3 px-4 font-mono whitespace-nowrap">
                       <span
@@ -213,16 +213,16 @@ export function AdminLogsTab({ logs, onRefresh, loading }: AdminLogsTabProps) {
 
       {/* Request Detail Inspector Modal */}
       {selectedLog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-[#090d16] border border-white/10 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-4 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-[#090d16] border border-white/10 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-4 shadow-2xl relative">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400">
+                <div className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 shrink-0">
                   <FileText className="w-4 h-4" />
                 </div>
                 <div>
                   <h3 className="font-bold text-sm text-white">Request Detail Inspector</h3>
-                  <p className="text-[11px] text-slate-400 font-mono">ID: {selectedLog.id}</p>
+                  <p className="text-[11px] text-slate-400 font-mono truncate max-w-[180px] sm:max-w-none">ID: {selectedLog.id}</p>
                 </div>
               </div>
 
@@ -230,15 +230,16 @@ export function AdminLogsTab({ logs, onRefresh, loading }: AdminLogsTabProps) {
                 <button
                   type="button"
                   onClick={handleCopyLogDetail}
-                  className="px-2.5 py-1 text-xs rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition-colors flex items-center gap-1 cursor-pointer"
+                  className="px-3 py-1.5 min-h-[44px] text-xs rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition-colors flex items-center gap-1.5 cursor-pointer touch-manipulation"
                 >
-                  {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                  <span>{copied ? "Copied JSON" : "Copy Payload"}</span>
+                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copied ? "Copied" : "Copy Payload"}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setSelectedLog(null)}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-white"
+                  className="p-2 min-w-[44px] min-h-[44px] rounded-xl text-slate-400 hover:text-white hover:bg-white/5 flex items-center justify-center touch-manipulation"
+                  aria-label="Close modal"
                 >
                   <X className="w-4 h-4" />
                 </button>

@@ -263,7 +263,7 @@ export function AdminProvidersTab({ providers, onUpdateProviders }: AdminProvide
             type="button"
             onClick={handleRunBenchmark}
             disabled={benchmarking}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-lg shadow-red-500/20 active:scale-95 transition-all cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-lg shadow-red-500/20 active:scale-95 transition-all cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed touch-manipulation"
           >
             {benchmarking ? (
               <>
@@ -291,7 +291,7 @@ export function AdminProvidersTab({ providers, onUpdateProviders }: AdminProvide
             <button
               type="button"
               onClick={() => setBenchmarkResults(null)}
-              className="text-xs text-slate-400 hover:text-white cursor-pointer"
+              className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-xs text-slate-400 hover:text-white cursor-pointer touch-manipulation"
             >
               Close
             </button>
@@ -347,7 +347,7 @@ export function AdminProvidersTab({ providers, onUpdateProviders }: AdminProvide
                 <div className="flex items-start sm:items-center gap-3.5 flex-1 min-w-0">
                   {/* Priority Order & Up/Down Arrows */}
                   <div className="flex sm:flex-col items-center gap-1 shrink-0 pt-0.5 sm:pt-0">
-                    <span className="w-7 h-7 rounded-xl bg-black/50 border border-white/10 text-xs font-mono font-bold flex items-center justify-center text-slate-300">
+                    <span className="w-8 h-8 rounded-xl bg-black/50 border border-white/10 text-xs font-mono font-bold flex items-center justify-center text-slate-300">
                       {index + 1}
                     </span>
                     <div className="flex sm:flex-col gap-0.5">
@@ -355,26 +355,28 @@ export function AdminProvidersTab({ providers, onUpdateProviders }: AdminProvide
                         type="button"
                         disabled={isFirst || Boolean(savingAction)}
                         onClick={() => handleMoveProvider(index, -1)}
-                        className="p-1 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer"
+                        className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg hover:bg-white/10 text-slate-400 hover:text-white disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer touch-manipulation"
                         title="Move Up in Failover Chain"
+                        aria-label="Move up"
                       >
                         {savingAction === `move-prov-${p.id}` ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin text-red-400" />
                         ) : (
-                          <ChevronUp className="w-3.5 h-3.5" />
+                          <ChevronUp className="w-4 h-4" />
                         )}
                       </button>
                       <button
                         type="button"
                         disabled={isLast || Boolean(savingAction)}
                         onClick={() => handleMoveProvider(index, 1)}
-                        className="p-1 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer"
+                        className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg hover:bg-white/10 text-slate-400 hover:text-white disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer touch-manipulation"
                         title="Move Down in Failover Chain"
+                        aria-label="Move down"
                       >
                         {savingAction === `move-prov-${p.id}` ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin text-red-400" />
                         ) : (
-                          <ChevronDown className="w-3.5 h-3.5" />
+                          <ChevronDown className="w-4 h-4" />
                         )}
                       </button>
                     </div>
@@ -387,7 +389,7 @@ export function AdminProvidersTab({ providers, onUpdateProviders }: AdminProvide
                         href={portalUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="font-bold text-sm sm:text-base text-white hover:text-red-400 flex items-center gap-1.5 transition-colors truncate"
+                        className="font-bold text-sm sm:text-base text-white hover:text-red-400 flex items-center gap-1.5 transition-colors truncate min-h-[36px]"
                       >
                         <span>{p.name}</span>
                         <ExternalLink className="w-3.5 h-3.5 text-slate-500 opacity-70 shrink-0" />
@@ -421,7 +423,7 @@ export function AdminProvidersTab({ providers, onUpdateProviders }: AdminProvide
                         <button
                           type="button"
                           onClick={() => setErrorModalProvider(p)}
-                          className="inline-flex items-center gap-1 text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/25 px-2 py-0.5 rounded-lg text-[11px] font-mono transition-all cursor-pointer"
+                          className="inline-flex items-center gap-1 text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/25 px-2 py-1 min-h-[32px] rounded-lg text-[11px] font-mono transition-all cursor-pointer touch-manipulation"
                         >
                           <AlertCircle className="w-3 h-3 text-rose-400 shrink-0" />
                           <span className="truncate max-w-[180px]">{p.lastError}</span>
@@ -438,7 +440,7 @@ export function AdminProvidersTab({ providers, onUpdateProviders }: AdminProvide
                     type="button"
                     disabled={Boolean(savingAction)}
                     onClick={() => handleToggleEnable(p.id)}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50 ${
+                    className={`px-3.5 py-2 min-h-[44px] rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50 touch-manipulation ${
                       p.enabled
                         ? "bg-red-500/15 text-red-400 border border-red-500/30 hover:bg-red-500/25"
                         : "bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10"
@@ -458,7 +460,7 @@ export function AdminProvidersTab({ providers, onUpdateProviders }: AdminProvide
                     type="button"
                     onClick={() => handleTestPrimary(p.id)}
                     disabled={isTesting || Boolean(savingAction)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-black/40 hover:bg-white/5 border border-white/10 text-slate-200 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                    className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 min-h-[44px] rounded-xl text-xs font-semibold bg-black/40 hover:bg-white/5 border border-white/10 text-slate-200 transition-all active:scale-95 cursor-pointer disabled:opacity-50 touch-manipulation"
                   >
                     {isTesting ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin text-red-400" />
