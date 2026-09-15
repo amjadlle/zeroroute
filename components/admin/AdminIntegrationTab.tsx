@@ -26,8 +26,8 @@ export function AdminIntegrationTab() {
       case "widget":
         return `<!-- ZeroRoute Floating AI Assistant Widget -->
 <script
-  src="https://zeroroute.app/widget.js"
-  data-key="zr_live_YOUR_API_KEY"
+  src="https://zeroroute.mapki.in/widget.js"
+  data-bot-id="bot_YOUR_BOT_ID"
   data-title="${botTitle}"
   data-color="${accentColor}"
   data-greeting="${greeting}"

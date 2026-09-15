@@ -73,7 +73,6 @@ export function DocsTab({
   data-greeting="${greeting || "Hi! 👋 How can I help you today?"}"
   data-prompts="${cleanPrompts}"
   data-color="${brandColor}"
-  data-key="${effectiveKey}"
   defer>
 </script>`,
 
@@ -92,7 +91,6 @@ Instructions:
   data-greeting="${greeting || "Hi! 👋 How can I help you today?"}"
   data-prompts="${cleanPrompts}"
   data-color="${brandColor}"
-  data-key="${effectiveKey}"
   defer>
 </script>
 \`\`\`
@@ -116,7 +114,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           data-greeting="${greeting || "Hi! 👋 How can I help you today?"}"
           data-prompts="${cleanPrompts}"
           data-color="${brandColor}"
-          data-key="${effectiveKey}"
           strategy="lazyOnload"
         />
       </body>
