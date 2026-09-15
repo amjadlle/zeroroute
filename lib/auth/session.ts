@@ -6,7 +6,7 @@ export const SESSION_COOKIE_NAME = "zr_session";
 export const ROLE_COOKIE_NAME = "zr_role";
 
 export const ADMIN_EMAILS = [
-  (process.env.ADMIN_EMAIL || "admin@zeroroute.io").toLowerCase(),
+  (process.env.ADMIN_EMAIL || "mapkisolutions@gmail.com").toLowerCase(),
 ];
 
 export function isMasterAdminKey(token: string): boolean {
@@ -50,7 +50,7 @@ export async function getCurrentUser(): Promise<Customer | null> {
     return {
       id: "admin_master",
       key: process.env.ROUTER_API_KEY || process.env.ADMIN_KEY || "zr_admin_master",
-      email: process.env.ADMIN_EMAIL || "admin@zeroroute.io",
+      email: process.env.ADMIN_EMAIL || "mapkisolutions@gmail.com",
       name: "ZeroRoute Admin",
       company: "ZeroRoute Master",
       bot_title: "Master Admin AI",
@@ -104,7 +104,7 @@ export async function resolveAuth(headerOrToken?: string): Promise<{
         customer: {
           id: "admin_master",
           key: clean,
-          email: process.env.ADMIN_EMAIL || "admin@zeroroute.io",
+          email: process.env.ADMIN_EMAIL || "mapkisolutions@gmail.com",
           name: "ZeroRoute Admin",
           company: "ZeroRoute Master",
           status: "active",
@@ -145,7 +145,7 @@ export async function getCustomerByTokenOrKey(token: string): Promise<Customer |
     return {
       id: "admin_master",
       key: token,
-      email: process.env.ADMIN_EMAIL || "admin@zeroroute.io",
+      email: process.env.ADMIN_EMAIL || "mapkisolutions@gmail.com",
       name: "ZeroRoute Admin",
       company: "ZeroRoute Master",
       bot_title: "Master Admin AI",

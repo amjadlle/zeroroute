@@ -133,7 +133,7 @@ Edit `.env.local` with your configuration:
 APP_URL=http://localhost:3000
 
 # Superadmin Access
-ADMIN_EMAIL=admin@zeroroute.io
+ADMIN_EMAIL=mapkisolutions@gmail.com
 ADMIN_PASSWORD=your_secure_password
 ADMIN_KEY=zr_admin_master_secret_key
 ROUTER_API_KEY=zr_admin_master_secret_key

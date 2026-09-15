@@ -16,7 +16,7 @@ APP_URL=https://zeroroute.mapki.in
 NODE_ENV=production
 
 # Admin Access Credentials
-ADMIN_EMAIL=admin@zeroroute.io
+ADMIN_EMAIL=mapkisolutions@gmail.com
 ADMIN_PASSWORD=your_secure_admin_password
 ROUTER_API_KEY=zr_live_master_secret_key
 
@@ -28,7 +28,7 @@ DODO_WEBHOOK_SECRET=whsec_your_webhook_secret_key
 
 # Transactional Email (Optional - falls back to secure stdout logging)
 RESEND_API_KEY=re_your_resend_key
-EMAIL_FROM="ZeroRoute <notifications@zeroroute.io>"
+EMAIL_FROM="ZeroRoute <mapkisolutions@gmail.com>"
 
 # Free AI Cloud Provider API Keys (Fallback Matrix)
 GROQ_API_KEY=gsk_...

@@ -12,7 +12,7 @@ export interface EmailOptions {
 
 export async function sendEmail(options: EmailOptions): Promise<{ success: boolean; id?: string; error?: string }> {
   const { to, subject, html, text } = options;
-  const fromAddress = process.env.EMAIL_FROM || process.env.RESEND_FROM_EMAIL || "ZeroRoute <notifications@zeroroute.io>";
+  const fromAddress = process.env.EMAIL_FROM || process.env.RESEND_FROM_EMAIL || "ZeroRoute <mapkisolutions@gmail.com>";
 
   // 1. Resend API Dispatch if RESEND_API_KEY configured
   const resendApiKey = process.env.RESEND_API_KEY;

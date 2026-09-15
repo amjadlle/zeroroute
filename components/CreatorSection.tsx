@@ -133,7 +133,7 @@ export function CreatorSection() {
               </a>
 
               <a
-                href="mailto:hire.amjad@gmail.com"
+                href="mailto:mapkisolutions@gmail.com"
                 className="inline-flex items-center gap-1.5 px-3.5 py-2.5 min-h-[44px] rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold transition-all active:scale-95 shadow-md shadow-red-500/25"
               >
                 <svg className="w-3.5 h-3.5 fill-none stroke-current" strokeWidth="2" viewBox="0 0 24 24">
