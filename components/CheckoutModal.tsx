@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { X, Sparkles, Check, ArrowRight, ShieldCheck, CreditCard, Loader2 } from "lucide-react";
@@ -126,17 +126,17 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
               type="button"
               onClick={handleStartCheckout}
               disabled={loading}
-              className="group w-full flex items-center justify-center gap-2 py-3.5 px-5 rounded-xl text-sm font-bold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-lg shadow-red-600/30 hover:shadow-red-500/50 hover:scale-[1.01] active:scale-[0.98] transition-all cursor-pointer disabled:opacity-75"
+              className="group w-full flex items-center justify-center gap-2 py-3.5 px-5 rounded-xl text-sm font-extrabold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-lg shadow-red-600/30 hover:shadow-red-500/50 hover:scale-[1.01] active:scale-[0.98] transition-all cursor-pointer disabled:brightness-95 disabled:cursor-wait drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Preparing Checkout…</span>
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  <span className="text-white font-bold">Preparing Checkout…</span>
                 </>
               ) : (
                 <>
-                  <span>Start Free Trial • $0 Due Today</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <span className="text-white font-bold">Start Free Trial • $0 Due Today</span>
+                  <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
                 </>
               )}
             </button>

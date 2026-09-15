@@ -690,17 +690,17 @@ function OnboardingContent() {
                 type="button"
                 onClick={handleFinishSetup}
                 disabled={loading}
-                className="flex items-center justify-center gap-2 px-6 py-2.5 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-xl shadow-red-500/25 active:scale-95 transition-all cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed touch-manipulation"
+                className="flex items-center justify-center gap-2 px-6 py-2.5 min-h-[44px] rounded-xl text-xs font-extrabold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-xl shadow-red-500/25 active:scale-95 transition-all cursor-pointer disabled:brightness-95 disabled:cursor-wait touch-manipulation drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
               >
                 {loading ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Launching Dashboard…</span>
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
+                    <span className="text-white font-bold">Launching Dashboard…</span>
                   </>
                 ) : (
                   <>
-                    <span>Complete &amp; Open Console</span>
-                    <Sparkles className="w-4 h-4" />
+                    <span className="text-white font-bold">Complete &amp; Open Console</span>
+                    <Sparkles className="w-4 h-4 text-white" />
                   </>
                 )}
               </button>

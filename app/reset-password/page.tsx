@@ -174,17 +174,17 @@ function ResetPasswordForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full flex items-center justify-center gap-2 py-3 px-4 min-h-[44px] rounded-xl text-sm font-bold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-xl shadow-red-500/20 active:scale-95 transition-all cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed touch-manipulation"
+        className="w-full flex items-center justify-center gap-2 py-3 px-4 min-h-[44px] rounded-xl text-sm font-extrabold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-xl shadow-red-500/20 active:scale-95 transition-all cursor-pointer disabled:brightness-95 disabled:cursor-wait touch-manipulation drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
       >
         {loading ? (
           <>
-            <Loader2 className="w-4 h-4 animate-spin" />
-            <span>Updating password…</span>
+            <Loader2 className="w-4 h-4 animate-spin text-white" />
+            <span className="text-white font-bold">Updating password…</span>
           </>
         ) : (
           <>
-            <span>Set New Password &amp; Sign In</span>
-            <ArrowRight className="w-4 h-4" />
+            <span className="text-white font-bold">Set New Password &amp; Sign In</span>
+            <ArrowRight className="w-4 h-4 text-white" />
           </>
         )}
       </button>
