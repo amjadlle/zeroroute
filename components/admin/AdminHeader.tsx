@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -11,7 +12,11 @@ import {
   CheckCircle2,
   Sparkles,
   Timer,
-  Layers
+  Layers,
+  Menu,
+  X,
+  ExternalLink,
+  LayoutDashboard
 } from "lucide-react";
 
 interface AdminHeaderProps {
@@ -37,10 +42,12 @@ export function AdminHeader({
   onLogout,
   onOpenKeysModal,
 }: AdminHeaderProps) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   return (
     <div className="space-y-4">
       {/* Top Bar Header */}
-      <header className="border-b border-white/10 bg-[#050608]/90 backdrop-blur-xl sticky top-0 z-40">
+      <header className="border-b border-white/10 bg-[#050608]/95 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-3 sm:px-8 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-4">
           
           {/* Logo & Admin Status */}
@@ -63,21 +70,22 @@ export function AdminHeader({
             </div>
           </div>
 
-          {/* Action Buttons: Subscriber View, Public Site, Buy Me a Coffee, API Keys, Sign Out */}
-          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          {/* Desktop Actions */}
+          <div className="hidden md:flex items-center gap-2 sm:gap-3 shrink-0">
             <Link
               href="/app"
-              className="hidden lg:inline-flex items-center gap-1.5 px-3 py-2 min-h-[38px] text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 rounded-xl transition-all shadow-sm touch-manipulation"
+              className="inline-flex items-center gap-1.5 px-3 py-2 min-h-[38px] text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 rounded-xl transition-all shadow-sm touch-manipulation"
             >
+              <LayoutDashboard className="w-3.5 h-3.5 text-slate-400" />
               <span>Subscriber View (/app)</span>
             </Link>
 
             <Link
               href="/"
               target="_blank"
-              className="hidden md:inline-flex items-center gap-1.5 px-3 py-2 min-h-[38px] text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 rounded-xl transition-all shadow-sm touch-manipulation"
+              className="inline-flex items-center gap-1.5 px-3 py-2 min-h-[38px] text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 rounded-xl transition-all shadow-sm touch-manipulation"
             >
-              <Globe className="w-3.5 h-3.5" />
+              <Globe className="w-3.5 h-3.5 text-slate-400" />
               <span>Public Site</span>
             </Link>
 
@@ -85,7 +93,7 @@ export function AdminHeader({
               href="https://buymeacoffee.com/amjadlle"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 min-h-[38px] text-xs font-bold bg-[#FFDD00] hover:bg-[#FFEA47] text-zinc-950 rounded-xl transition-all active:scale-95 shadow-md shadow-amber-500/20 whitespace-nowrap cursor-pointer touch-manipulation"
+              className="inline-flex items-center gap-1.5 px-3 py-2 min-h-[38px] text-xs font-bold bg-[#FFDD00] hover:bg-[#FFEA47] text-zinc-950 rounded-xl transition-all active:scale-95 shadow-md shadow-amber-500/20 whitespace-nowrap cursor-pointer touch-manipulation"
               title="Buy Me a Coffee"
             >
               <span>☕</span>
@@ -95,10 +103,10 @@ export function AdminHeader({
             <button
               type="button"
               onClick={onOpenKeysModal}
-              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 min-h-[38px] text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl shadow-md shadow-red-500/25 transition-all active:scale-95 cursor-pointer touch-manipulation shrink-0"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[38px] text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl shadow-md shadow-red-500/25 transition-all active:scale-95 cursor-pointer touch-manipulation shrink-0"
             >
               <KeyRound className="w-3.5 h-3.5 shrink-0" />
-              <span className="inline">API Keys</span>
+              <span>API Keys</span>
             </button>
 
             <button
@@ -112,7 +120,94 @@ export function AdminHeader({
               <span className="hidden sm:inline ml-1">Sign Out</span>
             </button>
           </div>
+
+          {/* Mobile Actions: API Keys + Hamburger Toggle */}
+          <div className="flex md:hidden items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={onOpenKeysModal}
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 min-h-[36px] text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-lg shadow-sm transition-all active:scale-95 cursor-pointer touch-manipulation"
+            >
+              <KeyRound className="w-3.5 h-3.5 shrink-0" />
+              <span>Keys</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition-all cursor-pointer touch-manipulation"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5 text-red-400" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Dropdown Drawer */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-white/10 bg-[#080b12] px-4 py-3 space-y-2 animate-in slide-in-from-top-2 duration-200 shadow-2xl">
+            <div className="flex items-center justify-between pb-2 border-b border-white/5 text-xs">
+              <span className="text-slate-400 font-medium">Role:</span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-bold uppercase tracking-wider">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Master Admin</span>
+              </div>
+            </div>
+
+            <Link
+              href="/app"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 text-xs font-semibold border border-white/5 transition-all"
+            >
+              <div className="flex items-center gap-2">
+                <LayoutDashboard className="w-4 h-4 text-red-400" />
+                <span>Subscriber View (/app)</span>
+              </div>
+              <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
+            </Link>
+
+            <Link
+              href="/"
+              target="_blank"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 text-xs font-semibold border border-white/5 transition-all"
+            >
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-blue-400" />
+                <span>Public Landing Site</span>
+              </div>
+              <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
+            </Link>
+
+            <a
+              href="https://buymeacoffee.com/amjadlle"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between p-2.5 rounded-xl bg-[#FFDD00]/10 hover:bg-[#FFDD00]/20 text-[#FFDD00] text-xs font-bold border border-[#FFDD00]/30 transition-all"
+            >
+              <div className="flex items-center gap-2">
+                <span>☕</span>
+                <span>Buy Me a Coffee</span>
+              </div>
+              <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+            </a>
+
+            <div className="pt-2 border-t border-white/5">
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onLogout();
+                }}
+                className="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold border border-red-500/20 transition-all cursor-pointer"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Sign Out Master Session</span>
+              </button>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* KPI Stats Ribbon */}
