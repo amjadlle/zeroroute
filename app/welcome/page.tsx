@@ -189,7 +189,7 @@ function WelcomeContent() {
           <div className="flex items-center gap-3">
             <Link
               href={consoleHref}
-              className="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center gap-1.5"
+              className="px-3.5 py-2 min-h-[44px] rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center gap-1.5 touch-manipulation"
             >
               <span>Console</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -229,13 +229,13 @@ function WelcomeContent() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <Link
                 href="/#pricing"
-                className="w-full sm:w-auto px-6 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-lg shadow-red-500/20 transition-all active:scale-95"
+                className="w-full sm:w-auto px-6 py-3 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-lg shadow-red-500/20 transition-all active:scale-95 flex items-center justify-center touch-manipulation"
               >
                 View Plans &amp; Pricing
               </Link>
               <Link
                 href="/login"
-                className="w-full sm:w-auto px-6 py-2.5 rounded-xl text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition-all"
+                className="w-full sm:w-auto px-6 py-3 min-h-[44px] rounded-xl text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition-all flex items-center justify-center touch-manipulation"
               >
                 Log In to Account
               </Link>
@@ -292,15 +292,16 @@ function WelcomeContent() {
                 <button
                   type="button"
                   onClick={() => setShowKey(!showKey)}
-                  className="text-slate-400 hover:text-slate-200 text-xs flex items-center gap-1 cursor-pointer"
+                  className="p-2.5 min-w-[44px] min-h-[44px] text-slate-400 hover:text-slate-200 text-xs flex items-center justify-center gap-1 cursor-pointer touch-manipulation"
+                  aria-label="Toggle key visibility"
                 >
-                  {showKey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                  {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   <span>{showKey ? "Hide" : "Show"}</span>
                 </button>
                 <button
                   type="button"
                   onClick={copyKey}
-                  className="text-red-400 hover:text-red-300 font-semibold text-xs flex items-center gap-1 cursor-pointer bg-red-500/10 px-2.5 py-1 rounded-lg border border-red-500/20"
+                  className="text-red-400 hover:text-red-300 font-semibold text-xs flex items-center gap-1.5 cursor-pointer bg-red-500/10 px-3.5 py-2 min-h-[44px] rounded-xl border border-red-500/20 touch-manipulation"
                 >
                   {copiedKey ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copiedKey ? "Copied!" : "Copy Key"}</span>
@@ -326,7 +327,7 @@ function WelcomeContent() {
               <button
                 type="button"
                 onClick={copyScript}
-                className="text-emerald-400 hover:text-emerald-300 font-semibold text-xs flex items-center gap-1 cursor-pointer bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20"
+                className="text-emerald-400 hover:text-emerald-300 font-semibold text-xs flex items-center gap-1.5 cursor-pointer bg-emerald-500/10 px-3.5 py-2 min-h-[44px] rounded-xl border border-emerald-500/20 touch-manipulation"
               >
                 {copiedScript ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copiedScript ? "Copied!" : "Copy Embed HTML"}</span>
@@ -357,7 +358,7 @@ function WelcomeContent() {
 
             <Link
               href={onboardingHref}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-lg shadow-red-500/20 transition-all active:scale-95"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-lg shadow-red-500/20 transition-all active:scale-95 touch-manipulation"
             >
               <span>Start Onboarding Wizard</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -380,7 +381,7 @@ function WelcomeContent() {
 
             <Link
               href={consoleHref}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 text-white border border-white/10 transition-all active:scale-95"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 min-h-[44px] rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 text-white border border-white/10 transition-all active:scale-95 touch-manipulation"
             >
               <span>Open Console Dashboard</span>
               <ArrowRight className="w-3.5 h-3.5" />
