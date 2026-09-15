@@ -13,12 +13,12 @@ interface AuthCardProps {
 
 export function AuthCard({ title, subtitle, children }: AuthCardProps) {
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 py-12 relative z-10">
+    <div className="min-h-screen flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 py-8 sm:py-12 relative z-10">
       {/* Top Navigation: Back to Home */}
-      <div className="w-full max-w-md mb-4 flex items-center justify-between">
+      <div className="w-full max-w-md mb-3 sm:mb-4 flex items-center justify-between">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors group px-3 py-1.5 rounded-lg bg-white/5 border border-white/5 hover:border-white/10"
+          className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors group px-3.5 py-2 min-h-[44px] rounded-xl bg-white/5 border border-white/5 hover:border-white/10 touch-manipulation"
         >
           <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
           <span>Back to Home</span>
