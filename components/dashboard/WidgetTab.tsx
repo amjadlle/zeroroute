@@ -492,14 +492,18 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
           <button
             type="submit"
             disabled={!chatInput.trim() || chatStreaming}
-            className="px-4 py-2.5 min-h-[44px] min-w-[44px] rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 touch-manipulation shrink-0"
+            className={`px-4 py-2.5 min-h-[44px] min-w-[44px] rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 touch-manipulation shrink-0 ${
+              !chatInput.trim() || chatStreaming
+                ? "bg-white/5 text-slate-500 border border-white/10 cursor-not-allowed"
+                : "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-lg shadow-red-500/25 active:scale-95 cursor-pointer"
+            }`}
           >
             {chatStreaming ? (
-              <Sparkles className="w-4 h-4 animate-spin" />
+              <Sparkles className="w-4 h-4 animate-spin text-slate-400" />
             ) : (
-              <Send className="w-4 h-4" />
+              <Send className={`w-4 h-4 ${!chatInput.trim() ? "text-slate-500" : "text-white"}`} />
             )}
-            <span className="hidden sm:inline">{chatStreaming ? "Streaming…" : "Send"}</span>
+            <span className="inline font-bold">{chatStreaming ? "Streaming…" : "Send"}</span>
           </button>
         </form>
       </div>
