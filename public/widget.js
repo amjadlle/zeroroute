@@ -240,6 +240,37 @@
       0%, 100% { opacity: 1; }
       50% { opacity: 0; }
     }
+    .zr-typing-dots {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 4px;
+      height: 18px;
+    }
+    .zr-typing-dots .zr-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: ${customColor};
+      opacity: 0.4;
+      animation: zrTypingBounce 1.4s infinite ease-in-out both;
+    }
+    .zr-typing-dots .zr-dot:nth-child(1) {
+      animation-delay: -0.32s;
+    }
+    .zr-typing-dots .zr-dot:nth-child(2) {
+      animation-delay: -0.16s;
+    }
+    @keyframes zrTypingBounce {
+      0%, 80%, 100% {
+        transform: scale(0.6);
+        opacity: 0.3;
+      }
+      40% {
+        transform: scale(1.15);
+        opacity: 1;
+      }
+    }
     #zr-suggestions-wrapper {
       padding: 0 16px 12px 16px;
     }
@@ -443,11 +474,13 @@
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
   }
 
-  function appendMessage(role, text) {
+  function appendMessage(role, text, isRawHtml) {
     var msgDiv = document.createElement("div");
     msgDiv.className = "zr-msg " + (role === "user" ? "user" : "bot");
     if (role === "user") {
       msgDiv.textContent = text;
+    } else if (isRawHtml) {
+      msgDiv.innerHTML = text;
     } else {
       msgDiv.innerHTML = renderMarkdown(text);
     }
@@ -521,7 +554,11 @@
     appendMessage("user", userText);
     chatHistory.push({ role: "user", content: userText });
 
-    var botMsgElem = appendMessage("assistant", "Thinking...");
+    var botMsgElem = appendMessage(
+      "assistant",
+      '<div class="zr-typing-dots"><span class="zr-dot"></span><span class="zr-dot"></span><span class="zr-dot"></span></div>',
+      true
+    );
 
     try {
       var res = await fetch(host + "/v1/chat/completions", {
