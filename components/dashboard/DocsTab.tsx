@@ -334,7 +334,7 @@ curl ${hostUrl}/v1/chat/completions \\
                     </div>
                     <div>
                       <div className="font-bold text-xs leading-tight">{botTitle || "ZeroRoute AI"}</div>
-                      <div className="text-[9px] text-white/80 font-mono">Online • Powered by ZeroRoute</div>
+                      <div className="text-[9px] text-white/80 font-mono">Online • Active</div>
                     </div>
                   </div>
                   <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" />

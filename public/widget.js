@@ -15,6 +15,10 @@
   if (!botId) botId = "demo";
   var customHost = scriptTag ? scriptTag.getAttribute("data-host") : null;
   var host = customHost || (scriptTag && scriptTag.src && scriptTag.src.startsWith("http") ? new URL(scriptTag.src).origin : (typeof window !== "undefined" ? window.location.origin : ""));
+  var customTitle = scriptTag ? scriptTag.getAttribute("data-title") : null;
+  var customGreeting = scriptTag ? scriptTag.getAttribute("data-greeting") : null;
+  var customPromptsRaw = scriptTag ? scriptTag.getAttribute("data-prompts") : null;
+  var customColor = (scriptTag ? scriptTag.getAttribute("data-color") : null) || "#ef4444";
 
   // Inject CSS Styles
   var style = document.createElement("style");
@@ -30,8 +34,8 @@
       width: 56px;
       height: 56px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-      box-shadow: 0 8px 24px rgba(239, 68, 68, 0.45);
+      background: ${customColor};
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
       border: 1px solid rgba(255, 255, 255, 0.2);
       cursor: pointer;
       display: flex;
@@ -43,7 +47,7 @@
     }
     #zr-widget-btn:hover {
       transform: scale(1.08);
-      box-shadow: 0 12px 28px rgba(239, 68, 68, 0.6);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
     }
     #zr-widget-btn svg {
       width: 26px;
@@ -62,7 +66,7 @@
       background: #080a0f;
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 20px;
-      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(239, 68, 68, 0.15);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.85);
       display: none;
       flex-direction: column;
       overflow: hidden;
@@ -73,36 +77,70 @@
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
     #zr-header {
-      padding: 14px 18px;
-      background: rgba(12, 16, 26, 0.92);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(12px);
+      padding: 12px 16px;
+      background: ${customColor};
+      color: #ffffff;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
       display: flex;
       align-items: center;
       justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    #zr-header .title-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #zr-header .zr-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    #zr-header .title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
     #zr-header .title {
       font-weight: 700;
-      font-size: 14.5px;
+      font-size: 14px;
       color: #ffffff;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+    #zr-header .status-wrap {
       display: flex;
       align-items: center;
-      gap: 8px;
-      letter-spacing: -0.01em;
+      gap: 5px;
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.85);
+      font-weight: 500;
     }
     #zr-header .status-dot {
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
       background: #10b981;
       border-radius: 50%;
-      box-shadow: 0 0 10px #10b981;
+      box-shadow: 0 0 8px #10b981;
+      display: inline-block;
     }
     #zr-header .close-btn {
-      background: none;
+      background: rgba(255, 255, 255, 0.15);
       border: none;
-      color: #94a3b8;
+      color: #ffffff;
       cursor: pointer;
-      padding: 5px;
+      width: 28px;
+      height: 28px;
       border-radius: 8px;
       display: flex;
       align-items: center;
@@ -110,8 +148,7 @@
       transition: all 0.15s;
     }
     #zr-header .close-btn:hover {
-      color: #ffffff;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.28);
     }
     #zr-messages {
       flex: 1;
@@ -146,14 +183,14 @@
       font-style: italic;
     }
     .zr-msg.bot a {
-      color: #f87171;
+      color: ${customColor};
       text-decoration: underline;
       text-underline-offset: 2px;
       font-weight: 600;
-      transition: color 0.15s;
+      transition: opacity 0.15s;
     }
     .zr-msg.bot a:hover {
-      color: #fca5a5;
+      opacity: 0.85;
     }
     .zr-msg.bot p {
       margin: 0 0 8px 0;
@@ -163,10 +200,10 @@
     }
     .zr-msg.user {
       align-self: flex-end;
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      background: ${customColor};
       color: #ffffff;
       border-bottom-right-radius: 4px;
-      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
       white-space: pre-wrap;
     }
     .zr-inline-code {
@@ -194,7 +231,7 @@
       display: inline-block;
       width: 2px;
       height: 13px;
-      background: #ef4444;
+      background: ${customColor};
       margin-left: 3px;
       vertical-align: middle;
       animation: zrBlink 0.8s infinite;
@@ -203,31 +240,44 @@
       0%, 100% { opacity: 1; }
       50% { opacity: 0; }
     }
+    #zr-suggestions-wrapper {
+      padding: 0 16px 12px 16px;
+    }
+    #zr-suggestions-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+      display: block;
+    }
     #zr-suggestions {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      padding: 0 16px 12px 16px;
     }
     .zr-pill {
       background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #94a3b8;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #cbd5e1;
       font-size: 11.5px;
       padding: 6px 12px;
-      border-radius: 20px;
+      border-radius: 12px;
       cursor: pointer;
       transition: all 0.15s ease;
+      text-align: left;
     }
     .zr-pill:hover {
-      background: rgba(239, 68, 68, 0.15);
-      border-color: rgba(239, 68, 68, 0.4);
-      color: #fca5a5;
+      background: ${customColor}22;
+      border-color: ${customColor}66;
+      color: #ffffff;
+      transform: translateY(-1px);
     }
     #zr-input-area {
       padding: 12px 16px;
-      padding-bottom: max(12px, env(safe-area-inset-bottom, 12px));
-      background: rgba(12, 16, 26, 0.95);
+      padding-bottom: max(14px, env(safe-area-inset-bottom, 14px));
+      background: rgba(12, 16, 26, 0.98);
       border-top: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       gap: 8px;
@@ -239,17 +289,17 @@
       border-radius: 12px;
       padding: 10px 14px;
       color: #ffffff;
-      font-size: 16px;
+      font-size: 14px;
       outline: none;
       transition: border-color 0.2s;
       -webkit-appearance: none;
       touch-action: manipulation;
     }
     #zr-input:focus {
-      border-color: #ef4444;
+      border-color: ${customColor};
     }
     #zr-send-btn {
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      background: ${customColor};
       border: none;
       border-radius: 12px;
       width: 44px;
@@ -272,19 +322,6 @@
       cursor: not-allowed;
       transform: none;
     }
-    #zr-footer {
-      font-size: 10px;
-      color: #64748b;
-      text-align: center;
-      padding: 6px 0 8px 0;
-      background: #080a0f;
-      border-top: 1px solid rgba(255, 255, 255, 0.03);
-    }
-    #zr-footer a {
-      color: #ef4444;
-      text-decoration: none;
-      font-weight: 600;
-    }
   `;
   document.head.appendChild(style);
 
@@ -295,25 +332,31 @@
   container.innerHTML = `
     <div id="zr-widget-box">
       <div id="zr-header">
-        <div class="title">
-          <div class="status-dot"></div>
-          <span id="zr-bot-title">AI Assistant</span>
+        <div class="title-box">
+          <div class="zr-avatar" id="zr-avatar-icon">A</div>
+          <div class="title-wrap">
+            <span class="title" id="zr-bot-title">AI Assistant</span>
+            <div class="status-wrap">
+              <span class="status-dot"></span>
+              <span>Online • Active</span>
+            </div>
+          </div>
         </div>
         <button class="close-btn" id="zr-close-btn" aria-label="Close chat">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
       </div>
       <div id="zr-messages"></div>
-      <div id="zr-suggestions"></div>
+      <div id="zr-suggestions-wrapper" style="display:none;">
+        <span id="zr-suggestions-label">Suggested Questions</span>
+        <div id="zr-suggestions"></div>
+      </div>
       <form id="zr-input-area">
-        <input type="text" id="zr-input" placeholder="Type a message..." autocomplete="off" />
+        <input type="text" id="zr-input" placeholder="Ask anything…" autocomplete="off" />
         <button type="submit" id="zr-send-btn" aria-label="Send message">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
         </button>
       </form>
-      <div id="zr-footer">
-        Powered by <a href="https://zeroroute.mapki.in" target="_blank" rel="noopener">ZeroRoute Multi-Cloud</a>
-      </div>
     </div>
     <button id="zr-widget-btn" aria-label="Open chat">
       <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
@@ -325,13 +368,21 @@
   var widgetBox = document.getElementById("zr-widget-box");
   var closeBtn = document.getElementById("zr-close-btn");
   var messagesContainer = document.getElementById("zr-messages");
+  var suggestionsWrapper = document.getElementById("zr-suggestions-wrapper");
   var suggestionsContainer = document.getElementById("zr-suggestions");
   var inputForm = document.getElementById("zr-input-area");
   var inputField = document.getElementById("zr-input");
   var botTitleElem = document.getElementById("zr-bot-title");
+  var avatarIconElem = document.getElementById("zr-avatar-icon");
 
   var isOpen = false;
   var chatHistory = [];
+
+  function updateAvatar(title) {
+    if (avatarIconElem && title) {
+      avatarIconElem.textContent = title.trim().charAt(0).toUpperCase() || "A";
+    }
+  }
 
   function toggleChat() {
     isOpen = !isOpen;
@@ -405,34 +456,25 @@
     return msgDiv;
   }
 
-  var customTitle = scriptTag ? scriptTag.getAttribute("data-title") : null;
-  var customGreeting = scriptTag ? scriptTag.getAttribute("data-greeting") : null;
-  var customPromptsRaw = scriptTag ? scriptTag.getAttribute("data-prompts") : null;
-  var customColor = scriptTag ? scriptTag.getAttribute("data-color") : null;
-
-  if (customColor) {
-    widgetBtn.style.background = customColor;
-    var sendBtn = document.getElementById("zr-send-btn");
-    if (sendBtn) sendBtn.style.background = customColor;
-  }
-
   // Load Bot Configurations
   fetch(host + "/api/widget/config?bot_id=" + encodeURIComponent(botId))
     .then(function (res) { return res.json(); })
     .then(function (data) {
       var bot = (data && data.bot) || {};
       var title = customTitle || bot.botTitle || "ZeroRoute AI";
-      var greeting = customGreeting || bot.greeting || "Hi! 👋 Welcome to ZeroRoute. How can I help you today?";
+      var greeting = customGreeting || bot.greeting || "Hi! 👋 How can I help you today?";
       var promptList = [];
       if (customPromptsRaw) {
         promptList = customPromptsRaw.split(",").map(function (s) { return s.trim(); }).filter(Boolean);
       } else if (Array.isArray(bot.prompts) && bot.prompts.length > 0) {
         promptList = bot.prompts;
       } else {
-        promptList = ["Is it really 100% free?", "How does failover work?", "Show me curl example"];
+        promptList = ["What are your services?", "Pricing details", "How to get started?"];
       }
 
       botTitleElem.textContent = title;
+      updateAvatar(title);
+
       if (greeting) {
         appendMessage("assistant", greeting);
         chatHistory.push({ role: "assistant", content: greeting });
@@ -440,6 +482,7 @@
 
       if (promptList.length > 0) {
         suggestionsContainer.innerHTML = "";
+        suggestionsWrapper.style.display = "block";
         promptList.forEach(function (promptText) {
           var pill = document.createElement("button");
           pill.className = "zr-pill";
@@ -447,7 +490,7 @@
           pill.type = "button";
           pill.addEventListener("click", function () {
             sendMessage(promptText);
-            suggestionsContainer.style.display = "none";
+            suggestionsWrapper.style.display = "none";
           });
           suggestionsContainer.appendChild(pill);
         });
@@ -456,8 +499,9 @@
     .catch(function (err) {
       console.warn("[ZeroRoute Widget] Failed to load config:", err);
       var title = customTitle || "ZeroRoute AI";
-      var greeting = customGreeting || "Hi! 👋 Welcome to ZeroRoute. How can I assist you today?";
+      var greeting = customGreeting || "Hi! 👋 How can I help you today?";
       botTitleElem.textContent = title;
+      updateAvatar(title);
       appendMessage("assistant", greeting);
     });
 
