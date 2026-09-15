@@ -9,7 +9,6 @@ import { AdminPlaygroundTab } from "@/components/admin/AdminPlaygroundTab";
 import { AdminLogsTab, GlobalLogItem } from "@/components/admin/AdminLogsTab";
 import { AdminKnowledgeTab } from "@/components/admin/AdminKnowledgeTab";
 import { AdminCustomersTab, CustomerAdminItem } from "@/components/admin/AdminCustomersTab";
-import { AdminIntegrationTab } from "@/components/admin/AdminIntegrationTab";
 import { AdminApiKeysModal } from "@/components/admin/AdminApiKeysModal";
 import {
   SlidersHorizontal,
@@ -18,14 +17,13 @@ import {
   Activity,
   BookOpen,
   Users,
-  Code2,
   Loader2
 } from "lucide-react";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<
-    "providers" | "analytics" | "playground" | "logs" | "knowledge" | "customers" | "code"
+    "providers" | "analytics" | "playground" | "logs" | "knowledge" | "customers"
   >("providers");
   const [loading, setLoading] = useState(true);
   const [showKeysModal, setShowKeysModal] = useState(false);
@@ -132,8 +130,7 @@ export default function AdminDashboardPage() {
     { id: "playground", label: "Playground", icon: Terminal },
     { id: "logs", label: `Logs & Failovers (${logsList.length})`, icon: Activity },
     { id: "knowledge", label: "Knowledge Base", icon: BookOpen },
-    { id: "customers", label: `Subscribers Directory (${customersList.length})`, icon: Users },
-    { id: "code", label: "Integration Code", icon: Code2 },
+    { id: "customers", label: `Subscribers & Bots (${customersList.length})`, icon: Users },
   ];
 
   return (
@@ -202,14 +199,9 @@ export default function AdminDashboardPage() {
           <AdminKnowledgeTab />
         )}
 
-        {/* Tab 6: Subscribers Directory */}
+        {/* Tab 6: Subscribers & Bots Directory */}
         {activeTab === "customers" && (
           <AdminCustomersTab customers={customersList} onRefresh={handleRefreshData} />
-        )}
-
-        {/* Tab 7: Integration Code */}
-        {activeTab === "code" && (
-          <AdminIntegrationTab />
         )}
       </div>
 
