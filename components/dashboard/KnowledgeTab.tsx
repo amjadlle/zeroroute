@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { BookOpen, Plus, Trash2, Globe, FileText, Loader2, Sparkles, ExternalLink, AlertCircle } from "lucide-react";
+import { 
+  BookOpen, Plus, Trash2, Globe, FileText, Loader2, Sparkles, 
+  ExternalLink, AlertCircle, UploadCloud, FileUp, RotateCw 
+} from "lucide-react";
 
 export interface KnowledgeDoc {
   id: string;
@@ -23,7 +26,7 @@ interface KnowledgeTabProps {
 
 export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc }: KnowledgeTabProps) {
   const [modalOpen, setModalOpen] = useState(false);
-  const [mode, setMode] = useState<"text" | "crawl">("crawl");
+  const [mode, setMode] = useState<"crawl" | "text" | "upload">("upload");
 
   // Text state
   const [title, setTitle] = useState("");
@@ -35,6 +38,14 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
   const [crawling, setCrawling] = useState(false);
   const [crawlError, setCrawlError] = useState("");
 
+  // Upload state
+  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState("");
+  const [uploading, setUploading] = useState(false);
+
+  // Sync state
+  const [syncingDocId, setSyncingDocId] = useState<string | null>(null);
+
   const handleTextSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
@@ -44,12 +55,48 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
     setModalOpen(false);
   };
 
+  const handleFileUpload = async (file: File) => {
+    setUploading(true);
+    setUploadError("");
+    setUploadStatus(`Reading ${file.name}…`);
+    try {
+      const text = await file.text();
+      const res = await fetch("/api/knowledge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: file.name,
+          content: text,
+          type: "file_upload",
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setUploadError(data.error || "Failed to upload document.");
+        setUploadStatus(null);
+        return;
+      }
+
+      setUploadStatus(`✅ Indexed ${file.name} (${text.length} chars)`);
+      if (onRefresh) await onRefresh();
+      setTimeout(() => {
+        setModalOpen(false);
+        setUploadStatus(null);
+      }, 1200);
+    } catch (err: any) {
+      setUploadError(err.message || "Failed to upload file.");
+      setUploadStatus(null);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleCrawlSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     let cleanUrl = crawlUrl.trim();
     if (!cleanUrl) return;
     
-    // Auto prepend https if protocol is omitted
     if (!cleanUrl.startsWith("http://") && !cleanUrl.startsWith("https://")) {
       cleanUrl = `https://${cleanUrl}`;
     }
@@ -71,7 +118,6 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
         return;
       }
 
-      // Refresh list smoothly without full page reload
       setCrawlUrl("");
       setCrawlTitle("");
       setModalOpen(false);
@@ -85,16 +131,46 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
     }
   };
 
+  const handleSyncDoc = async (doc: KnowledgeDoc) => {
+    if (!doc.source_url) return;
+    setSyncingDocId(doc.id);
+    try {
+      const res = await fetch("/api/knowledge/crawl", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: doc.source_url }),
+      });
+      if (res.ok && onRefresh) {
+        await onRefresh();
+      }
+    } catch (err) {
+      console.error("Sync error:", err);
+    } finally {
+      setSyncingDocId(null);
+    }
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h3 className="text-sm font-bold text-white">Semantic Knowledge Base (RAG)</h3>
           <p className="text-xs text-slate-400">
-            Documents and live website URLs crawled here are automatically injected into AI prompts for accurate answers.
+            Upload files, paste FAQs, or crawl website URLs to train your chatbot with verified knowledge.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setMode("upload");
+              setModalOpen(true);
+            }}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-bold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/20 shadow-sm cursor-pointer transition-all touch-manipulation"
+          >
+            <FileUp className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <span>Upload Files</span>
+          </button>
           <button
             type="button"
             onClick={() => {
@@ -126,18 +202,30 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
           <BookOpen className="w-10 h-10 text-slate-600 mx-auto" />
           <h4 className="text-sm font-bold text-white">No knowledge documents yet</h4>
           <p className="text-xs text-slate-400 max-w-sm mx-auto">
-            Crawl your website or paste product FAQs to enable high-accuracy RAG for your assistant.
+            Upload document files (.md, .txt, .json), crawl your website, or paste FAQs to enable zero-hallucination RAG for your assistant.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => {
+                setMode("upload");
+                setModalOpen(true);
+              }}
+              className="px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 hover:bg-emerald-500/20 cursor-pointer touch-manipulation flex items-center gap-1.5"
+            >
+              <FileUp className="w-4 h-4 text-emerald-400" />
+              <span>Upload Document</span>
+            </button>
             <button
               type="button"
               onClick={() => {
                 setMode("crawl");
                 setModalOpen(true);
               }}
-              className="px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold bg-blue-600/20 text-blue-300 border border-blue-500/30 hover:bg-blue-600/30 cursor-pointer touch-manipulation"
+              className="px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold bg-blue-600/20 text-blue-300 border border-blue-500/30 hover:bg-blue-600/30 cursor-pointer touch-manipulation flex items-center gap-1.5"
             >
-              🌐 Crawl Website
+              <Globe className="w-4 h-4 text-blue-400" />
+              <span>Crawl Website</span>
             </button>
             <button
               type="button"
@@ -159,20 +247,44 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
               <div key={d.id} className="p-4 bg-dark-card border border-dark-border rounded-2xl space-y-3 relative group hover:border-white/20 transition-all">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
-                    {isWeb ? <Globe className="w-4 h-4 text-blue-400 shrink-0" /> : <FileText className="w-4 h-4 text-amber-400 shrink-0" />}
+                    {isWeb ? (
+                      <Globe className="w-4 h-4 text-blue-400 shrink-0" />
+                    ) : d.type === "file_upload" ? (
+                      <FileUp className="w-4 h-4 text-emerald-400 shrink-0" />
+                    ) : (
+                      <FileText className="w-4 h-4 text-amber-400 shrink-0" />
+                    )}
                     <span className="text-xs font-bold text-white truncate max-w-[180px] sm:max-w-[240px]" title={d.title}>
                       {d.title}
                     </span>
+                    <span className="text-[9.5px] font-mono px-1.5 py-0.5 rounded bg-white/5 text-slate-400 border border-white/5 shrink-0">
+                      {d.type}
+                    </span>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => onDeleteDoc(d.id)}
-                    className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-slate-500 hover:text-red-400 hover:bg-white/5 transition-colors cursor-pointer touch-manipulation shrink-0"
-                    title="Delete Document"
-                    aria-label="Delete document"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  
+                  <div className="flex items-center gap-1 shrink-0">
+                    {d.source_url && (
+                      <button
+                        type="button"
+                        onClick={() => handleSyncDoc(d)}
+                        disabled={syncingDocId === d.id}
+                        className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-slate-400 hover:text-blue-400 hover:bg-white/5 transition-colors cursor-pointer touch-manipulation disabled:opacity-50"
+                        title="Re-sync from URL"
+                        aria-label="Re-sync from URL"
+                      >
+                        <RotateCw className={`w-3.5 h-3.5 ${syncingDocId === d.id ? "animate-spin text-blue-400" : ""}`} />
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => onDeleteDoc(d.id)}
+                      className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-slate-500 hover:text-red-400 hover:bg-white/5 transition-colors cursor-pointer touch-manipulation"
+                      title="Delete Document"
+                      aria-label="Delete document"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 {d.source_url && (
@@ -201,13 +313,24 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
         </div>
       )}
 
-      {/* Unified Add / Crawl Modal */}
+      {/* Unified Add / Crawl / Upload Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
           <div className="w-full max-w-lg bg-[#0c0e14] border border-white/10 rounded-2xl p-6 space-y-4 shadow-2xl">
             {/* Modal Tabs */}
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setMode("upload")}
+                  className={`px-3 py-2 min-h-[44px] rounded-xl text-xs font-bold transition-all cursor-pointer touch-manipulation ${
+                    mode === "upload"
+                      ? "bg-emerald-600/20 text-emerald-300 border border-emerald-500/30"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  📁 Upload File (.md, .txt, .json)
+                </button>
                 <button
                   type="button"
                   onClick={() => setMode("crawl")}
@@ -217,7 +340,7 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
                       : "text-slate-400 hover:text-white"
                   }`}
                 >
-                  🌐 Crawl Website URL
+                  🌐 Crawl URL
                 </button>
                 <button
                   type="button"
@@ -228,7 +351,7 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
                       : "text-slate-400 hover:text-white"
                   }`}
                 >
-                  📝 Paste Manual Text
+                  📝 Manual Text
                 </button>
               </div>
               <button
@@ -241,7 +364,44 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
               </button>
             </div>
 
-            {/* Mode 1: Crawl Web Page */}
+            {/* Mode 1: Upload File */}
+            {mode === "upload" && (
+              <div className="space-y-4">
+                {uploadError && (
+                  <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-start gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                    <span>{uploadError}</span>
+                  </div>
+                )}
+
+                <label className="border-2 border-dashed border-white/10 hover:border-emerald-500/50 bg-black/40 hover:bg-emerald-500/[0.02] rounded-2xl p-8 text-center transition-all cursor-pointer block space-y-3 touch-manipulation">
+                  <input
+                    type="file"
+                    accept=".md,.txt,.json,.markdown"
+                    className="hidden"
+                    disabled={uploading}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleFileUpload(file);
+                    }}
+                  />
+                  <div className="w-12 h-12 mx-auto rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                    <UploadCloud className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-white">Click to browse or drop file here</p>
+                    <p className="text-[11px] text-slate-400 mt-1">Supports Markdown (.md), Plain Text (.txt), and JSON</p>
+                  </div>
+                  {uploadStatus && (
+                    <span className="inline-block text-xs font-mono text-emerald-400 font-semibold animate-pulse">
+                      {uploadStatus}
+                    </span>
+                  )}
+                </label>
+              </div>
+            )}
+
+            {/* Mode 2: Crawl Web Page */}
             {mode === "crawl" && (
               <form onSubmit={handleCrawlSubmit} className="space-y-4">
                 {crawlError && (
@@ -315,7 +475,7 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
               </form>
             )}
 
-            {/* Mode 2: Manual Text */}
+            {/* Mode 3: Manual Text */}
             {mode === "text" && (
               <form onSubmit={handleTextSubmit} className="space-y-3">
                 <div className="space-y-1">
