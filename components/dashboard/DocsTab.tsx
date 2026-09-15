@@ -40,6 +40,7 @@ export function DocsTab({
   const [botTitle, setBotTitle] = useState(initialBotTitle);
   const [brandColor, setBrandColor] = useState("#ef4444");
   const [greeting, setGreeting] = useState(initialGreeting);
+  const [logoUrl, setLogoUrl] = useState("");
   const [promptChips, setPromptChips] = useState(
     initialPrompts.length > 0
       ? initialPrompts.join(",")
@@ -72,7 +73,7 @@ export function DocsTab({
   data-title="${botTitle || "ZeroRoute AI"}"
   data-greeting="${greeting || "Hi! 👋 How can I help you today?"}"
   data-prompts="${cleanPrompts}"
-  data-color="${brandColor}"
+  data-color="${brandColor}"${logoUrl ? `\n  data-logo="${logoUrl}"` : ""}
   defer>
 </script>`,
 
@@ -90,7 +91,7 @@ Instructions:
   data-title="${botTitle || "ZeroRoute AI"}"
   data-greeting="${greeting || "Hi! 👋 How can I help you today?"}"
   data-prompts="${cleanPrompts}"
-  data-color="${brandColor}"
+  data-color="${brandColor}"${logoUrl ? `\n  data-logo="${logoUrl}"` : ""}
   defer>
 </script>
 \`\`\`
@@ -113,7 +114,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           data-title="${botTitle || "ZeroRoute AI"}"
           data-greeting="${greeting || "Hi! 👋 How can I help you today?"}"
           data-prompts="${cleanPrompts}"
-          data-color="${brandColor}"
+          data-color="${brandColor}"${logoUrl ? `\n          data-logo="${logoUrl}"` : ""}
           strategy="lazyOnload"
         />
       </body>
@@ -280,16 +281,29 @@ curl ${hostUrl}/v1/chat/completions \\
 
               <div className="space-y-1">
                 <label className="block text-[10px] font-semibold text-slate-400 uppercase">
-                  Quick Starter Question Chips (Comma separated)
+                  Custom Logo Image URL (Optional)
                 </label>
                 <input
-                  type="text"
-                  value={promptChips}
-                  onChange={(e) => setPromptChips(e.target.value)}
-                  placeholder="What are your services?,Pricing details,How to get started?"
-                  className="w-full px-3.5 py-2.5 text-base sm:text-xs bg-[#050608] border border-dark-border rounded-xl text-white focus:outline-none focus:border-red-500 font-sans touch-manipulation"
+                  type="url"
+                  value={logoUrl}
+                  onChange={(e) => setLogoUrl(e.target.value)}
+                  placeholder="https://yourwebsite.com/logo.png"
+                  className="w-full px-3.5 py-2.5 text-base sm:text-xs bg-[#050608] border border-dark-border rounded-xl text-white focus:outline-none focus:border-red-500 font-mono touch-manipulation"
                 />
               </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-[10px] font-semibold text-slate-400 uppercase">
+                Quick Starter Question Chips (Comma separated)
+              </label>
+              <input
+                type="text"
+                value={promptChips}
+                onChange={(e) => setPromptChips(e.target.value)}
+                placeholder="What are your services?,Pricing details,How to get started?"
+                className="w-full px-3.5 py-2.5 text-base sm:text-xs bg-[#050608] border border-dark-border rounded-xl text-white focus:outline-none focus:border-red-500 font-sans touch-manipulation"
+              />
             </div>
           </div>
         )}
@@ -328,10 +342,14 @@ curl ${hostUrl}/v1/chat/completions \\
                   className="p-3 text-white flex items-center justify-between shadow-md"
                   style={{ backgroundColor: brandColor }}
                 >
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center font-bold text-xs">
-                      {botTitle.charAt(0) || "Z"}
-                    </div>
+                  <div className="flex items-center gap-2.5">
+                    {logoUrl ? (
+                      <img
+                        src={logoUrl}
+                        alt=""
+                        className="w-7 h-7 rounded-full object-cover border border-white/20 shrink-0"
+                      />
+                    ) : null}
                     <div>
                       <div className="font-bold text-xs leading-tight">{botTitle || "ZeroRoute AI"}</div>
                       <div className="text-[9px] text-white/80 font-mono">Online • Active</div>
@@ -344,13 +362,14 @@ curl ${hostUrl}/v1/chat/completions \\
                 <div className="p-3 flex-1 overflow-y-auto space-y-3 text-xs">
                   {/* Bot Greeting Bubble */}
                   <div className="flex items-start gap-2">
-                    <div
-                      className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] text-white font-bold shrink-0 mt-0.5"
-                      style={{ backgroundColor: brandColor }}
-                    >
-                      {botTitle.charAt(0) || "Z"}
-                    </div>
-                    <div className="bg-white/10 border border-white/10 text-slate-200 p-2.5 rounded-2xl rounded-tl-sm text-[11px] leading-relaxed max-w-[85%]">
+                    {logoUrl ? (
+                      <img
+                        src={logoUrl}
+                        alt=""
+                        className="w-5 h-5 rounded-full object-cover border border-white/20 shrink-0 mt-0.5"
+                      />
+                    ) : null}
+                    <div className="bg-white/10 border border-white/10 text-slate-200 p-2.5 rounded-2xl text-[11px] leading-relaxed max-w-[85%]">
                       {greeting || "Hi! 👋 How can I help you today?"}
                     </div>
                   </div>

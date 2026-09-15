@@ -19,6 +19,7 @@
   var customGreeting = scriptTag ? scriptTag.getAttribute("data-greeting") : null;
   var customPromptsRaw = scriptTag ? scriptTag.getAttribute("data-prompts") : null;
   var customColor = (scriptTag ? scriptTag.getAttribute("data-color") : null) || "#ef4444";
+  var customLogo = scriptTag ? scriptTag.getAttribute("data-logo") : null;
 
   // Inject CSS Styles
   var style = document.createElement("style");
@@ -91,19 +92,12 @@
       align-items: center;
       gap: 10px;
     }
-    #zr-header .zr-avatar {
-      width: 32px;
-      height: 32px;
+    #zr-header .zr-logo {
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.22);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      color: #ffffff;
-      font-weight: 700;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-transform: uppercase;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.25);
       flex-shrink: 0;
     }
     #zr-header .title-wrap {
@@ -364,7 +358,7 @@
     <div id="zr-widget-box">
       <div id="zr-header">
         <div class="title-box">
-          <div class="zr-avatar" id="zr-avatar-icon">A</div>
+          <img class="zr-logo" id="zr-avatar-logo" src="${customLogo || ''}" alt="" style="display:${customLogo ? 'block' : 'none'};" onerror="this.style.display='none'" />
           <div class="title-wrap">
             <span class="title" id="zr-bot-title">AI Assistant</span>
             <div class="status-wrap">
@@ -404,16 +398,10 @@
   var inputForm = document.getElementById("zr-input-area");
   var inputField = document.getElementById("zr-input");
   var botTitleElem = document.getElementById("zr-bot-title");
-  var avatarIconElem = document.getElementById("zr-avatar-icon");
+  var avatarLogoElem = document.getElementById("zr-avatar-logo");
 
   var isOpen = false;
   var chatHistory = [];
-
-  function updateAvatar(title) {
-    if (avatarIconElem && title) {
-      avatarIconElem.textContent = title.trim().charAt(0).toUpperCase() || "A";
-    }
-  }
 
   function toggleChat() {
     isOpen = !isOpen;
@@ -506,7 +494,15 @@
       }
 
       botTitleElem.textContent = title;
-      updateAvatar(title);
+      var logo = customLogo || bot.logo || null;
+      if (avatarLogoElem) {
+        if (logo) {
+          avatarLogoElem.src = logo;
+          avatarLogoElem.style.display = "block";
+        } else {
+          avatarLogoElem.style.display = "none";
+        }
+      }
 
       if (greeting) {
         appendMessage("assistant", greeting);
@@ -534,7 +530,6 @@
       var title = customTitle || "ZeroRoute AI";
       var greeting = customGreeting || "Hi! 👋 How can I help you today?";
       botTitleElem.textContent = title;
-      updateAvatar(title);
       appendMessage("assistant", greeting);
     });
 
