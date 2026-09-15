@@ -93,7 +93,7 @@ export function ProviderMarquee() {
           <button
             type="button"
             onClick={() => setModalOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white border border-white/10 transition-all active:scale-95 shadow-sm cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white border border-white/10 transition-all active:scale-95 shadow-sm cursor-pointer min-h-[44px] touch-manipulation"
           >
             <BarChart2 className="w-3.5 h-3.5 text-red-400" />
             <span>Inspect All 10 Cloud AI Providers</span>
@@ -118,7 +118,8 @@ export function ProviderMarquee() {
               </div>
               <button
                 onClick={() => setModalOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
+                className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer touch-manipulation"
+                aria-label="Close"
               >
                 <X className="w-4 h-4" />
               </button>

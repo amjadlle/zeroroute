@@ -100,7 +100,7 @@ export function ChatWidgetSection() {
                 }
               }
             }}
-            className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold bg-red-600 hover:bg-red-500 text-white rounded-xl shadow-lg shadow-red-500/25 transition-all active:scale-95 cursor-pointer"
+            className="inline-flex items-center gap-2 px-5 py-3 text-xs font-bold bg-red-600 hover:bg-red-500 text-white rounded-xl shadow-lg shadow-red-500/25 transition-all active:scale-95 cursor-pointer min-h-[44px] touch-manipulation"
           >
             <MessageSquare className="w-4 h-4" />
             <span>Open Chatbot Widget</span>

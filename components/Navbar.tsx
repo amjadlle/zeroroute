@@ -133,7 +133,7 @@ export function Navbar() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-slate-300 hover:text-white border border-white/10 transition-all active:scale-95"
+            className="md:hidden p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-slate-300 hover:text-white border border-white/10 transition-all active:scale-95 touch-manipulation"
             aria-label="Toggle Navigation Menu"
           >
             {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -143,39 +143,39 @@ export function Navbar() {
 
       {/* Mobile Dropdown Drawer */}
       {mobileMenuOpen && (
-        <div className="pointer-events-auto md:hidden mt-2 bg-[#080a0f]/95 backdrop-blur-2xl border border-white/10 rounded-2xl p-4 shadow-2xl space-y-2.5 font-semibold text-sm text-slate-200 ring-1 ring-white/5 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="pointer-events-auto md:hidden mt-2 bg-[#080a0f]/95 backdrop-blur-2xl border border-white/10 rounded-2xl p-4 shadow-2xl space-y-1 font-semibold text-sm text-slate-200 ring-1 ring-white/5 animate-in fade-in slide-in-from-top-2 duration-200">
           <a
             href="#features"
             onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 rounded-lg hover:bg-white/5 transition-colors"
+            className="flex items-center px-3 py-3 min-h-[44px] rounded-lg hover:bg-white/5 transition-colors touch-manipulation"
           >
             Features
           </a>
           <a
             href="#widget"
             onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 rounded-lg hover:bg-white/5 transition-colors"
+            className="flex items-center px-3 py-3 min-h-[44px] rounded-lg hover:bg-white/5 transition-colors touch-manipulation"
           >
             1-Line Chatbot
           </a>
           <a
             href="#providers"
             onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 rounded-lg hover:bg-white/5 transition-colors"
+            className="flex items-center px-3 py-3 min-h-[44px] rounded-lg hover:bg-white/5 transition-colors touch-manipulation"
           >
             Supported Providers
           </a>
           <a
             href="#pricing"
             onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 rounded-lg hover:bg-white/5 transition-colors text-amber-400"
+            className="flex items-center px-3 py-3 min-h-[44px] rounded-lg hover:bg-white/5 transition-colors text-amber-400 touch-manipulation"
           >
             Pricing &amp; Hosted Cloud
           </a>
           <a
             href="#quickstart"
             onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 rounded-lg hover:bg-white/5 transition-colors"
+            className="flex items-center px-3 py-3 min-h-[44px] rounded-lg hover:bg-white/5 transition-colors touch-manipulation"
           >
             Integration Code
           </a>
@@ -183,7 +183,7 @@ export function Navbar() {
             href="https://github.com/amjadlle/zeroroute"
             target="_blank"
             rel="noopener noreferrer"
-            className="block px-3 py-2 rounded-lg text-red-400 hover:bg-white/5 transition-colors"
+            className="flex items-center px-3 py-3 min-h-[44px] rounded-lg text-red-400 hover:bg-white/5 transition-colors touch-manipulation"
           >
             GitHub &amp; Docs ↗
           </a>
@@ -192,7 +192,7 @@ export function Navbar() {
               href="https://buymeacoffee.com/amjadlle"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-bold bg-[#FFDD00] hover:bg-[#FFEA47] text-zinc-950 shadow-md shadow-amber-500/20 transition-all active:scale-95"
+              className="flex items-center justify-center gap-2 py-3 px-4 min-h-[44px] rounded-xl font-bold bg-[#FFDD00] hover:bg-[#FFEA47] text-zinc-950 shadow-md shadow-amber-500/20 transition-all active:scale-95 touch-manipulation"
             >
               <span>☕</span>
               <span>Buy Me a Coffee</span>

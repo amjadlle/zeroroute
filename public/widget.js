@@ -21,8 +21,8 @@
   style.textContent = `
     #zr-widget-container {
       position: fixed;
-      bottom: 24px;
-      right: 24px;
+      bottom: max(24px, env(safe-area-inset-bottom, 24px));
+      right: max(16px, env(safe-area-inset-right, 16px));
       z-index: 2147483647;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
@@ -38,6 +38,8 @@
       align-items: center;
       justify-content: center;
       transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
     #zr-widget-btn:hover {
       transform: scale(1.08);
@@ -224,6 +226,7 @@
     }
     #zr-input-area {
       padding: 12px 16px;
+      padding-bottom: max(12px, env(safe-area-inset-bottom, 12px));
       background: rgba(12, 16, 26, 0.95);
       border-top: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
@@ -236,9 +239,11 @@
       border-radius: 12px;
       padding: 10px 14px;
       color: #ffffff;
-      font-size: 13.5px;
+      font-size: 16px;
       outline: none;
       transition: border-color 0.2s;
+      -webkit-appearance: none;
+      touch-action: manipulation;
     }
     #zr-input:focus {
       border-color: #ef4444;
@@ -247,14 +252,17 @@
       background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
       border: none;
       border-radius: 12px;
-      width: 42px;
-      height: 42px;
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       color: #ffffff;
       transition: transform 0.15s, opacity 0.15s;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
     #zr-send-btn:hover {
       transform: scale(1.05);
