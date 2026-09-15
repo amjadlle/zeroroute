@@ -12,7 +12,6 @@ import {
   Bot,
   ExternalLink,
   Send,
-  HelpCircle,
   Eye,
   EyeOff
 } from "lucide-react";

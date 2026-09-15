@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import {
-  Activity,
   Radio,
   RefreshCw,
   Cpu,
@@ -12,8 +11,6 @@ import {
   X,
   Copy,
   Check,
-  Trash2,
-  Sparkles,
   Filter
 } from "lucide-react";
 

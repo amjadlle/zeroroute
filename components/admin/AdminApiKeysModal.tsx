@@ -11,8 +11,7 @@ import {
   Upload,
   Check,
   ShieldCheck,
-  Save,
-  Loader2
+  Save
 } from "lucide-react";
 import { PROVIDER_PORTALS } from "@/lib/providers/catalog";
 import { ProviderItem } from "./AdminProvidersTab";

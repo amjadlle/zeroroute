@@ -1,15 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import {
   Globe,
   PieChart,
   ShieldAlert,
   RefreshCw,
-  Cpu,
-  Layers,
-  Activity,
-  Zap,
   CheckCircle2,
   AlertTriangle,
   Timer

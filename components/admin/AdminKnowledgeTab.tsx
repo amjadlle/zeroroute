@@ -13,8 +13,6 @@ import {
   Layers,
   Trash2,
   FileText,
-  CheckCircle2,
-  AlertTriangle,
   Loader2
 } from "lucide-react";
 

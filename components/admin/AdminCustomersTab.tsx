@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Users, Search, Key, CheckCircle2, PauseCircle, XCircle, RefreshCw, Trash2, Shield, Eye, EyeOff } from "lucide-react";
+import { Users, Search, Key, CheckCircle2, PauseCircle, RefreshCw, Trash2, Eye, EyeOff } from "lucide-react";
 
 export interface CustomerAdminItem {
   id: string;

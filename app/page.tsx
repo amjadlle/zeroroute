@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
@@ -10,6 +10,7 @@ import { ProviderMarquee } from "@/components/ProviderMarquee";
 import { Pricing } from "@/components/Pricing";
 import { CodeQuickstart } from "@/components/CodeQuickstart";
 import { CreatorSection } from "@/components/CreatorSection";
+import { FAQSection } from "@/components/FAQSection";
 import { Footer } from "@/components/Footer";
 import { CheckoutModal } from "@/components/CheckoutModal";
 
@@ -29,6 +30,7 @@ export default function Home() {
           <Pricing onOpenCheckout={() => setCheckoutOpen(true)} />
           <CodeQuickstart />
           <CreatorSection />
+          <FAQSection />
           <Footer />
         </div>
       </div>

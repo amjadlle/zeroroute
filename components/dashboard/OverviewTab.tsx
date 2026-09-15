@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Key, Copy, Check, Eye, EyeOff, RefreshCw, Bot, Sparkles, Activity } from "lucide-react";
+import { Key, Copy, Check, Eye, EyeOff, RefreshCw, Bot } from "lucide-react";
 
 interface OverviewTabProps {
   apiKey: string;

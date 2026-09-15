@@ -7,10 +7,6 @@ import {
   Check,
   BookOpen,
   Sliders,
-  Sparkles,
-  Terminal,
-  ExternalLink,
-  Layers,
   X
 } from "lucide-react";
 

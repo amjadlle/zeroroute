@@ -12,10 +12,7 @@ import {
   Trash2,
   Check,
   Loader2,
-  CheckCircle2,
-  AlertTriangle,
-  Search,
-  Zap
+  Search
 } from "lucide-react";
 import { ProviderItem } from "./AdminProvidersTab";
 
