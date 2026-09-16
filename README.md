@@ -71,39 +71,39 @@ Whether you need a **1-line embeddable AI customer support chatbot** trained on 
 
 ```mermaid
 flowchart TD
-    User([Client / Widget / OpenAI SDK]) --> Gateway[ZeroRoute API Gateway /v1/chat/completions]
+    User["Client / Widget / OpenAI SDK"] --> Gateway["ZeroRoute API Gateway (/v1/chat/completions)"]
     
-    Gateway --> RAG[RAG Retrieval Engine]
-    RAG --> Cache{Response Cache}
+    Gateway --> RAG["RAG Retrieval Engine"]
+    RAG --> Cache{"Response Cache"}
     
-    Cache -- Cache Hit --> Immediate[Cached Response (0ms)]
-    Cache -- Cache Miss --> ProviderPool[Dynamic Multi-Cloud Pool]
+    Cache -->|"Cache Hit (0ms)"| Immediate["Cached Instant Response"]
+    Cache -->|"Cache Miss"| ProviderPool["Dynamic Multi-Cloud Pool"]
 
-    subgraph "11 Cloud Fallback Matrix"
-        P1[1. Groq - Llama 3.3 / GPT-OSS]
-        P2[2. Cerebras - Ultra-Fast 120B]
-        P3[3. SambaNova - MiniMax / Gemma 4]
-        P4[4. Mistral AI - Nemo / Ministral]
-        P5[5. Cohere - Command R+]
-        P6[6. Google Gemini - 2.0 / 2.5 Flash]
-        P7[7. OpenRouter - Nemotron Super 120B]
-        P8[8. NVIDIA NIM - Nemotron 30B]
-        P9[9. Cloudflare AI - Llama 3.1 8B]
-        P10[10. Hugging Face - Llama 3.1 8B]
-        P11[11. BazaarLink AI - Qwen 2.5]
+    subgraph Matrix["11 Cloud Routing Matrix"]
+        P1["1. Groq — Llama 3.3 / GPT-OSS"]
+        P2["2. Cerebras — Ultra-Fast 120B"]
+        P3["3. SambaNova — MiniMax / Gemma 4"]
+        P4["4. Mistral AI — Nemo / Ministral"]
+        P5["5. Cohere — Command R+"]
+        P6["6. Google Gemini — 2.0 / 2.5 Flash"]
+        P7["7. OpenRouter — Nemotron Super 120B"]
+        P8["8. NVIDIA NIM — Nemotron 30B"]
+        P9["9. Cloudflare AI — Llama 3.1 8B"]
+        P10["10. Hugging Face — Llama 3.1 8B"]
+        P11["11. BazaarLink AI — Qwen 2.5"]
     end
 
     ProviderPool --> P1
-    P1 -- 429 / Timeout --> P2
-    P2 -- 429 / Timeout --> P3
-    P3 -- 429 / Timeout --> P4
-    P4 -- 429 / Timeout --> P5
-    P5 -- 429 / Timeout --> P6
-    P6 -- 429 / Timeout --> P7
-    P7 -- 429 / Timeout --> P8
-    P8 -- 429 / Timeout --> P9
-    P9 -- 429 / Timeout --> P10
-    P10 -- 429 / Timeout --> P11
+    P1 -->|"Sub-8ms Route"| P2
+    P2 -->|"Sub-8ms Route"| P3
+    P3 -->|"Sub-8ms Route"| P4
+    P4 -->|"Sub-8ms Route"| P5
+    P5 -->|"Sub-8ms Route"| P6
+    P6 -->|"Sub-8ms Route"| P7
+    P7 -->|"Sub-8ms Route"| P8
+    P8 -->|"Sub-8ms Route"| P9
+    P9 -->|"Sub-8ms Route"| P10
+    P10 -->|"Sub-8ms Route"| P11
 ```
 
 ---
@@ -172,7 +172,7 @@ const openai = new OpenAI({
 
 async function main() {
   const completion = await openai.chat.completions.create({
-    model: "auto", // Automatically routes and fails over across 11 clouds
+    model: "auto", // Automatically routes across 11 pooled AI clouds with zero downtime
     messages: [
       { role: "system", content: "You are a helpful assistant." },
       { role: "user", content: "Explain quantum computing in one sentence." }
