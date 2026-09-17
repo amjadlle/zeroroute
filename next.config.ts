@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",
+            value: "public, max-age=60, s-maxage=60, stale-while-revalidate=30",
           },
           {
             key: "Access-Control-Allow-Origin",
