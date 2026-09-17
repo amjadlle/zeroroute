@@ -223,6 +223,13 @@
       color: #ffffff;
       font-weight: 700;
     }
+    .zr-heading {
+      display: block;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 8px 0 4px 0;
+    }
     .zr-msg.bot em {
       color: #f1f5f9;
       font-style: italic;
@@ -529,11 +536,14 @@
       return '§§ZRLINK' + (links.length - 1) + '§§' + trailing;
     });
 
-    // 5. Bold **text** or __text__
+    // 5. Headings #, ##, ###, ####
+    escaped = escaped.replace(/^(#{1,6})\s+(.+)$/gm, '<strong class="zr-heading">$2</strong>');
+
+    // 6. Bold **text** or __text__
     escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<strong class="zr-bold">$1</strong>');
     escaped = escaped.replace(/__([^_]+)__/g, '<strong class="zr-bold">$1</strong>');
 
-    // 6. Italic *text* or _text_
+    // 7. Italic *text* or _text_
     escaped = escaped.replace(/\*([^*]+)\*/g, '<em class="zr-italic">$1</em>');
 
     // 7. Split paragraphs

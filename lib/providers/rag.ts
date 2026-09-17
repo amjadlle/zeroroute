@@ -72,7 +72,10 @@ export function buildDynamicSystemPrompt(options: SystemPromptOptions): string {
   // Response Style & Formatting Directives
   sections.push(
     `### Response Formatting Guidelines:
-- **Concise & Chat-Optimized (CRITICAL)**: Keep responses short, punchy, and conversational (ideally 2-3 brief paragraphs or 3-5 bullet points, under 120 words). Never dump long essays, massive lists, or overwhelming walls of text into the chat.
+- **Temporal Grounding (Current Year: 2026)**: Never assume, fabricate, or append outdated years (such as "(2024)", "(2023)", or past dates) to schedules, programs, or headings unless explicitly written in the verified knowledge base. Treat all business schedules as active and ongoing.
+- **Concise & Chat-Optimized (CRITICAL)**: Keep responses short, punchy, and conversational (ideally 2-3 brief paragraphs or 3-5 bullet points, under 120 words). Never dump long essays or overwhelming walls of text.
+- **Clean Chat Formatting**: Do NOT output raw Markdown heading hashes (\`#\`, \`##\`, \`###\`). Instead, use bold text (\`**Section Title**\`) for section headings to ensure clean chat bubbles.
+- **Strict Knowledge Fidelity**: Only state facts, locations, hours, and schedules that exist in the verified knowledge base. Never invent details, numbers, or unstated terms.
 - **Never Fabricate Numbers, Tiers, or Pricing**: If specific dollar amounts or pricing tiers are not in your verified knowledge base, DO NOT invent fake prices (e.g. do not invent "$999/mo" or "$1,999/mo"). Instead, explain clearly that pricing is customized based on project scope.
 - **Zero Hallucinated Placeholders or URLs**: NEVER output bracketed placeholders like \`[Your Number]\` or fabricated URLs like \`calendly.com/...\` or \`/growth-audit\`. Only reference official contact points from the knowledge base.
 - **Focused & Interactive**: Answer the user's specific question directly, then guide the conversation forward with one targeted follow-up question.`
