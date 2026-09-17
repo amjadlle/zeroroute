@@ -480,6 +480,19 @@
       .replace(/'/g, "&#039;");
   }
 
+  function getLinkTargetAttr(url) {
+    if (typeof window === "undefined" || !window.location) return 'target="_blank" rel="noopener noreferrer"';
+    try {
+      var linkUrl = new URL(url, window.location.href);
+      var linkHost = linkUrl.hostname.toLowerCase().replace(/^www\./, '');
+      var currentHost = window.location.hostname.toLowerCase().replace(/^www\./, '');
+      if (linkHost === currentHost) {
+        return 'target="_self"';
+      }
+    } catch (e) {}
+    return 'target="_blank" rel="noopener noreferrer"';
+  }
+
   function renderMarkdown(rawText) {
     if (!rawText) return "";
     var escaped = escapeHtml(rawText);
@@ -500,8 +513,9 @@
 
     // 3. Tokenize Markdown Links [text](url)
     var links = [];
-    escaped = escaped.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, function (m, text, url) {
-      links.push('<a href="' + url + '" target="_blank" rel="noopener noreferrer" class="zr-link">' + text + '</a>');
+    escaped = escaped.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+|\/[^\s)]*)\)/g, function (m, text, url) {
+      var targetAttr = getLinkTargetAttr(url);
+      links.push('<a href="' + url + '" ' + targetAttr + ' class="zr-link">' + text + '</a>');
       return '___ZR_LINK_' + (links.length - 1) + '___';
     });
 
@@ -510,7 +524,8 @@
       // Strip trailing punctuation like .,;:!? from url
       var cleanUrl = url.replace(/[.,!?;:]+$/, '');
       var trailing = url.slice(cleanUrl.length);
-      links.push('<a href="' + cleanUrl + '" target="_blank" rel="noopener noreferrer" class="zr-link">' + cleanUrl + '</a>');
+      var targetAttr = getLinkTargetAttr(cleanUrl);
+      links.push('<a href="' + cleanUrl + '" ' + targetAttr + ' class="zr-link">' + cleanUrl + '</a>');
       return '___ZR_LINK_' + (links.length - 1) + '___' + trailing;
     });
 
