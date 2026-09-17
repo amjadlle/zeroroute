@@ -19,7 +19,31 @@
   var customGreeting = scriptTag ? scriptTag.getAttribute("data-greeting") : null;
   var customPromptsRaw = scriptTag ? scriptTag.getAttribute("data-prompts") : null;
   var customColor = (scriptTag ? scriptTag.getAttribute("data-color") : null) || "#ef4444";
+  var customLinkColor = scriptTag ? scriptTag.getAttribute("data-link-color") : null;
   var customLogo = scriptTag ? scriptTag.getAttribute("data-logo") : null;
+
+  function getAccessibleLinkColor(brandColor, explicitLinkColor) {
+    if (explicitLinkColor && explicitLinkColor.trim()) return explicitLinkColor.trim();
+    if (!brandColor || typeof brandColor !== "string") return "#38bdf8";
+    var hex = brandColor.replace("#", "").trim();
+    if (hex.length === 3) {
+      hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+    }
+    if (hex.length !== 6) return "#38bdf8";
+    var r = parseInt(hex.substring(0, 2), 16);
+    var g = parseInt(hex.substring(2, 4), 16);
+    var b = parseInt(hex.substring(4, 6), 16);
+    // Perceived luminance formula (ITU-R BT.709)
+    var luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+    // If brand color is too dark on dark background (#111622) or heavily blue-shifted,
+    // use high-contrast vibrant electric sky blue #38bdf8
+    if (luminance < 0.52 || (b > 115 && r < 110)) {
+      return "#38bdf8";
+    }
+    return brandColor;
+  }
+
+  var linkColor = getAccessibleLinkColor(customColor, customLinkColor);
 
   // Inject CSS Styles
   var style = document.createElement("style");
@@ -154,6 +178,31 @@
       flex-direction: column;
       gap: 12px;
       scroll-behavior: smooth;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+      -webkit-overflow-scrolling: touch;
+    }
+    #zr-messages::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    #zr-messages::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    #zr-messages::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 9999px;
+    }
+    #zr-messages::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    #zr-messages::-webkit-scrollbar-button {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+    #zr-messages::-webkit-scrollbar-corner {
+      background: transparent;
     }
     .zr-msg {
       max-width: 88%;
@@ -178,15 +227,19 @@
       color: #f1f5f9;
       font-style: italic;
     }
-    .zr-msg.bot a {
-      color: ${customColor};
+    .zr-msg.bot a, .zr-link {
+      color: ${linkColor};
       text-decoration: underline;
-      text-underline-offset: 2px;
+      text-underline-offset: 3px;
+      text-decoration-color: ${linkColor}99;
       font-weight: 600;
-      transition: opacity 0.15s;
+      transition: all 0.15s ease;
+      word-break: break-word;
     }
-    .zr-msg.bot a:hover {
-      opacity: 0.85;
+    .zr-msg.bot a:hover, .zr-link:hover {
+      color: #ffffff;
+      text-decoration-color: #ffffff;
+      text-shadow: 0 0 8px ${linkColor}66;
     }
     .zr-msg.bot p {
       margin: 0 0 8px 0;
@@ -431,33 +484,65 @@
     if (!rawText) return "";
     var escaped = escapeHtml(rawText);
 
-    // Code blocks ```code```
+    // 1. Tokenize Code blocks ```code```
+    var codeBlocks = [];
     escaped = escaped.replace(/```([a-zA-Z0-9_-]*)\n?([\s\S]*?)```/g, function (m, lang, code) {
-      return '<pre class="zr-code-block"><code>' + code.trim() + '</code></pre>';
+      codeBlocks.push('<pre class="zr-code-block"><code>' + code.trim() + '</code></pre>');
+      return '___ZR_CODE_BLOCK_' + (codeBlocks.length - 1) + '___';
     });
 
-    // Inline code `code`
-    escaped = escaped.replace(/`([^`]+)`/g, '<code class="zr-inline-code">$1</code>');
+    // 2. Tokenize Inline code `code`
+    var inlineCodes = [];
+    escaped = escaped.replace(/`([^`]+)`/g, function (m, code) {
+      inlineCodes.push('<code class="zr-inline-code">' + code + '</code>');
+      return '___ZR_INLINE_CODE_' + (inlineCodes.length - 1) + '___';
+    });
 
-    // Bold **text** or __text__
+    // 3. Tokenize Markdown Links [text](url)
+    var links = [];
+    escaped = escaped.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, function (m, text, url) {
+      links.push('<a href="' + url + '" target="_blank" rel="noopener noreferrer" class="zr-link">' + text + '</a>');
+      return '___ZR_LINK_' + (links.length - 1) + '___';
+    });
+
+    // 4. Auto-link Standalone Raw URLs (https://... or http://...)
+    escaped = escaped.replace(/(https?:\/\/[^\s<)]+)/g, function (m, url) {
+      // Strip trailing punctuation like .,;:!? from url
+      var cleanUrl = url.replace(/[.,!?;:]+$/, '');
+      var trailing = url.slice(cleanUrl.length);
+      links.push('<a href="' + cleanUrl + '" target="_blank" rel="noopener noreferrer" class="zr-link">' + cleanUrl + '</a>');
+      return '___ZR_LINK_' + (links.length - 1) + '___' + trailing;
+    });
+
+    // 5. Bold **text** or __text__
     escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<strong class="zr-bold">$1</strong>');
     escaped = escaped.replace(/__([^_]+)__/g, '<strong class="zr-bold">$1</strong>');
 
-    // Italic *text* or _text_
+    // 6. Italic *text* or _text_
     escaped = escaped.replace(/\*([^*]+)\*/g, '<em class="zr-italic">$1</em>');
 
-    // Links [text](url)
-    escaped = escaped.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="zr-link">$1</a>');
-
-    // Split paragraphs
+    // 7. Split paragraphs
     var paragraphs = escaped.split(/\n\s*\n/);
-    if (paragraphs.length > 1) {
-      return paragraphs.map(function (p) {
-        return '<p>' + p.replace(/\n/g, '<br/>') + '</p>';
-      }).join('');
+    var html = paragraphs.length > 1
+      ? paragraphs.map(function (p) { return '<p>' + p.replace(/\n/g, '<br/>') + '</p>'; }).join('')
+      : escaped.replace(/\n/g, '<br/>');
+
+    // 8. Restore Links
+    for (var i = 0; i < links.length; i++) {
+      html = html.replace('___ZR_LINK_' + i + '___', links[i]);
     }
 
-    return escaped.replace(/\n/g, '<br/>');
+    // 9. Restore Inline Codes
+    for (var j = 0; j < inlineCodes.length; j++) {
+      html = html.replace('___ZR_INLINE_CODE_' + j + '___', inlineCodes[j]);
+    }
+
+    // 10. Restore Code Blocks
+    for (var k = 0; k < codeBlocks.length; k++) {
+      html = html.replace('___ZR_CODE_BLOCK_' + k + '___', codeBlocks[k]);
+    }
+
+    return html;
   }
 
   function scrollToBottom() {
