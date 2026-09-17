@@ -501,14 +501,14 @@
     var codeBlocks = [];
     escaped = escaped.replace(/```([a-zA-Z0-9_-]*)\n?([\s\S]*?)```/g, function (m, lang, code) {
       codeBlocks.push('<pre class="zr-code-block"><code>' + code.trim() + '</code></pre>');
-      return '___ZR_CODE_BLOCK_' + (codeBlocks.length - 1) + '___';
+      return '§§ZRBLOCK' + (codeBlocks.length - 1) + '§§';
     });
 
     // 2. Tokenize Inline code `code`
     var inlineCodes = [];
     escaped = escaped.replace(/`([^`]+)`/g, function (m, code) {
-      inlineCodes.push('<code class="zr-inline-code">' + code + '</code>');
-      return '___ZR_INLINE_CODE_' + (inlineCodes.length - 1) + '___';
+      inlineCodes.push('<code class="zr-inline-code">$1</code>'.replace('$1', code));
+      return '§§ZRCODE' + (inlineCodes.length - 1) + '§§';
     });
 
     // 3. Tokenize Markdown Links [text](url)
@@ -516,7 +516,7 @@
     escaped = escaped.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+|\/[^\s)]*)\)/g, function (m, text, url) {
       var targetAttr = getLinkTargetAttr(url);
       links.push('<a href="' + url + '" ' + targetAttr + ' class="zr-link">' + text + '</a>');
-      return '___ZR_LINK_' + (links.length - 1) + '___';
+      return '§§ZRLINK' + (links.length - 1) + '§§';
     });
 
     // 4. Auto-link Standalone Raw URLs (https://... or http://...)
@@ -526,7 +526,7 @@
       var trailing = url.slice(cleanUrl.length);
       var targetAttr = getLinkTargetAttr(cleanUrl);
       links.push('<a href="' + cleanUrl + '" ' + targetAttr + ' class="zr-link">' + cleanUrl + '</a>');
-      return '___ZR_LINK_' + (links.length - 1) + '___' + trailing;
+      return '§§ZRLINK' + (links.length - 1) + '§§' + trailing;
     });
 
     // 5. Bold **text** or __text__
@@ -544,17 +544,17 @@
 
     // 8. Restore Links
     for (var i = 0; i < links.length; i++) {
-      html = html.replace('___ZR_LINK_' + i + '___', links[i]);
+      html = html.split('§§ZRLINK' + i + '§§').join(links[i]);
     }
 
     // 9. Restore Inline Codes
     for (var j = 0; j < inlineCodes.length; j++) {
-      html = html.replace('___ZR_INLINE_CODE_' + j + '___', inlineCodes[j]);
+      html = html.split('§§ZRCODE' + j + '§§').join(inlineCodes[j]);
     }
 
     // 10. Restore Code Blocks
     for (var k = 0; k < codeBlocks.length; k++) {
-      html = html.replace('___ZR_CODE_BLOCK_' + k + '___', codeBlocks[k]);
+      html = html.split('§§ZRBLOCK' + k + '§§').join(codeBlocks[k]);
     }
 
     return html;
