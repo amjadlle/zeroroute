@@ -35,12 +35,13 @@ export async function POST(request: Request) {
   const startTime = Date.now();
   const origin = request.headers.get("origin") || request.headers.get("referer") || "Direct API";
   const corsHdrs = getCorsHeaders(origin);
+  const db = getDb();
 
   // Extract authentication tokens
   const authHeader = request.headers.get("authorization") || "";
   const bearerToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : authHeader.trim();
   const xBotId = request.headers.get("x-bot-id");
-  const isMasterKey = Boolean(isMasterAdminKey(bearerToken));
+  let isMasterKey = Boolean(isMasterAdminKey(bearerToken));
 
   let body: ChatRequest;
   try {
@@ -59,12 +60,28 @@ export async function POST(request: Request) {
     );
   }
 
-  const db = getDb();
   const rawBotId = xBotId || body.bot_id || (bearerToken.startsWith("bot_") ? bearerToken : undefined);
   let customerKey = bearerToken.startsWith("zr_live_") ? bearerToken : undefined;
 
   let customer: any = null;
-  const lookupIdentifier = customerKey || rawBotId || (bearerToken && bearerToken.length > 5 && !isMasterKey ? bearerToken : null);
+
+  // Check cookie session fallback if no bearer token provided (e.g. Admin Playground or App Dashboard)
+  if (!bearerToken && !isMasterKey && !rawBotId) {
+    try {
+      const { getCurrentUser } = await import("@/lib/auth/session");
+      const user = await getCurrentUser();
+      if (user) {
+        if (user.id === "admin_master") {
+          isMasterKey = true;
+        } else if (user.key) {
+          customer = user;
+          customerKey = user.key;
+        }
+      }
+    } catch {}
+  }
+
+  const lookupIdentifier = customerKey || (rawBotId && rawBotId !== "demo" ? rawBotId : null) || (bearerToken && bearerToken.length > 5 && !isMasterKey ? bearerToken : null);
 
   if (lookupIdentifier) {
     const cached = customerLookupCache.get(lookupIdentifier);
@@ -76,14 +93,13 @@ export async function POST(request: Request) {
 
   // Resolve customer by key or bot ID if not in memory cache
   if (!customer && lookupIdentifier) {
-    const db = getDb();
     if (customerKey) {
       const res = await db.execute({
         sql: `SELECT * FROM customers WHERE key = ? LIMIT 1`,
         args: [customerKey]
       });
       customer = res.rows[0] || null;
-    } else if (rawBotId) {
+    } else if (rawBotId && rawBotId !== "demo") {
       const res = await db.execute({
         sql: `SELECT * FROM customers WHERE bot_id = ? LIMIT 1`,
         args: [rawBotId]
@@ -110,19 +126,76 @@ export async function POST(request: Request) {
     }
   }
 
-  if (bearerToken && !customer && !isMasterKey && !rawBotId) {
+  // 1. Strict Direct API Authentication Lock:
+  // If request is a Direct API call (no bot ID, or invalid key), reject immediately with 401
+  if (!rawBotId && !isMasterKey && !customer) {
     return NextResponse.json(
       {
         error: {
-          message: "Invalid, expired, or revoked subscriber API key.",
-          type: "invalid_key"
+          message: bearerToken
+            ? "Invalid, expired, or revoked API key."
+            : "Authentication required. Please provide your API key via 'Authorization: Bearer <your_api_key>' or configure your embed chatbot 'X-Bot-Id'.",
+          type: "invalid_key",
+          code: 401
         }
       },
       { status: 401, headers: corsHdrs }
     );
   }
 
-  // 1. Domain Whitelisting Validation
+  // 2. Chatbot ID Validation (If a bot ID was provided but not found in DB)
+  if (rawBotId && rawBotId !== "demo" && !customer) {
+    return NextResponse.json(
+      {
+        error: {
+          message: "Invalid or unknown Chatbot ID. Please verify your data-bot-id in the ZeroRoute Console.",
+          type: "invalid_bot_id",
+          code: 404
+        }
+      },
+      { status: 404, headers: corsHdrs }
+    );
+  }
+
+  // 3. Demo Bot Validation (Strictly locked to official ZeroRoute website)
+  if (rawBotId === "demo") {
+    const callerOrigin = (request.headers.get("origin") || request.headers.get("referer") || "").toLowerCase();
+    const isOfficialSite =
+      callerOrigin.includes("zeroroute.mapki.in") ||
+      callerOrigin.includes("mapki.in") ||
+      callerOrigin.includes("localhost") ||
+      callerOrigin.includes("127.0.0.1");
+
+    if (!isOfficialSite && origin === "Direct API") {
+      return NextResponse.json(
+        {
+          error: {
+            message: "The demo chatbot is strictly authorized on https://zeroroute.mapki.in. Direct API/CLI inference requires a valid API key.",
+            type: "unauthorized_demo_origin",
+            code: 403
+          }
+        },
+        { status: 403, headers: corsHdrs }
+      );
+    }
+
+    const ip = request.headers.get("x-forwarded-for") || "demo_user";
+    if (isRateLimited(`demo_chat:${ip}`, 15, 60_000)) {
+      return NextResponse.json(
+        { error: { message: "Demo rate limit reached (15 req/min). Please wait a moment or sign up for ZeroRoute Pro." } },
+        { status: 429, headers: corsHdrs }
+      );
+    }
+    body.max_tokens = Math.min(body.max_tokens || 500, 500);
+    if (body.messages.filter(m => m.role === "user").some(m => (m.content || "").length > 2000)) {
+      return NextResponse.json(
+        { error: { message: "Demo message length limit is 2,000 characters." } },
+        { status: 400, headers: corsHdrs }
+      );
+    }
+  }
+
+  // 4. Domain Whitelisting Validation (for paying customer bots)
   if (customer && customer.allowed_domains) {
     try {
       const allowed = typeof customer.allowed_domains === "string" ? JSON.parse(customer.allowed_domains) : customer.allowed_domains;
@@ -141,7 +214,8 @@ export async function POST(request: Request) {
             {
               error: {
                 message: `Domain '${callerOrigin}' is not authorized to use this chatbot. Please add it to your allowed domains in the ZeroRoute Console.`,
-                type: "domain_not_allowed"
+                type: "domain_not_allowed",
+                code: 403
               }
             },
             { status: 403, headers: corsHdrs }
@@ -150,24 +224,6 @@ export async function POST(request: Request) {
       }
     } catch {
       // Ignore domain parsing errors
-    }
-  }
-
-  // 2. Demo / Unauthenticated caller protection
-  if (!customer && !isMasterKey) {
-    const ip = request.headers.get("x-forwarded-for") || "demo_user";
-    if (isRateLimited(`demo_chat:${ip}`, 15, 60_000)) {
-      return NextResponse.json(
-        { error: { message: "Demo rate limit reached. Please wait a minute or sign up for ZeroRoute Pro." } },
-        { status: 429, headers: corsHdrs }
-      );
-    }
-    body.max_tokens = Math.min(body.max_tokens || 500, 500);
-    if (body.messages.filter(m => m.role === "user").some(m => (m.content || "").length > 2000)) {
-      return NextResponse.json(
-        { error: { message: "User message length limit is 2,000 characters for demo." } },
-        { status: 400, headers: corsHdrs }
-      );
     }
   }
 
