@@ -80,13 +80,15 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
         </div>
 
         {/* Managed ZeroRoute Pro Plan - Radiant Violet Theme */}
-        <div className="relative flex flex-col justify-between p-6 sm:p-8 bg-gradient-to-b from-[#180e2b] via-[#120a21] to-[#0a0514] border-2 border-violet-500/70 rounded-3xl shadow-2xl shadow-violet-500/20 ring-1 ring-violet-400/30 space-y-6 overflow-hidden">
+        <div className="relative flex flex-col justify-between p-6 sm:p-8 bg-gradient-to-b from-[#180e2b] via-[#120a21] to-[#0a0514] border-2 border-violet-500/70 rounded-3xl shadow-2xl shadow-violet-500/20 ring-1 ring-violet-400/30 space-y-6">
           {/* Subtle Ambient Violet Glow */}
-          <div className="absolute -top-24 -right-24 w-64 h-64 bg-violet-600/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-violet-600/20 rounded-full blur-3xl" />
+            <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-purple-600/15 rounded-full blur-3xl" />
+          </div>
 
           {/* Popular Ribbon */}
-          <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 text-white shadow-lg shadow-purple-500/40 border border-violet-300/30 flex items-center gap-1">
+          <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 text-white shadow-lg shadow-purple-500/40 border border-violet-300/30 flex items-center gap-1 z-20">
             <span>★ Most Popular • White-Label</span>
           </div>
 
