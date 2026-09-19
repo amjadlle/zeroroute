@@ -60,7 +60,9 @@ export async function POST(req: NextRequest) {
     const botId = generateBotId();
     const sessionToken = generateSessionToken();
     const now = Date.now();
-    const trialExpires = now + 3 * 24 * 60 * 60 * 1000; // 3-day free trial
+    // Free Forever tier: 500 requests/month, perpetual access
+    const nextMonth = now + 30 * 24 * 60 * 60 * 1000;
+    const freePlanExpires = now + 3650 * 24 * 60 * 60 * 1000; // 10 years (perpetual free tier)
 
     await db.execute({
       sql: `
@@ -73,7 +75,7 @@ export async function POST(req: NextRequest) {
         ) VALUES (
           ?, ?, ?, ?, ?, ?, ?,
           'ZeroRoute AI', 'AI Assistant', 'helpful and concise', 'Hi there! How can I help you today?', '[]',
-          'active', ?, 0, 10000,
+          'active', ?, 0, 500,
           ?, ?, ?, ?,
           ?, ?
         )
@@ -86,9 +88,9 @@ export async function POST(req: NextRequest) {
         salt,
         name || email.split("@")[0],
         company || null,
-        trialExpires,
+        freePlanExpires,
         now,
-        trialExpires,
+        nextMonth,
         botId,
         sessionToken,
         now,
@@ -121,7 +123,7 @@ export async function POST(req: NextRequest) {
         company,
         bot_id: botId,
         status: "active",
-        subscription_expires: trialExpires,
+        subscription_expires: freePlanExpires,
       },
     });
 

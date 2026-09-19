@@ -74,28 +74,34 @@ export function BillingModal({
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                 Current Plan
               </span>
-              <span className="text-base font-extrabold text-white">ZeroRoute Cloud Pro</span>
+              <span className="text-base font-extrabold text-white">
+                {monthlyLimit >= 10000 ? "ZeroRoute Pro" : "ZeroRoute Free"}
+              </span>
             </div>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-mono">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Active Pro Trial</span>
+              <span>{monthlyLimit >= 10000 ? "Active Pro" : "Free Forever"}</span>
             </span>
           </div>
 
           <div className="flex items-baseline gap-1.5 pt-0.5">
-            <span className="text-2xl font-extrabold text-white font-mono">$3.99</span>
+            <span className="text-2xl font-extrabold text-white font-mono">
+              {monthlyLimit >= 10000 ? "$2.00" : "$0"}
+            </span>
             <span className="text-xs text-slate-400">/ month</span>
           </div>
 
           <div className="p-3.5 rounded-xl bg-[#050608] border border-dark-border space-y-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400">Trial Period:</span>
-              <strong className="text-emerald-400 font-mono font-bold">{daysRemaining} Days Remaining</strong>
+              <span className="text-slate-400">Monthly Usage:</span>
+              <strong className="text-emerald-400 font-mono font-bold">
+                {monthlyRequests.toLocaleString()} / {monthlyLimit.toLocaleString()} reqs
+              </strong>
             </div>
             <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
               <div
                 className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500"
-                style={{ width: `${Math.max(5, (daysRemaining / 30) * 100)}%` }}
+                style={{ width: `${Math.min(100, Math.max(5, (monthlyRequests / (monthlyLimit || 1)) * 100))}%` }}
               />
             </div>
           </div>
@@ -103,15 +109,25 @@ export function BillingModal({
 
         {/* Action CTA */}
         <div className="pt-1">
-          <a
-            href="https://test.checkout.dodopayments.com/portal"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-lg shadow-red-500/20 active:scale-95 transition-all cursor-pointer touch-manipulation"
-          >
-            <span>Manage Subscription</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
+          {monthlyLimit >= 10000 ? (
+            <a
+              href="https://checkout.dodopayments.com/portal"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 min-h-[44px] rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 text-white border border-white/15 active:scale-95 transition-all cursor-pointer touch-manipulation"
+            >
+              <span>Manage Subscription</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          ) : (
+            <a
+              href="/api/checkout"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-lg shadow-red-500/20 active:scale-95 transition-all cursor-pointer touch-manipulation"
+            >
+              <span>⚡ Upgrade to Pro ($2.00 / month)</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          )}
         </div>
       </div>
     </div>

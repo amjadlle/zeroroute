@@ -123,14 +123,15 @@ export async function GET(request: Request) {
       };
 
     } else {
-      // Ensure status is active
+      // Ensure status is active and upgrade quota to 10,000 requests/month
       const sessionToken = `zr_sess_${crypto.randomBytes(24).toString("hex")}`;
       await db.execute({
-        sql: `UPDATE customers SET status = 'active', subscription_expires = ?, session_token = ?, updated_at = ? WHERE id = ?`,
+        sql: `UPDATE customers SET status = 'active', monthly_limit = 10000, subscription_expires = ?, session_token = ?, updated_at = ? WHERE id = ?`,
         args: [expiresAt, sessionToken, now, customer.id],
       });
       customer.session_token = sessionToken;
       customer.status = "active";
+      customer.monthly_limit = 10000;
     }
 
     // Dispatch welcome credentials email upon successful checkout

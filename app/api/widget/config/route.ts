@@ -14,7 +14,7 @@ export async function GET(request: Request) {
   try {
     const db = getDb();
     const res = await db.execute({
-      sql: `SELECT bot_title, bot_role, tone, greeting, prompts, company, name, status FROM customers WHERE bot_id = ? LIMIT 1`,
+      sql: `SELECT bot_title, bot_role, tone, greeting, prompts, company, name, status, monthly_limit FROM customers WHERE bot_id = ? LIMIT 1`,
       args: [botId]
     });
 
@@ -29,7 +29,9 @@ export async function GET(request: Request) {
             greeting: "Hi! 👋 Welcome to ZeroRoute. Ask me anything about multi-cloud routing, free AI tiers, or embedding our 1-line chatbot!",
             prompts: ["Is it really 100% free?", "How does automatic failover work?", "How do I embed on my site?"],
             company: "ZeroRoute",
-            status: "active"
+            status: "active",
+            isPaid: true,
+            showBadge: false
           }
         }, {
           headers: {
@@ -46,6 +48,8 @@ export async function GET(request: Request) {
       if (row.prompts) prompts = JSON.parse(row.prompts);
     } catch {}
 
+    const isPaid = Number(row.monthly_limit || 0) >= 10000;
+
     return NextResponse.json({
       success: true,
       bot: {
@@ -54,7 +58,9 @@ export async function GET(request: Request) {
         greeting: row.greeting || "Hi there! How can I help you today?",
         prompts: prompts.length > 0 ? prompts : ["Tell me about your services", "How much does it cost?", "Can I talk to support?"],
         company: row.company || "ZeroRoute",
-        status: row.status
+        status: row.status,
+        isPaid,
+        showBadge: !isPaid
       }
     }, {
       headers: {

@@ -22,88 +22,86 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
       </div>
 
       <div className="grid md:grid-cols-2 gap-6 lg:gap-8 items-stretch">
-        {/* Self-Hosted DIY Plan */}
+        {/* Free Forever Plan */}
         <div className="relative flex flex-col justify-between p-6 sm:p-8 bg-dark-card/90 border border-dark-border rounded-3xl backdrop-blur-xl shadow-xl space-y-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                  Open-Source
+                  Starter Plan
                 </span>
-                <h3 className="text-2xl font-bold text-white mt-1">DIY Self-Hosted</h3>
+                <h3 className="text-2xl font-bold text-white mt-1">Free Forever</h3>
               </div>
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
-                100% FREE
+                $0 FOREVER
               </span>
             </div>
             <p className="text-xs sm:text-sm text-slate-400">
-              For tinkerers and engineers who want full control and don&apos;t mind managing 11 provider API accounts.
+              Perfect for testing, personal projects, and launching your first embeddable AI website assistant.
             </p>
             <div className="text-3xl sm:text-4xl font-extrabold text-white font-mono pt-2">
-              $0 <span className="text-sm font-normal text-slate-400 font-sans">/ forever</span>
+              $0 <span className="text-sm font-normal text-slate-400 font-sans">/ month (No credit card needed)</span>
             </div>
 
             <ul className="space-y-3 text-xs sm:text-sm text-slate-300 pt-4 border-t border-dark-border">
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Full TypeScript source code (MIT License)</span>
+                <span><strong>500 Monthly AI Requests</strong> (Free forever)</span>
               </li>
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Deploy to your own Vercel / Docker / VPS</span>
+                <span><strong>1 Whitelisted Website Domain</strong></span>
               </li>
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Bring your own 11 API keys (BYOK)</span>
+                <span><strong>11-Cloud Multi-Cloud Gateway</strong> (Zero setup)</span>
               </li>
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>In-memory caching &amp; rate limiting</span>
+                <span><strong>Embeddable 1-Line Chat Widget</strong></span>
               </li>
-              <li className="flex items-center gap-2.5 text-slate-500">
-                <X className="w-4 h-4 text-slate-600 shrink-0" />
-                <span>Requires manual setup of 11 cloud accounts</span>
+              <li className="flex items-center gap-2.5">
+                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Knowledge Base &amp; FAQ Ingestion</span>
+              </li>
+              <li className="flex items-center gap-2.5 text-slate-400">
+                <span className="text-xs font-mono bg-white/5 px-2 py-0.5 rounded text-slate-400">Badge</span>
+                <span>Includes subtle &quot;Powered by ZeroRoute&quot; footer</span>
               </li>
             </ul>
           </div>
 
           <a
-            href="https://github.com/amjadlle/zeroroute"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold bg-white/[0.06] hover:bg-white/[0.12] text-white border border-white/10 transition-all active:scale-95 shadow-md min-h-[44px] touch-manipulation"
+            href="/login?tab=signup"
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold bg-white/[0.08] hover:bg-white/[0.15] text-white border border-white/15 transition-all active:scale-95 shadow-md min-h-[44px] touch-manipulation cursor-pointer"
           >
-            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-            </svg>
-            <span>Clone Repository &amp; Deploy Free</span>
+            <span>🚀 Get Started Free (No Card Needed)</span>
           </a>
         </div>
 
-        {/* Managed ZeroRoute Cloud Plan */}
+        {/* Managed ZeroRoute Pro Plan */}
         <div className="relative flex flex-col justify-between p-6 sm:p-8 bg-gradient-to-b from-[#17111b] via-[#100d16] to-[#0a080f] border-2 border-red-500/50 rounded-3xl shadow-2xl shadow-red-500/10 space-y-6 glow-effect">
           {/* Popular Ribbon */}
           <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-lg shadow-red-500/30">
-            ★ Most Popular • Zero Hassle
+            ★ Most Popular • White-Label
           </div>
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-red-400">
-                  Managed Cloud
+                  Pro Cloud
                 </span>
-                <h3 className="text-2xl font-bold text-white mt-1">ZeroRoute Cloud</h3>
+                <h3 className="text-2xl font-bold text-white mt-1">ZeroRoute Pro</h3>
               </div>
             </div>
             <p className="text-xs sm:text-sm text-slate-400">
-              Instant 1-key setup. We manage the 11-cloud key pools, intelligent load balancing, and 99.9% uptime for your apps.
+              For businesses and developers wanting 100% white-label branding, high traffic volume, and multi-domain support.
             </p>
             <div className="text-3xl sm:text-4xl font-extrabold text-white font-mono pt-2">
-              $3.99{" "}
+              $2.00{" "}
               <span className="text-sm font-normal text-slate-400 font-sans">
-                / month{" "}
-                <span className="text-xs text-emerald-400 font-mono">(3-Day Free Trial)</span>
+                / month
               </span>
             </div>
             <div className="text-[11px] text-slate-400 font-mono -mt-1">
@@ -114,13 +112,19 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                 <span>
-                  <strong>10,000 Monthly AI Requests</strong> (~330 req/day included)
+                  <strong>10,000 Monthly AI Requests</strong> (~330 req/day)
+                </span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>
+                  <strong>100% White-Label</strong> (Removes ZeroRoute badge)
                 </span>
               </li>
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-red-400 shrink-0" />
                 <span>
-                  <strong>Instant 1-Key Access</strong> (Zero setup or API keys needed)
+                  <strong>Up to 3 Whitelisted Domains</strong>
                 </span>
               </li>
               <li className="flex items-center gap-2.5">
@@ -144,12 +148,6 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-red-400 shrink-0" />
                 <span>
-                  <strong>Hosted 1-Line Chatbot Widget</strong> (Embed anywhere in 30s)
-                </span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-red-400 shrink-0" />
-                <span>
                   <strong>Private Visitor Chat Logs</strong> &amp; Question History
                 </span>
               </li>
@@ -168,7 +166,7 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
               onClick={onOpenCheckout}
               className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-xl shadow-red-500/25 transition-all active:scale-95 cursor-pointer min-h-[44px] touch-manipulation"
             >
-              <span>🚀 Start 3-Day Free Trial ($3.99/mo)</span>
+              <span>⚡ Upgrade to Pro ($2.00 / month)</span>
             </button>
             <p className="text-[11px] text-center text-slate-500">
               Cancel anytime. Instant automated activation.

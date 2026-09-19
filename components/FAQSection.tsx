@@ -40,9 +40,9 @@ const FAQS: FAQItem[] = [
       "We provide 100% free personal setup! If you're not sure how to add the script tag or configure documents for your website (WordPress, Shopify, Webflow, Next.js, or HTML), you can book a free 15-minute 1-on-1 call with our team or email us (mapkisolutions@gmail.com), and we will set up and test your chatbot for you for free.",
   },
   {
-    question: "How does the 3-day free trial work for Starter Pro?",
+    question: "How does the Free Plan and Pro Plan work?",
     answer:
-      "You get complete access to 10,000 monthly chat requests, hosted Cloudflare D1 SQL database, 5-in-1 live knowledge sync, and website chatbot widget for 3 full days completely free. You can cancel anytime before the trial ends without being charged.",
+      "You can start immediately on our $0 Free Forever tier (500 requests/month, 1 website domain, with subtle ZeroRoute badge) without entering any credit card. If you want 100% white-label branding, 10,000 monthly requests, and multi-domain support, you can upgrade to ZeroRoute Pro anytime for just $2.00 / month.",
   },
 ];
 

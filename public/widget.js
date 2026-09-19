@@ -409,6 +409,30 @@
       cursor: not-allowed;
       transform: none;
     }
+    #zr-footer-badge {
+      text-align: center;
+      padding: 5px 0 7px 0;
+      background: rgba(12, 16, 26, 0.98);
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    #zr-footer-badge a {
+      font-size: 10.5px;
+      color: #64748b;
+      text-decoration: none;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      transition: color 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    #zr-footer-badge a:hover {
+      color: #94a3b8;
+    }
+    #zr-footer-badge a span {
+      color: #f1f5f9;
+      font-weight: 600;
+    }
   `;
   document.head.appendChild(style);
 
@@ -444,6 +468,9 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
         </button>
       </form>
+      <div id="zr-footer-badge" style="display:none;">
+        <a href="https://zeroroute.mapki.in" target="_blank" rel="noopener noreferrer">⚡ Powered by <span>ZeroRoute</span></a>
+      </div>
     </div>
     <button id="zr-widget-btn" aria-label="Open chat">
       <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
@@ -613,6 +640,15 @@
           avatarLogoElem.style.display = "block";
         } else {
           avatarLogoElem.style.display = "none";
+        }
+      }
+
+      var footerBadgeElem = document.getElementById("zr-footer-badge");
+      if (footerBadgeElem) {
+        if (bot.showBadge) {
+          footerBadgeElem.style.display = "block";
+        } else {
+          footerBadgeElem.style.display = "none";
         }
       }
 

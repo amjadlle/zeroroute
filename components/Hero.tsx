@@ -44,23 +44,22 @@ export function Hero({ onOpenCheckout }: HeroProps) {
       {/* Clean Action Buttons */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2.5 sm:gap-4 pt-2 max-w-md sm:max-w-none mx-auto w-full">
         {/* Primary CTA */}
-        <button
-          type="button"
-          onClick={onOpenCheckout}
+        <Link
+          href="/login?tab=signup"
           className="inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-bold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white rounded-xl transition-all shadow-xl shadow-red-500/20 active:scale-95 cursor-pointer touch-manipulation min-h-[44px]"
         >
           <Zap className="w-4 h-4 fill-white" />
-          <span>Start 3-Day Free Trial ($3.99/mo)</span>
-        </button>
-
-        {/* Console Link */}
-        <Link
-          href="/app"
-          className="inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold bg-white/[0.05] hover:bg-white/[0.1] text-slate-200 hover:text-white border border-white/10 rounded-xl transition-all active:scale-95 touch-manipulation min-h-[44px]"
-        >
-          <SlidersHorizontal className="w-4 h-4 text-slate-400" />
-          <span>Open Console</span>
+          <span>Get Started Free (500 req/mo)</span>
         </Link>
+
+        {/* Pro Upgrade CTA */}
+        <button
+          type="button"
+          onClick={onOpenCheckout}
+          className="inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-bold bg-white/[0.08] hover:bg-white/[0.15] text-white border border-white/15 rounded-xl transition-all active:scale-95 cursor-pointer touch-manipulation min-h-[44px]"
+        >
+          <span>⚡ Upgrade to Pro ($2.00/mo)</span>
+        </button>
 
         {/* Live Chatbot Demo Trigger */}
         <button
@@ -83,19 +82,19 @@ export function Hero({ onOpenCheckout }: HeroProps) {
           className="inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/30 rounded-xl transition-all active:scale-95 cursor-pointer touch-manipulation min-h-[44px]"
         >
           <MessageSquare className="w-4 h-4 text-red-400" />
-          <span>Test Chatbot Demo</span>
+          <span>Test Live Bot</span>
         </button>
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 text-xs text-slate-400 font-medium pt-1">
         <span className="inline-flex items-center gap-1.5 text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span>10,000 Requests/Mo Included</span>
+          <span>Free Plan (500 req/mo)</span>
         </span>
         <span className="text-slate-600">•</span>
-        <span>3-Day Free Trial</span>
+        <span>Pro Tier: $2.00 / mo (10,000 req)</span>
         <span className="text-slate-600">•</span>
-        <span>Instant Setup in 30s</span>
+        <span>No Credit Card Required</span>
         <span className="text-slate-600">•</span>
         <span>Cancel Anytime</span>
       </div>

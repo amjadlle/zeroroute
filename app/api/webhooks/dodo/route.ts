@@ -77,7 +77,7 @@ export async function POST(request: Request) {
           activeName = existing.name || customerName;
 
           await db.execute({
-            sql: `UPDATE customers SET status = 'active', subscription_expires = ?, key = ?, bot_id = ?, monthly_requests = 0, updated_at = ? WHERE email = ?`,
+            sql: `UPDATE customers SET status = 'active', monthly_limit = 10000, subscription_expires = ?, key = ?, bot_id = ?, monthly_requests = 0, updated_at = ? WHERE email = ?`,
             args: [expiresAt, activeKey, activeBotId, now, customerEmail]
           });
         } else {

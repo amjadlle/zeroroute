@@ -69,13 +69,13 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
           <div className="space-y-2 pr-6">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
               <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Risk-Free 3-Day Trial</span>
+              <span>ZeroRoute Pro Plan</span>
             </div>
             <h3 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight leading-snug">
-              Unlock ZeroRoute Cloud
+              Unlock ZeroRoute Pro
             </h3>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Instant multi-cloud AI routing, embeddable website widget, and custom knowledge RAG ready in 60 seconds.
+              10,000 monthly requests, 100% white-label (removes badge), multi-domain whitelist, and 11-cloud pooled reliability.
             </p>
           </div>
 
@@ -88,11 +88,11 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
               </div>
               <div className="text-right flex-shrink-0">
                 <div className="flex items-baseline gap-1 justify-end">
-                  <span className="text-2xl font-black text-white font-mono">$3.99</span>
+                  <span className="text-2xl font-black text-white font-mono">$2.00</span>
                   <span className="text-xs text-slate-400">/mo</span>
                 </div>
                 <span className="text-[10px] font-semibold text-emerald-400 block">
-                  3 Days Free Trial • Cancel Anytime
+                  Cancel Anytime • Instant Activation
                 </span>
               </div>
             </div>
@@ -108,6 +108,18 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                 <span>
+                  <strong>100% White-Label</strong> (Removes ZeroRoute badge)
+                </span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                <span>
+                  <strong>Up to 3 Whitelisted Domains</strong>
+                </span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                <span>
                   <strong>11 Pooled AI Clouds</strong> (Gemini, Groq, Cloudflare &amp; more)
                 </span>
               </li>
@@ -115,12 +127,6 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                 <span>
                   <strong>1-Line Chatbot Widget</strong> with custom RAG knowledge
-                </span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>
-                  <strong>Unlimited API Keys</strong> &amp; real-time latency analytics
                 </span>
               </li>
             </ul>
@@ -141,7 +147,7 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                 </>
               ) : (
                 <>
-                  <span className="text-white font-bold">Start Free Trial • $0 Due Today</span>
+                  <span className="text-white font-bold">Upgrade to Pro • $2.00 / month</span>
                   <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
                 </>
               )}
