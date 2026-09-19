@@ -56,7 +56,7 @@ export function Hero({ onOpenCheckout }: HeroProps) {
         <button
           type="button"
           onClick={onOpenCheckout}
-          className="inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-bold bg-white/[0.08] hover:bg-white/[0.15] text-white border border-white/15 rounded-xl transition-all active:scale-95 cursor-pointer touch-manipulation min-h-[44px]"
+          className="inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-extrabold bg-gradient-to-r from-violet-600/30 via-purple-600/30 to-indigo-600/30 hover:from-violet-600/50 hover:to-indigo-600/50 text-violet-200 hover:text-white border border-violet-500/40 hover:border-violet-400/70 rounded-xl transition-all shadow-lg shadow-violet-500/20 active:scale-95 cursor-pointer touch-manipulation min-h-[44px]"
         >
           <span>⚡ Upgrade to Pro ($2.00/mo)</span>
         </button>
@@ -92,7 +92,9 @@ export function Hero({ onOpenCheckout }: HeroProps) {
           <span>Free Plan (500 req/mo)</span>
         </span>
         <span className="text-slate-600">•</span>
-        <span>Pro Tier: $2.00 / mo (10,000 req)</span>
+        <span className="inline-flex items-center gap-1.5 text-violet-300 font-bold bg-violet-500/15 border border-violet-500/30 px-2.5 py-0.5 rounded-full shadow-sm">
+          <span>Pro Tier: $2.00 / mo (10,000 req)</span>
+        </span>
         <span className="text-slate-600">•</span>
         <span>No Credit Card Required</span>
         <span className="text-slate-600">•</span>

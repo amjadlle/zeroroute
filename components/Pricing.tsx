@@ -79,36 +79,42 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
           </a>
         </div>
 
-        {/* Managed ZeroRoute Pro Plan */}
-        <div className="relative flex flex-col justify-between p-6 sm:p-8 bg-gradient-to-b from-[#17111b] via-[#100d16] to-[#0a080f] border-2 border-red-500/50 rounded-3xl shadow-2xl shadow-red-500/10 space-y-6 glow-effect">
+        {/* Managed ZeroRoute Pro Plan - Radiant Violet Theme */}
+        <div className="relative flex flex-col justify-between p-6 sm:p-8 bg-gradient-to-b from-[#180e2b] via-[#120a21] to-[#0a0514] border-2 border-violet-500/70 rounded-3xl shadow-2xl shadow-violet-500/20 ring-1 ring-violet-400/30 space-y-6 overflow-hidden">
+          {/* Subtle Ambient Violet Glow */}
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-violet-600/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
+
           {/* Popular Ribbon */}
-          <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-lg shadow-red-500/30">
-            ★ Most Popular • White-Label
+          <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 text-white shadow-lg shadow-purple-500/40 border border-violet-300/30 flex items-center gap-1">
+            <span>★ Most Popular • White-Label</span>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-4 relative z-10">
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-red-400">
+                <span className="text-xs font-bold uppercase tracking-wider text-violet-400 font-mono">
                   Pro Cloud
                 </span>
-                <h3 className="text-2xl font-bold text-white mt-1">ZeroRoute Pro</h3>
+                <h3 className="text-2xl sm:text-3xl font-extrabold text-white mt-1 bg-gradient-to-r from-white via-violet-100 to-violet-300 bg-clip-text text-transparent">
+                  ZeroRoute Pro
+                </h3>
               </div>
             </div>
-            <p className="text-xs sm:text-sm text-slate-400">
+            <p className="text-xs sm:text-sm text-slate-300">
               For businesses and developers wanting 100% white-label branding, high traffic volume, and multi-domain support.
             </p>
-            <div className="text-3xl sm:text-4xl font-extrabold text-white font-mono pt-2">
-              $2.00{" "}
-              <span className="text-sm font-normal text-slate-400 font-sans">
+            <div className="text-3xl sm:text-4xl font-extrabold text-white font-mono pt-2 flex items-baseline gap-1.5">
+              <span className="bg-gradient-to-r from-violet-200 to-white bg-clip-text text-transparent">$2.00</span>
+              <span className="text-sm font-normal text-violet-300/70 font-sans">
                 / month
               </span>
             </div>
-            <div className="text-[11px] text-slate-400 font-mono -mt-1">
+            <div className="text-[11px] text-violet-300/70 font-mono -mt-1">
               Apple Pay, Google Pay, Cards &amp; UPI Supported
             </div>
 
-            <ul className="space-y-3 text-xs sm:text-sm text-slate-200 pt-4 border-t border-white/10">
+            <ul className="space-y-3 text-xs sm:text-sm text-slate-200 pt-4 border-t border-violet-500/20">
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                 <span>
@@ -116,42 +122,44 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
                 </span>
               </li>
               <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span className="text-[10px] font-mono font-bold bg-violet-500/25 text-violet-300 border border-violet-400/30 px-2 py-0.5 rounded-full shrink-0">
+                  PRO
+                </span>
                 <span>
                   <strong>100% White-Label</strong> (Removes ZeroRoute badge)
                 </span>
               </li>
               <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-red-400 shrink-0" />
+                <Check className="w-4 h-4 text-violet-400 shrink-0" />
                 <span>
                   <strong>Up to 3 Whitelisted Domains</strong>
                 </span>
               </li>
               <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-red-400 shrink-0" />
+                <Check className="w-4 h-4 text-violet-400 shrink-0" />
                 <span>
                   <strong>11 Clouds Pooled &amp; Managed</strong> for 99.9% uptime
                 </span>
               </li>
               <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-red-400 shrink-0" />
+                <Check className="w-4 h-4 text-violet-400 shrink-0" />
                 <span>
                   <strong>Knowledge Base &amp; Semantic RAG</strong> (Upload docs &amp; FAQs)
                 </span>
               </li>
               <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-red-400 shrink-0" />
+                <Check className="w-4 h-4 text-violet-400 shrink-0" />
                 <span>
                   <strong>Custom AI Brand Persona</strong> &amp; Tone customizer
                 </span>
               </li>
               <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-red-400 shrink-0" />
+                <Check className="w-4 h-4 text-violet-400 shrink-0" />
                 <span>
                   <strong>Private Visitor Chat Logs</strong> &amp; Question History
                 </span>
               </li>
-              <li className="flex items-center gap-2.5 bg-emerald-500/10 -mx-2 px-2 py-1.5 rounded-xl border border-emerald-500/20 text-emerald-300">
+              <li className="flex items-center gap-2.5 bg-emerald-500/10 -mx-2 px-2.5 py-1.5 rounded-xl border border-emerald-500/25 text-emerald-300">
                 <Sparkles className="w-4 h-4 text-emerald-400 shrink-0" />
                 <span>
                   <strong>Free 1-on-1 Setup &amp; Installation</strong> (We install &amp; test it on your site for free)
@@ -160,15 +168,15 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
             </ul>
           </div>
 
-          <div className="space-y-2 pt-2">
+          <div className="space-y-2 pt-2 relative z-10">
             <button
               type="button"
               onClick={onOpenCheckout}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-xl shadow-red-500/25 transition-all active:scale-95 cursor-pointer min-h-[44px] touch-manipulation"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-xl shadow-violet-600/35 border border-violet-400/30 transition-all active:scale-95 cursor-pointer min-h-[44px] touch-manipulation"
             >
               <span>⚡ Upgrade to Pro ($2.00 / month)</span>
             </button>
-            <p className="text-[11px] text-center text-slate-500">
+            <p className="text-[11px] text-center text-violet-300/60 font-mono">
               Cancel anytime. Instant automated activation.
             </p>
           </div>

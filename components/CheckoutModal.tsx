@@ -54,7 +54,7 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       }}
       className="fixed inset-0 z-[999999] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
     >
-      <div className="relative w-full max-w-[440px] bg-[#0c0f17] border border-white/10 rounded-2xl shadow-2xl shadow-black/80 overflow-hidden flex flex-col max-h-[95vh] overflow-y-auto">
+      <div className="relative w-full max-w-[440px] bg-[#0d0a18] border border-violet-500/30 rounded-2xl shadow-2xl shadow-violet-950/80 overflow-hidden flex flex-col max-h-[95vh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -67,29 +67,29 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
         <div className="p-5 sm:p-7 space-y-5">
           {/* Header & Value Prop */}
           <div className="space-y-2 pr-6">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide bg-violet-500/20 text-violet-300 border border-violet-400/30">
+              <Sparkles className="w-3.5 h-3.5 text-violet-300" />
               <span>ZeroRoute Pro Plan</span>
             </div>
             <h3 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight leading-snug">
               Unlock ZeroRoute Pro
             </h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <p className="text-xs text-slate-300 leading-relaxed">
               10,000 monthly requests, 100% white-label (removes badge), multi-domain whitelist, and 11-cloud pooled reliability.
             </p>
           </div>
 
           {/* Plan Card / Pricing Anchor */}
-          <div className="p-4 rounded-xl bg-white/[0.04] border border-white/10 relative overflow-hidden space-y-3.5">
+          <div className="p-4 rounded-xl bg-violet-950/30 border border-violet-500/30 relative overflow-hidden space-y-3.5">
             <div className="flex items-baseline justify-between gap-2">
               <div>
                 <span className="text-sm font-bold text-white block">ZeroRoute Pro</span>
-                <span className="text-[11px] text-slate-400">All-in-one Managed Suite</span>
+                <span className="text-[11px] text-violet-300/70">All-in-one Managed Suite</span>
               </div>
               <div className="text-right flex-shrink-0">
                 <div className="flex items-baseline gap-1 justify-end">
                   <span className="text-2xl font-black text-white font-mono">$2.00</span>
-                  <span className="text-xs text-slate-400">/mo</span>
+                  <span className="text-xs text-violet-300/70">/mo</span>
                 </div>
                 <span className="text-[10px] font-semibold text-emerald-400 block">
                   Cancel Anytime • Instant Activation
@@ -98,7 +98,7 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
             </div>
 
             {/* Feature Bullets */}
-            <ul className="space-y-2.5 pt-3 border-t border-white/10 text-xs text-slate-300">
+            <ul className="space-y-2.5 pt-3 border-t border-violet-500/20 text-xs text-slate-200">
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                 <span>
@@ -106,25 +106,25 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                 </span>
               </li>
               <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                <Check className="w-4 h-4 text-violet-400 flex-shrink-0" />
                 <span>
                   <strong>100% White-Label</strong> (Removes ZeroRoute badge)
                 </span>
               </li>
               <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                <Check className="w-4 h-4 text-violet-400 flex-shrink-0" />
                 <span>
                   <strong>Up to 3 Whitelisted Domains</strong>
                 </span>
               </li>
               <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                <Check className="w-4 h-4 text-violet-400 flex-shrink-0" />
                 <span>
                   <strong>11 Pooled AI Clouds</strong> (Gemini, Groq, Cloudflare &amp; more)
                 </span>
               </li>
               <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                <Check className="w-4 h-4 text-violet-400 flex-shrink-0" />
                 <span>
                   <strong>1-Line Chatbot Widget</strong> with custom RAG knowledge
                 </span>
@@ -138,7 +138,7 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
               type="button"
               onClick={handleStartCheckout}
               disabled={loading}
-              className="group w-full flex items-center justify-center gap-2 py-3.5 px-5 rounded-xl text-sm font-extrabold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-lg shadow-red-600/30 hover:shadow-red-500/50 hover:scale-[1.01] active:scale-[0.98] transition-all cursor-pointer disabled:brightness-95 disabled:cursor-wait drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
+              className="group w-full flex items-center justify-center gap-2 py-3.5 px-5 rounded-xl text-sm font-extrabold bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-xl shadow-violet-600/35 border border-violet-400/30 hover:scale-[1.01] active:scale-[0.98] transition-all cursor-pointer disabled:brightness-95 disabled:cursor-wait"
             >
               {loading ? (
                 <>
