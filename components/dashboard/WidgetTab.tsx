@@ -301,7 +301,7 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
   const isInitialOnly = chatMessages.length === 1 && chatMessages[0].role === "assistant";
 
   return (
-    <div className="w-full bg-[#07090e] border border-dark-border rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[calc(100vh-210px)] min-h-[600px] max-h-[850px] animate-in fade-in duration-200">
+    <div className="max-w-4xl mx-auto w-full bg-[#07090e] border border-dark-border rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[calc(100vh-210px)] min-h-[600px] max-h-[850px] animate-in fade-in duration-200">
       {/* ChatGPT-Style Top Header Bar */}
       <div className="px-5 py-3.5 bg-dark-card/90 backdrop-blur-md border-b border-dark-border flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
@@ -344,9 +344,9 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
         </div>
       </div>
 
-      {/* Main Chat Scroll Container (Full Width / Max-W-4xl Centered) */}
+      {/* Main Chat Scroll Container (Compact Max-W-3xl Centered) */}
       <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 scrollbar-thin scrollbar-thumb-white/10">
-        <div className="max-w-4xl mx-auto space-y-6">
+        <div className="max-w-3xl mx-auto space-y-6">
           {chatMessages.map((m, i) => {
             const isLastAssistant = i === chatMessages.length - 1 && m.role === "assistant";
             const isCopied = copiedMsgIdx === i;
@@ -379,19 +379,13 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
                       </p>
                     </div>
                   ) : (
-                    <div className="p-4 rounded-2xl rounded-tl-sm bg-[#0c1018] border border-white/10 text-slate-200 shadow-md w-full">
+                    <div className={`p-3.5 rounded-2xl rounded-tl-sm bg-[#0c1018] border border-white/10 text-slate-200 shadow-md ${isThinking ? "w-fit" : "w-full"}`}>
                       {isThinking ? (
-                        /* Thinking State Indicator in Reply Box */
-                        <div className="flex items-center gap-3 py-1.5 px-0.5 text-xs text-slate-300">
-                          <div className="flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse [animation-duration:900ms]" />
-                            <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse [animation-duration:900ms] [animation-delay:200ms]" />
-                            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse [animation-duration:900ms] [animation-delay:400ms]" />
-                          </div>
-                          <span className="font-semibold text-slate-300 text-xs tracking-wide flex items-center gap-1.5">
-                            <Sparkles className="w-3.5 h-3.5 text-red-400 animate-spin" />
-                            <span>Thinking...</span>
-                          </span>
+                        /* Simple Clean 3-Dot Bouncing Animation */
+                        <div className="flex items-center gap-1.5 py-1 px-1">
+                          <span className="w-2 h-2 rounded-full bg-red-400 animate-bounce [animation-delay:-0.3s]" />
+                          <span className="w-2 h-2 rounded-full bg-rose-400 animate-bounce [animation-delay:-0.15s]" />
+                          <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce" />
                         </div>
                       ) : (
                         <div className="relative">
@@ -466,7 +460,7 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
       {/* Bottom Floating Prompt Chips Bar (when active conversation) */}
       {!isInitialOnly && prompts && prompts.length > 0 && (
         <div className="px-4 sm:px-6 py-2 border-t border-white/5 bg-[#050608]/70 backdrop-blur-sm">
-          <div className="max-w-4xl mx-auto flex items-center gap-2 overflow-x-auto scrollbar-none touch-pan-x">
+          <div className="max-w-3xl mx-auto flex items-center gap-2 overflow-x-auto scrollbar-none touch-pan-x">
             <span className="text-[10px] font-semibold text-slate-500 uppercase shrink-0">Suggestions:</span>
             {prompts.map((p, idx) => (
               <button
@@ -485,7 +479,7 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
 
       {/* Bottom Input Area */}
       <div className="p-4 sm:p-5 bg-dark-card border-t border-dark-border shrink-0">
-        <div className="max-w-4xl mx-auto space-y-2">
+        <div className="max-w-3xl mx-auto space-y-2">
           <form
             onSubmit={(e) => {
               e.preventDefault();
