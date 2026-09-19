@@ -30,6 +30,7 @@ interface CustomerProfile {
   monthly_requests: number;
   monthly_limit: number;
   bot_id: string;
+  allowed_domains?: string[];
   knowledge_docs_count: number;
   is_admin?: boolean;
 }
@@ -104,6 +105,29 @@ export default function AppDashboard() {
       }
     } catch {}
     setRotatingKey(false);
+  };
+
+  const handleUpdateDomains = async (domains: string[]) => {
+    try {
+      const urlParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+      const queryKey = urlParams?.get("key");
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (queryKey) headers["Authorization"] = `Bearer ${queryKey}`;
+
+      const res = await fetch("/api/customer/domains", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ domains }),
+      });
+      const data = await res.json();
+      if (res.ok && data.allowedDomains && profile) {
+        setProfile({ ...profile, allowed_domains: data.allowedDomains });
+      } else if (!res.ok) {
+        alert(data.error || "Failed to update allowed domains.");
+      }
+    } catch {
+      alert("Failed to connect to server. Please try again.");
+    }
   };
 
   const handleAddDoc = async (title: string, content: string) => {
@@ -219,6 +243,9 @@ export default function AppDashboard() {
             monthlyRequests={profile?.monthly_requests || 0}
             monthlyLimit={profile?.monthly_limit || 500}
             daysRemaining={profile?.days_remaining || 0}
+            allowedDomains={profile?.allowed_domains || []}
+            onUpdateDomains={handleUpdateDomains}
+            onOpenBilling={() => setBillingOpen(true)}
             onRotateKey={handleRotateKey}
             rotatingKey={rotatingKey}
             onNavigateTab={setActiveTab}

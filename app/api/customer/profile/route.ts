@@ -65,6 +65,7 @@ export async function GET(req: NextRequest) {
         monthly_requests: customer.monthly_requests || 0,
         monthly_limit: customer.monthly_limit || 10000,
         bot_id: customer.bot_id || "",
+        allowed_domains: customer.allowed_domains ? (typeof customer.allowed_domains === "string" ? JSON.parse(customer.allowed_domains) : customer.allowed_domains) : [],
         knowledge_docs_count: docCount,
         created_at: customer.created_at,
         is_admin: isAdmin,
