@@ -21,224 +21,221 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-7 items-stretch">
-        {/* 1. DIY Self-Hosted Plan */}
-        <div className="relative flex flex-col justify-between p-6 sm:p-7 bg-dark-card/90 border border-dark-border rounded-3xl backdrop-blur-xl shadow-xl space-y-6">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono">
-                  Open-Source
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
+        {/* Left Column: Stacked Free Options (DIY Self-Hosted + Free Hosted) */}
+        <div className="lg:col-span-6 flex flex-col gap-6 justify-between">
+          {/* 1. DIY Self-Hosted Plan */}
+          <div className="relative flex flex-col justify-between p-6 sm:p-7 bg-dark-card/90 border border-dark-border rounded-3xl backdrop-blur-xl shadow-xl space-y-5">
+            <div className="space-y-3.5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono">
+                    Open-Source
+                  </span>
+                  <h3 className="text-xl sm:text-2xl font-bold text-white mt-0.5">DIY Self-Hosted</h3>
+                </div>
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+                  100% FREE
                 </span>
-                <h3 className="text-2xl font-bold text-white mt-1">DIY Self-Hosted</h3>
               </div>
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
-                100% FREE
-              </span>
-            </div>
-            <p className="text-xs sm:text-sm text-slate-400">
-              For tinkerers and developers who want complete control and full source code on their own infrastructure.
-            </p>
-            <div className="text-3xl sm:text-4xl font-extrabold text-white font-mono pt-2">
-              $0 <span className="text-sm font-normal text-slate-400 font-sans">/ forever</span>
-            </div>
-
-            <ul className="space-y-3 text-xs sm:text-sm text-slate-300 pt-4 border-t border-dark-border">
-              <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Full TypeScript source code (MIT License)</span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Deploy to Cloudflare Workers / Docker / VPS</span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Bring your own 11 provider API keys (BYOK)</span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Unlimited requests on your own infrastructure</span>
-              </li>
-              <li className="flex items-center gap-2.5 text-slate-400">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Community GitHub issues &amp; discussions</span>
-              </li>
-            </ul>
-          </div>
-
-          <a
-            href="https://github.com/amjadlle/zeroroute"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold bg-white/[0.08] hover:bg-white/[0.15] text-white border border-white/15 transition-all active:scale-95 shadow-md min-h-[44px] touch-manipulation cursor-pointer"
-          >
-            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-            </svg>
-            <span>GitHub Repo (Free)</span>
-          </a>
-        </div>
-
-        {/* 2. Free Hosted Plan */}
-        <div className="relative flex flex-col justify-between p-6 sm:p-7 bg-dark-card/90 border border-dark-border rounded-3xl backdrop-blur-xl shadow-xl space-y-6">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono">
-                  Starter Cloud
-                </span>
-                <h3 className="text-2xl font-bold text-white mt-1">Free Hosted</h3>
+              <p className="text-xs sm:text-sm text-slate-400">
+                For tinkerers and developers who want complete control and full source code on their own infrastructure.
+              </p>
+              <div className="text-2xl sm:text-3xl font-extrabold text-white font-mono">
+                $0 <span className="text-xs sm:text-sm font-normal text-slate-400 font-sans">/ forever</span>
               </div>
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
-                $0 FOREVER
-              </span>
-            </div>
-            <p className="text-xs sm:text-sm text-slate-400">
-              Perfect for testing, personal projects, and launching your first embeddable AI website assistant.
-            </p>
-            <div className="text-3xl sm:text-4xl font-extrabold text-white font-mono pt-2">
-              $0 <span className="text-sm font-normal text-slate-400 font-sans">/ month (No card needed)</span>
-            </div>
 
-            <ul className="space-y-3 text-xs sm:text-sm text-slate-300 pt-4 border-t border-dark-border">
-              <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span><strong>500 Monthly AI Requests</strong> (Free forever)</span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span><strong>1 Whitelisted Website Domain</strong></span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span><strong>11-Cloud Multi-Cloud Gateway</strong> (Zero setup)</span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span><strong>Embeddable 1-Line Chat Widget</strong></span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Knowledge Base &amp; FAQ Ingestion</span>
-              </li>
-              <li className="flex items-center gap-2.5 text-slate-400">
-                <span className="text-xs font-mono bg-white/5 px-2 py-0.5 rounded text-slate-400">Badge</span>
-                <span>Includes subtle &quot;Powered by ZeroRoute&quot; footer</span>
-              </li>
-            </ul>
-          </div>
-
-          <a
-            href="/login?tab=signup"
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold bg-white/[0.08] hover:bg-white/[0.15] text-white border border-white/15 transition-all active:scale-95 shadow-md min-h-[44px] touch-manipulation cursor-pointer"
-          >
-            <span>🚀 Get Started Free (No Card Needed)</span>
-          </a>
-        </div>
-
-        {/* 3. Managed ZeroRoute Pro Plan - Radiant Violet Theme */}
-        <div className="relative flex flex-col justify-between p-6 sm:p-7 bg-gradient-to-b from-[#180e2b] via-[#120a21] to-[#0a0514] border-2 border-violet-500/70 rounded-3xl shadow-2xl shadow-violet-500/20 ring-1 ring-violet-400/30 space-y-6 md:col-span-2 lg:col-span-1">
-          {/* Subtle Ambient Violet Glow */}
-          <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
-            <div className="absolute -top-24 -right-24 w-64 h-64 bg-violet-600/20 rounded-full blur-3xl" />
-            <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-purple-600/15 rounded-full blur-3xl" />
-          </div>
-
-          {/* Popular Ribbon */}
-          <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 text-white shadow-lg shadow-purple-500/40 border border-violet-300/30 flex items-center gap-1 z-20">
-            <span>★ Most Popular • White-Label</span>
-          </div>
-
-          <div className="space-y-4 relative z-10">
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-violet-400 font-mono">
-                  Pro Cloud
-                </span>
-                <h3 className="text-2xl sm:text-3xl font-extrabold text-white mt-1 bg-gradient-to-r from-white via-violet-100 to-violet-300 bg-clip-text text-transparent">
-                  ZeroRoute Pro
-                </h3>
-              </div>
-            </div>
-            <p className="text-xs sm:text-sm text-slate-300">
-              For businesses and developers wanting 100% white-label branding, high traffic volume, and multi-domain support.
-            </p>
-            <div className="text-3xl sm:text-4xl font-extrabold text-white font-mono pt-2 flex items-baseline gap-1.5">
-              <span className="bg-gradient-to-r from-violet-200 to-white bg-clip-text text-transparent">$2.00</span>
-              <span className="text-sm font-normal text-violet-300/70 font-sans">
-                / month
-              </span>
-            </div>
-            <div className="text-[11px] text-violet-300/70 font-mono -mt-1">
-              Apple Pay, Google Pay, Cards &amp; UPI Supported
+              <ul className="space-y-2.5 text-xs sm:text-sm text-slate-300 pt-3 border-t border-dark-border">
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Full TypeScript source code (MIT License)</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Deploy to Cloudflare Workers / Docker / VPS</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Bring your own 11 provider API keys (BYOK)</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Unlimited requests on your own infrastructure</span>
+                </li>
+              </ul>
             </div>
 
-            <ul className="space-y-3 text-xs sm:text-sm text-slate-200 pt-4 border-t border-violet-500/20">
-              <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>
-                  <strong>10,000 Monthly AI Requests</strong> (~330 req/day)
-                </span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <span className="text-[10px] font-mono font-bold bg-violet-500/25 text-violet-300 border border-violet-400/30 px-2 py-0.5 rounded-full shrink-0">
-                  PRO
-                </span>
-                <span>
-                  <strong>100% White-Label</strong> (Removes ZeroRoute badge)
-                </span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-violet-400 shrink-0" />
-                <span>
-                  <strong>Up to 3 Whitelisted Domains</strong>
-                </span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-violet-400 shrink-0" />
-                <span>
-                  <strong>11 Clouds Pooled &amp; Managed</strong> for 99.9% uptime
-                </span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-violet-400 shrink-0" />
-                <span>
-                  <strong>Knowledge Base &amp; Semantic RAG</strong> (Upload docs &amp; FAQs)
-                </span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-violet-400 shrink-0" />
-                <span>
-                  <strong>Custom AI Brand Persona</strong> &amp; Tone customizer
-                </span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-violet-400 shrink-0" />
-                <span>
-                  <strong>Private Visitor Chat Logs</strong> &amp; Question History
-                </span>
-              </li>
-              <li className="flex items-center gap-2.5 bg-emerald-500/10 -mx-2 px-2.5 py-1.5 rounded-xl border border-emerald-500/25 text-emerald-300">
-                <Sparkles className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>
-                  <strong>Free 1-on-1 Setup &amp; Installation</strong> (We install &amp; test it on your site for free)
-                </span>
-              </li>
-            </ul>
-          </div>
-
-          <div className="space-y-2 pt-2 relative z-10">
-            <button
-              type="button"
-              onClick={onOpenCheckout}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-xl shadow-violet-600/35 border border-violet-400/30 transition-all active:scale-95 cursor-pointer min-h-[44px] touch-manipulation"
+            <a
+              href="https://github.com/amjadlle/zeroroute"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold bg-white/[0.08] hover:bg-white/[0.15] text-white border border-white/15 transition-all active:scale-95 shadow-md min-h-[42px] touch-manipulation cursor-pointer"
             >
-              <span>⚡ Upgrade to Pro ($2.00 / month)</span>
-            </button>
-            <p className="text-[11px] text-center text-violet-300/60 font-mono">
-              Cancel anytime. Instant automated activation.
-            </p>
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+              </svg>
+              <span>GitHub Repo (Free)</span>
+            </a>
+          </div>
+
+          {/* 2. Free Hosted Plan */}
+          <div className="relative flex flex-col justify-between p-6 sm:p-7 bg-dark-card/90 border border-dark-border rounded-3xl backdrop-blur-xl shadow-xl space-y-5">
+            <div className="space-y-3.5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono">
+                    Starter Cloud
+                  </span>
+                  <h3 className="text-xl sm:text-2xl font-bold text-white mt-0.5">Free Hosted</h3>
+                </div>
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+                  $0 FOREVER
+                </span>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-400">
+                Perfect for testing, personal projects, and launching your first embeddable AI website assistant.
+              </p>
+              <div className="text-2xl sm:text-3xl font-extrabold text-white font-mono">
+                $0 <span className="text-xs sm:text-sm font-normal text-slate-400 font-sans">/ month (No card needed)</span>
+              </div>
+
+              <ul className="space-y-2.5 text-xs sm:text-sm text-slate-300 pt-3 border-t border-dark-border">
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span><strong>500 Monthly AI Requests</strong> (Free forever)</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span><strong>1 Whitelisted Website Domain</strong></span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span><strong>11-Cloud Multi-Cloud Gateway</strong> (Zero setup)</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span><strong>Embeddable 1-Line Chat Widget</strong> &amp; Knowledge Base</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-slate-400">
+                  <span className="text-xs font-mono bg-white/5 px-2 py-0.5 rounded text-slate-400">Badge</span>
+                  <span>Includes subtle &quot;Powered by ZeroRoute&quot; footer</span>
+                </li>
+              </ul>
+            </div>
+
+            <a
+              href="/login?tab=signup"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold bg-white/[0.08] hover:bg-white/[0.15] text-white border border-white/15 transition-all active:scale-95 shadow-md min-h-[42px] touch-manipulation cursor-pointer"
+            >
+              <span>🚀 Get Started Free (No Card Needed)</span>
+            </a>
+          </div>
+        </div>
+
+        {/* Right Column: Standalone Featured ZeroRoute Pro Plan */}
+        <div className="lg:col-span-6 flex flex-col">
+          <div className="relative flex flex-col justify-between h-full p-6 sm:p-8 bg-gradient-to-b from-[#180e2b] via-[#120a21] to-[#0a0514] border-2 border-violet-500/70 rounded-3xl shadow-2xl shadow-violet-500/20 ring-1 ring-violet-400/30 space-y-6">
+            {/* Subtle Ambient Violet Glow */}
+            <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
+              <div className="absolute -top-24 -right-24 w-64 h-64 bg-violet-600/20 rounded-full blur-3xl" />
+              <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-purple-600/15 rounded-full blur-3xl" />
+            </div>
+
+            {/* Popular Ribbon */}
+            <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 text-white shadow-lg shadow-purple-500/40 border border-violet-300/30 flex items-center gap-1 z-20">
+              <span>★ Most Popular • White-Label</span>
+            </div>
+
+            <div className="space-y-4 relative z-10">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-violet-400 font-mono">
+                    Pro Cloud
+                  </span>
+                  <h3 className="text-2xl sm:text-3xl font-extrabold text-white mt-1 bg-gradient-to-r from-white via-violet-100 to-violet-300 bg-clip-text text-transparent">
+                    ZeroRoute Pro
+                  </h3>
+                </div>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-300">
+                For businesses and developers wanting 100% white-label branding, high traffic volume, and multi-domain support.
+              </p>
+              <div className="text-3xl sm:text-4xl font-extrabold text-white font-mono pt-2 flex items-baseline gap-1.5">
+                <span className="bg-gradient-to-r from-violet-200 to-white bg-clip-text text-transparent">$2.00</span>
+                <span className="text-sm font-normal text-violet-300/70 font-sans">
+                  / month
+                </span>
+              </div>
+              <div className="text-[11px] text-violet-300/70 font-mono -mt-1">
+                Apple Pay, Google Pay, Cards &amp; UPI Supported
+              </div>
+
+              <ul className="space-y-3 text-xs sm:text-sm text-slate-200 pt-4 border-t border-violet-500/20">
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>
+                    <strong>10,000 Monthly AI Requests</strong> (~330 req/day)
+                  </span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <span className="text-[10px] font-mono font-bold bg-violet-500/25 text-violet-300 border border-violet-400/30 px-2 py-0.5 rounded-full shrink-0">
+                    PRO
+                  </span>
+                  <span>
+                    <strong>100% White-Label</strong> (Removes ZeroRoute badge)
+                  </span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-violet-400 shrink-0" />
+                  <span>
+                    <strong>Up to 3 Whitelisted Domains</strong>
+                  </span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-violet-400 shrink-0" />
+                  <span>
+                    <strong>11 Clouds Pooled &amp; Managed</strong> for 99.9% uptime
+                  </span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-violet-400 shrink-0" />
+                  <span>
+                    <strong>Knowledge Base &amp; Semantic RAG</strong> (Upload docs &amp; FAQs)
+                  </span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-violet-400 shrink-0" />
+                  <span>
+                    <strong>Custom AI Brand Persona</strong> &amp; Tone customizer
+                  </span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-violet-400 shrink-0" />
+                  <span>
+                    <strong>Private Visitor Chat Logs</strong> &amp; Question History
+                  </span>
+                </li>
+                <li className="flex items-center gap-2.5 bg-emerald-500/10 -mx-2 px-2.5 py-1.5 rounded-xl border border-emerald-500/25 text-emerald-300">
+                  <Sparkles className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>
+                    <strong>Free 1-on-1 Setup &amp; Installation</strong> (We install &amp; test it on your site for free)
+                  </span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="space-y-2 pt-2 relative z-10">
+              <button
+                type="button"
+                onClick={onOpenCheckout}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-xl shadow-violet-600/35 border border-violet-400/30 transition-all active:scale-95 cursor-pointer min-h-[44px] touch-manipulation"
+              >
+                <span>⚡ Upgrade to Pro ($2.00 / month)</span>
+              </button>
+              <p className="text-[11px] text-center text-violet-300/60 font-mono">
+                Cancel anytime. Instant automated activation.
+              </p>
+            </div>
           </div>
         </div>
       </div>
