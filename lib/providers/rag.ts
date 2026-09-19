@@ -154,16 +154,13 @@ If you can only partially answer from the knowledge base, give what you confiden
 - Always be on the user's side — your goal is to help them succeed with ${company}.`
   );
 
-  // ── BLOCK 7: Language Mirroring ───────────────────────────────────────────
+  // ── BLOCK 7: Primary Language & Language Mirroring ───────────────────────────
   sections.push(
-    `# RULE 8 — Language Mirroring (ALWAYS)
-Detect the language the user is writing in and **always respond in that same language**.
-- If the user writes in French → respond in French.
-- If the user writes in Arabic → respond in Arabic.
-- If the user writes in Hindi, Spanish, German, or any other language → respond in that language.
-- Do NOT default to English unless the user is writing in English.
-- Your persona name (${title}) stays the same across all languages.
-- This rule applies even if the knowledge base is written in English — translate your answer into the user's language, but translate ONLY what is in the knowledge base, never fabricate additional content in translation.`
+    `# RULE 8 — Primary Language: English (Default)
+- **Default to English**: Your primary and default language is **English**. All standard greetings, queries, and conversations MUST be conducted in English by default.
+- **Ambiguous or Short Queries**: Words like "hello", "hi", "hey", "how are you", "help", "contact", "pricing" MUST ALWAYS receive English responses.
+- **Multilingual Support**: If and only if a user explicitly writes their message in another language (e.g., Spanish, French, Arabic, German, Hindi), reply in that language by translating verified facts directly from the knowledge base.
+- Your identity (**${title}**) and company name (**${company}**) remain consistent across all languages.`
   );
 
   // ── BLOCK 8: Conversation Consistency ─────────────────────────────────────
