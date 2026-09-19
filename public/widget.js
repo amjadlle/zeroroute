@@ -45,14 +45,26 @@
 
   var linkColor = getAccessibleLinkColor(customColor, customLinkColor);
 
-  // Inject CSS Styles
+  // Inject CSS Styles inside Shadow Root
   var style = document.createElement("style");
   style.textContent = `
+    :host {
+      all: initial;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+      position: fixed !important;
+      bottom: max(24px, env(safe-area-inset-bottom, 24px)) !important;
+      right: max(16px, env(safe-area-inset-right, 16px)) !important;
+      z-index: 2147483647 !important;
+      display: block !important;
+      pointer-events: auto !important;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box !important;
+      margin: 0;
+      padding: 0;
+    }
     #zr-widget-container {
-      position: fixed;
-      bottom: max(24px, env(safe-area-inset-bottom, 24px));
-      right: max(16px, env(safe-area-inset-right, 16px));
-      z-index: 2147483647;
+      position: relative;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     #zr-widget-btn {
@@ -434,12 +446,16 @@
       font-weight: 600;
     }
   `;
-  document.head.appendChild(style);
 
-  // Widget Container
+  // Mount Widget inside Closed Shadow DOM for absolute isolation from host page styles and tampering
+  var hostElement = document.createElement("div");
+  hostElement.id = "zeroroute-widget-root";
+
+  var shadowRoot = hostElement.attachShadow ? hostElement.attachShadow({ mode: "closed" }) : hostElement;
+  shadowRoot.appendChild(style);
+
   var container = document.createElement("div");
   container.id = "zr-widget-container";
-
   container.innerHTML = `
     <div id="zr-widget-box">
       <div id="zr-header">
@@ -476,18 +492,63 @@
       <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
     </button>
   `;
-  document.body.appendChild(container);
+  shadowRoot.appendChild(container);
+  document.body.appendChild(hostElement);
 
-  var widgetBtn = document.getElementById("zr-widget-btn");
-  var widgetBox = document.getElementById("zr-widget-box");
-  var closeBtn = document.getElementById("zr-close-btn");
-  var messagesContainer = document.getElementById("zr-messages");
-  var suggestionsWrapper = document.getElementById("zr-suggestions-wrapper");
-  var suggestionsContainer = document.getElementById("zr-suggestions");
-  var inputForm = document.getElementById("zr-input-area");
-  var inputField = document.getElementById("zr-input");
-  var botTitleElem = document.getElementById("zr-bot-title");
-  var avatarLogoElem = document.getElementById("zr-avatar-logo");
+  function getEl(id) {
+    return shadowRoot.getElementById ? shadowRoot.getElementById(id) : shadowRoot.querySelector("#" + id);
+  }
+
+  var widgetBtn = getEl("zr-widget-btn");
+  var widgetBox = getEl("zr-widget-box");
+  var closeBtn = getEl("zr-close-btn");
+  var messagesContainer = getEl("zr-messages");
+  var suggestionsWrapper = getEl("zr-suggestions-wrapper");
+  var suggestionsContainer = getEl("zr-suggestions");
+  var inputForm = getEl("zr-input-area");
+  var inputField = getEl("zr-input");
+  var botTitleElem = getEl("zr-bot-title");
+  var avatarLogoElem = getEl("zr-avatar-logo");
+  var footerBadgeElem = getEl("zr-footer-badge");
+
+  // Tamper-Proof Watchdog for Free Tier
+  function initBrandingWatchdog() {
+    var ensureBadgeIntegrity = function () {
+      if (!footerBadgeElem) {
+        footerBadgeElem = getEl("zr-footer-badge");
+      }
+      if (!footerBadgeElem) return;
+
+      // 1. Force visibility against any script overrides
+      if (footerBadgeElem.style.display === "none") {
+        footerBadgeElem.style.setProperty("display", "block", "important");
+      }
+      if (footerBadgeElem.style.visibility === "hidden") {
+        footerBadgeElem.style.setProperty("visibility", "visible", "important");
+      }
+      if (parseFloat(footerBadgeElem.style.opacity) < 0.5) {
+        footerBadgeElem.style.setProperty("opacity", "1", "important");
+      }
+      // 2. Ensure badge is present in widgetBox DOM
+      var box = getEl("zr-widget-box");
+      if (box && !box.contains(footerBadgeElem)) {
+        box.appendChild(footerBadgeElem);
+      }
+      // 3. Ensure anchor link integrity
+      var link = footerBadgeElem.querySelector("a");
+      if (!link || !link.href || !link.href.includes("zeroroute")) {
+        footerBadgeElem.innerHTML = '<a href="https://zeroroute.mapki.in" target="_blank" rel="noopener noreferrer">⚡ Powered by <span>ZeroRoute</span></a>';
+      }
+    };
+
+    setInterval(ensureBadgeIntegrity, 2000);
+    if (typeof MutationObserver !== "undefined") {
+      var observer = new MutationObserver(function () {
+        ensureBadgeIntegrity();
+      });
+      observer.observe(container, { childList: true, subtree: true, attributes: true });
+    }
+  }
 
   var isOpen = false;
   var chatHistory = [];
@@ -643,10 +704,10 @@
         }
       }
 
-      var footerBadgeElem = document.getElementById("zr-footer-badge");
       if (footerBadgeElem) {
         if (bot.showBadge) {
           footerBadgeElem.style.display = "block";
+          initBrandingWatchdog();
         } else {
           footerBadgeElem.style.display = "none";
         }
