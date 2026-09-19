@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, getCustomerByTokenOrKey } from "@/lib/auth/session";
 import { getDb, initDb } from "@/lib/db";
 import { generateApiKey } from "@/lib/auth/password";
@@ -41,6 +41,10 @@ export async function POST(req: NextRequest) {
       sql: "UPDATE request_logs SET customer_key = ? WHERE customer_key = ?",
       args: [newKey, customer.key],
     });
+
+    const { invalidateSessionCache, invalidateCustomerLookupCache } = await import("@/lib/auth/session");
+    invalidateSessionCache();
+    invalidateCustomerLookupCache();
 
     return NextResponse.json({
       success: true,

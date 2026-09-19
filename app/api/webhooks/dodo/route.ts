@@ -140,6 +140,10 @@ export async function POST(request: Request) {
           console.log(`[DodoWebhook] Paused subscriber: ${customerEmail}`);
         }
       }
+
+      const { invalidateSessionCache, invalidateCustomerLookupCache } = await import("@/lib/auth/session");
+      invalidateSessionCache();
+      invalidateCustomerLookupCache();
     }
 
     return NextResponse.json({ received: true });

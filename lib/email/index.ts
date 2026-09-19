@@ -20,6 +20,7 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
     try {
       const res = await fetch("https://api.resend.com/emails", {
         method: "POST",
+        signal: AbortSignal.timeout(3000),
         headers: {
           Authorization: `Bearer ${resendApiKey}`,
           "Content-Type": "application/json",
@@ -52,6 +53,7 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
     try {
       const res = await fetch(webhookUrl, {
         method: "POST",
+        signal: AbortSignal.timeout(3000),
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           to,

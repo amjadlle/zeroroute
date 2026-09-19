@@ -223,7 +223,7 @@ function OnboardingContent() {
       // Redirect to /app dashboard with key if present
       const finalKey = data.customer?.key || customerKey || tokenFromUrl;
       const targetUrl = finalKey ? `/app?key=${encodeURIComponent(finalKey)}` : "/app";
-      router.push(targetUrl);
+      window.location.href = targetUrl;
     } catch {
       setError("An unexpected error occurred while saving setup.");
       setLoading(false);

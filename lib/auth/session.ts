@@ -30,11 +30,46 @@ interface SessionCacheEntry {
   customer: Customer;
   expiresAt: number;
 }
-const sessionCache = new Map<string, SessionCacheEntry>();
+const globalForAuth = globalThis as unknown as {
+  zrSessionCache?: Map<string, SessionCacheEntry>;
+  zrCustomerLookupCache?: Map<string, CustomerLookupEntry>;
+};
+
+const sessionCache = globalForAuth.zrSessionCache || new Map<string, SessionCacheEntry>();
+if (!globalForAuth.zrSessionCache) globalForAuth.zrSessionCache = sessionCache;
 
 export function invalidateSessionCache(tokenOrKey?: string) {
   if (tokenOrKey) sessionCache.delete(tokenOrKey);
   else sessionCache.clear();
+}
+
+interface CustomerLookupEntry {
+  customer: any;
+  expiresAt: number;
+}
+const customerLookupCache = globalForAuth.zrCustomerLookupCache || new Map<string, CustomerLookupEntry>();
+if (!globalForAuth.zrCustomerLookupCache) globalForAuth.zrCustomerLookupCache = customerLookupCache;
+
+export function getCachedCustomer(id: string): any | null {
+  const cached = customerLookupCache.get(id);
+  if (cached && Date.now() < cached.expiresAt) {
+    return cached.customer;
+  }
+  return null;
+}
+
+export function setCachedCustomer(id: string, customer: any, ttlMs = 5000) {
+  customerLookupCache.set(id, { customer, expiresAt: Date.now() + ttlMs });
+  if (customer.key) customerLookupCache.set(customer.key, { customer, expiresAt: Date.now() + ttlMs });
+  if (customer.bot_id) customerLookupCache.set(customer.bot_id, { customer, expiresAt: Date.now() + ttlMs });
+}
+
+export function invalidateCustomerLookupCache(tokenOrKey?: string) {
+  if (tokenOrKey) {
+    customerLookupCache.delete(tokenOrKey);
+  } else {
+    customerLookupCache.clear();
+  }
 }
 
 export async function getCurrentUser(): Promise<Customer | null> {

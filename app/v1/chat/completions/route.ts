@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
-import { isMasterAdminKey } from "@/lib/auth/session";
+import { isMasterAdminKey, getCachedCustomer, setCachedCustomer } from "@/lib/auth/session";
 import { getDb } from "@/lib/db";
 import { isRateLimited } from "@/lib/auth/rate-limit";
 import { getEligibleProviders, TIMEOUT_MS, COOLDOWN_MS } from "@/lib/providers/state";
@@ -24,12 +24,6 @@ export async function OPTIONS(request: Request) {
     headers: getCorsHeaders(origin)
   });
 }
-
-interface CustomerLookupEntry {
-  customer: any;
-  expiresAt: number;
-}
-const customerLookupCache = new Map<string, CustomerLookupEntry>();
 
 export async function POST(request: Request) {
   const startTime = Date.now();
@@ -84,9 +78,9 @@ export async function POST(request: Request) {
   const lookupIdentifier = customerKey || (rawBotId && rawBotId !== "demo" ? rawBotId : null) || (bearerToken && bearerToken.length > 5 && !isMasterKey ? bearerToken : null);
 
   if (lookupIdentifier) {
-    const cached = customerLookupCache.get(lookupIdentifier);
-    if (cached && Date.now() < cached.expiresAt) {
-      customer = cached.customer;
+    const cached = getCachedCustomer(lookupIdentifier);
+    if (cached) {
+      customer = cached;
       if (customer) customerKey = customer.key;
     }
   }
@@ -120,9 +114,7 @@ export async function POST(request: Request) {
     }
 
     if (customer) {
-      customerLookupCache.set(lookupIdentifier, { customer, expiresAt: Date.now() + 60_000 });
-      if (customer.key) customerLookupCache.set(customer.key, { customer, expiresAt: Date.now() + 60_000 });
-      if (customer.bot_id) customerLookupCache.set(customer.bot_id, { customer, expiresAt: Date.now() + 60_000 });
+      setCachedCustomer(lookupIdentifier, customer);
     }
   }
 

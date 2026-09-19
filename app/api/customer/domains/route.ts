@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { getSessionFromCookie } from "@/lib/auth/session";
+import { getSessionFromCookie, invalidateCustomerLookupCache, invalidateSessionCache } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
@@ -16,9 +16,12 @@ export async function POST(request: Request) {
 
     const db = getDb();
     await db.execute({
-      sql: `UPDATE customers SET allowed_domains = ?, updated_at = ? WHERE key = ?`,
-      args: [JSON.stringify(domains), Date.now(), session.key]
+      sql: `UPDATE customers SET allowed_domains = ?, updated_at = ? WHERE id = ?`,
+      args: [JSON.stringify(domains), Date.now(), session.id]
     });
+
+    invalidateCustomerLookupCache();
+    invalidateSessionCache();
 
     return NextResponse.json({
       success: true,

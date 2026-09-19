@@ -1,4 +1,23 @@
 import crypto from "crypto";
+import fs from "fs";
+import path from "path";
+
+try {
+  const envPath = path.join(process.cwd(), ".env.local");
+  if (fs.existsSync(envPath)) {
+    const lines = fs.readFileSync(envPath, "utf-8").split("\n");
+    for (const line of lines) {
+      const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
+      if (match) {
+        const key = match[1];
+        let val = (match[2] || "").trim();
+        if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
+        if (val.startsWith("'") && val.endsWith("'")) val = val.slice(1, -1);
+        if (!process.env[key]) process.env[key] = val;
+      }
+    }
+  }
+} catch {}
 
 const BASE_URL = "http://localhost:3000";
 
@@ -283,13 +302,16 @@ async function runFullSuite() {
     const forgotData = await forgotRes.json();
     assert(forgotRes.status === 200 && forgotData.success, "POST /api/auth/forgot-password generates 6-digit OTP");
 
-    // Fetch OTP directly from DB
-    const db = (await import("../lib/db")).getDb();
-    const otpRes = await db.execute({
-      sql: "SELECT code FROM auth_otps WHERE email = ? LIMIT 1",
-      args: [userEmail],
-    });
-    const otpCode = String(otpRes.rows[0]?.code || "");
+    // Fetch OTP from debug response or directly from DB
+    let otpCode = forgotData.debugOtp;
+    if (!otpCode) {
+      const db = (await import("../lib/db")).getDb();
+      const otpRes = await db.execute({
+        sql: "SELECT code FROM auth_otps WHERE email = ? LIMIT 1",
+        args: [userEmail],
+      });
+      otpCode = String(otpRes.rows[0]?.code || "");
+    }
 
     const resetRes = await fetch(`${BASE_URL}/api/auth/reset-password`, {
       method: "POST",

@@ -49,11 +49,8 @@ function LoginForm() {
       }
 
       // Dynamic redirect based on role (Admin -> /admin, Customer -> /app)
-      if (data.redirect === "/admin" || data.role === "admin") {
-        router.push("/admin");
-      } else {
-        router.push("/app");
-      }
+      const target = data.redirect || (data.role === "admin" ? "/admin" : "/app");
+      window.location.href = target;
     } catch {
       setError("An unexpected network error occurred. Please try again.");
       setLoading(false);

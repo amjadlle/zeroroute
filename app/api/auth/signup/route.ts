@@ -98,23 +98,28 @@ export async function POST(req: NextRequest) {
       ],
     });
 
-    // Dispatch transactional welcome email
-    try {
-      const { sendWelcomeCredentialsEmail } = await import("@/lib/email");
-      await sendWelcomeCredentialsEmail({
-        email,
-        name: name || email.split("@")[0],
-        key: apiKey,
-        botId,
+    // Dispatch transactional welcome email in background (non-blocking)
+    import("@/lib/email")
+      .then(({ sendWelcomeCredentialsEmail }) => {
+        sendWelcomeCredentialsEmail({
+          email,
+          name: name || email.split("@")[0],
+          key: apiKey,
+          botId,
+        }).catch((emailErr) => {
+          console.warn("[Signup] Welcome credentials email error:", emailErr);
+        });
+      })
+      .catch((err) => {
+        console.warn("[Signup] Failed to import email service:", err);
       });
-    } catch (emailErr) {
-      console.warn("[Signup] Welcome credentials email error:", emailErr);
-    }
 
     const response = NextResponse.json({
       success: true,
       message: "Account created successfully!",
       token: sessionToken,
+      role: "customer",
+      redirect: "/app",
       customer: {
         id,
         key: apiKey,
