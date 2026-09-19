@@ -206,6 +206,8 @@ export const initDb = async (): Promise<void> => {
       db.execute(`CREATE INDEX IF NOT EXISTS idx_customers_email ON customers(email);`),
       db.execute(`CREATE INDEX IF NOT EXISTS idx_customers_key ON customers(key);`),
       db.execute(`CREATE INDEX IF NOT EXISTS idx_knowledge_customer ON knowledge_documents(customer_key);`),
+      db.execute(`CREATE INDEX IF NOT EXISTS idx_knowledge_created ON knowledge_documents(created_at);`),
+      db.execute(`CREATE INDEX IF NOT EXISTS idx_knowledge_type ON knowledge_documents(type);`),
       db.execute(`CREATE INDEX IF NOT EXISTS idx_logs_customer ON request_logs(customer_key);`),
     ]);
 

@@ -58,7 +58,7 @@ export function getCachedCustomer(id: string): any | null {
   return null;
 }
 
-export function setCachedCustomer(id: string, customer: any, ttlMs = 5000) {
+export function setCachedCustomer(id: string, customer: any, ttlMs = 30_000) {
   customerLookupCache.set(id, { customer, expiresAt: Date.now() + ttlMs });
   if (customer.key) customerLookupCache.set(customer.key, { customer, expiresAt: Date.now() + ttlMs });
   if (customer.bot_id) customerLookupCache.set(customer.bot_id, { customer, expiresAt: Date.now() + ttlMs });

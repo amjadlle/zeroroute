@@ -260,41 +260,43 @@ export async function POST(request: Request) {
   // 4. Dynamic System Prompt & RAG Context Injection
   const lastUserMsg = [...body.messages].reverse().find(m => m.role === "user")?.content || "";
   let ragContext = "";
-  let defaultKnowledge = "";
   let defaultPersona = "";
 
   if (customerKey) {
-    ragContext = await retrieveKnowledgeContext(customerKey, lastUserMsg, 2500);
+    ragContext = await retrieveKnowledgeContext(customerKey, lastUserMsg, 3000);
   } else {
     const defaults = getDefaultLandingKnowledge();
-    defaultKnowledge = defaults.knowledge;
     defaultPersona = defaults.persona;
-    ragContext = defaultKnowledge;
+    ragContext = defaults.knowledge;
   }
-
-  let promptList: string[] = [];
-  try {
-    if (customer?.prompts) promptList = typeof customer.prompts === "string" ? JSON.parse(customer.prompts) : customer.prompts;
-  } catch {}
 
   const dynamicSystemPrompt = buildDynamicSystemPrompt({
     companyName: customer?.company || customer?.name || "ZeroRoute",
     botTitle: customer?.bot_title || "ZeroRoute AI Assistant",
     botRole: customer?.bot_role || "ZeroRoute AI & Multi-Cloud Specialist",
     tone: customer?.tone || "friendly, concise, and developer-focused",
-    greeting: customer?.greeting || "Hi! 👋 Welcome to ZeroRoute. How can I help you today?",
-    prompts: promptList.length > 0 ? promptList : ["Is it really 100% free?", "How does multi-cloud routing work?", "Show me curl example"],
     customPersona: customer?.persona || defaultPersona,
     knowledgeContext: ragContext
   });
 
-  const existingSystem = body.messages.find(m => m.role === "system");
-  if (existingSystem) {
-    body.messages = body.messages.map(m =>
-      m.role === "system" ? { ...m, content: `${dynamicSystemPrompt}\n\n${m.content}` } : m
-    );
+  // Security: For widget/bot requests, strip any client-supplied system messages entirely
+  // to prevent prompt-injection attacks. For direct API calls (bearer key only), allow
+  // the developer's system message to be appended after ours (trusted path).
+  const isWidgetRequest = Boolean(rawBotId);
+  if (isWidgetRequest) {
+    // Remove all client-sent system messages — our prompt is the only authority
+    const userAndAssistantMessages = body.messages.filter(m => m.role !== "system");
+    body.messages = [{ role: "system", content: dynamicSystemPrompt }, ...userAndAssistantMessages];
   } else {
-    body.messages = [{ role: "system", content: dynamicSystemPrompt }, ...body.messages];
+    // Direct API: prepend our system prompt, keep developer's system message appended
+    const existingSystem = body.messages.find(m => m.role === "system");
+    if (existingSystem) {
+      body.messages = body.messages.map(m =>
+        m.role === "system" ? { ...m, content: `${dynamicSystemPrompt}\n\n${m.content}` } : m
+      );
+    } else {
+      body.messages = [{ role: "system", content: dynamicSystemPrompt }, ...body.messages];
+    }
   }
 
   // 5. Response Caching Check
