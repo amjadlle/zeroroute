@@ -248,6 +248,30 @@ async function runFullSuite() {
     assert(false, "Domains test error", e);
   }
 
+  // 11. Request Quota Limit Enforcement (429)
+  try {
+    const db = (await import("@/lib/db")).getDb();
+    // Force monthly limit to 1 for this test user
+    await db.execute({
+      sql: `UPDATE customers SET monthly_requests = 1, monthly_limit = 1 WHERE key = ?`,
+      args: [customerKey],
+    });
+
+    const quotaRes = await fetch(`${BASE_URL}/v1/chat/completions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${customerKey}`,
+        Origin: "https://myverifiedsite.com",
+      },
+      body: JSON.stringify({ messages: [{ role: "user", content: "test quota" }] }),
+    });
+    const quotaData = await quotaRes.json();
+    assert(quotaRes.status === 429 && quotaData.error?.type === "quota_exceeded", "Quota limit enforcement blocks request with 429 Too Many Requests", quotaData);
+  } catch (e) {
+    assert(false, "Quota enforcement test error", e);
+  }
+
   // 11. Dodo Payments Webhook Lifecycle
   try {
     const webhookSecret = process.env.DODO_WEBHOOK_SECRET || "whsec_test_secret_12345678";

@@ -220,12 +220,19 @@ export async function POST(request: Request) {
   }
 
   // 3. Customer subscription & quota check
-  if (customer) {
-    if (customer.status !== "active") {
+  if (customer && customer.key) {
+    // Query live real-time usage and limit from database for 100% precision
+    const liveCustRes = await db.execute({
+      sql: `SELECT status, monthly_requests, monthly_limit FROM customers WHERE key = ? LIMIT 1`,
+      args: [customer.key]
+    });
+    const liveCust = (liveCustRes.rows[0] as any) || customer;
+
+    if (liveCust.status !== "active") {
       return NextResponse.json(
         {
           error: {
-            message: `Your ZeroRoute subscription is currently inactive (${customer.status}). Please visit your dashboard to manage billing.`,
+            message: `Your ZeroRoute subscription is currently inactive (${liveCust.status}). Please visit your dashboard to manage billing.`,
             type: "subscription_inactive"
           }
         },
@@ -233,14 +240,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const currentUsage = Number(customer.monthly_requests || 0);
-    const limit = Number(customer.monthly_limit || 10000);
+    const currentUsage = Number(liveCust.monthly_requests || 0);
+    const limit = Number(liveCust.monthly_limit !== undefined ? liveCust.monthly_limit : 500);
 
     if (currentUsage >= limit) {
       return NextResponse.json(
         {
           error: {
-            message: `Monthly request quota of ${limit.toLocaleString()} requests reached. Please upgrade your plan or wait for the next billing cycle.`,
+            message: `Monthly request quota of ${limit.toLocaleString()} requests reached (${currentUsage}/${limit} used). Please upgrade to ZeroRoute Pro for 10,000 requests/month.`,
             type: "quota_exceeded",
             limit,
             current: currentUsage
@@ -250,7 +257,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Increment usage counter asynchronously
+    // Increment usage counter in DB
     db.execute({
       sql: `UPDATE customers SET monthly_requests = monthly_requests + 1, updated_at = ? WHERE key = ?`,
       args: [Date.now(), customer.key]

@@ -229,8 +229,14 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
       });
 
       if (!res.ok || !res.body) {
-        const fallbackReply = `I am ${botTitle || "ZeroRoute Assistant"}, powered by ZeroRoute's multi-cloud gateway. I have received your message: "${textToSend.trim()}". All requests route dynamically with sub-8ms latency across our provider pool!`;
-        await runTypewriterSimulation(fallbackReply, newHistory);
+        let errorNotice = `⚠️ **Request Blocked (HTTP ${res.status}):** Unable to process chat request.`;
+        try {
+          const errData = await res.json();
+          if (errData?.error?.message) {
+            errorNotice = `🚫 **Request Blocked:** ${errData.error.message}`;
+          }
+        } catch {}
+        await runTypewriterSimulation(errorNotice, newHistory);
         setChatStreaming(false);
         return;
       }
