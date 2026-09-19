@@ -248,7 +248,7 @@ async function runFullSuite() {
     assert(false, "Domains test error", e);
   }
 
-  // 11. Request Quota Limit Enforcement (429)
+  // 11. Request Quota Limit Enforcement (429) - Developer API & Public Widget Visitor
   try {
     const db = (await import("@/lib/db")).getDb();
     // Force monthly limit to 1 for this test user
@@ -257,6 +257,7 @@ async function runFullSuite() {
       args: [customerKey],
     });
 
+    // 11a. Direct API / Subscriber Console: gets developer message with metrics & upgrade advice
     const quotaRes = await fetch(`${BASE_URL}/v1/chat/completions`, {
       method: "POST",
       headers: {
@@ -267,7 +268,32 @@ async function runFullSuite() {
       body: JSON.stringify({ messages: [{ role: "user", content: "test quota" }] }),
     });
     const quotaData = await quotaRes.json();
-    assert(quotaRes.status === 429 && quotaData.error?.type === "quota_exceeded", "Quota limit enforcement blocks request with 429 Too Many Requests", quotaData);
+    assert(
+      quotaRes.status === 429 &&
+      quotaData.error?.type === "quota_exceeded" &&
+      quotaData.error?.message.includes("Monthly request quota of 1 requests reached"),
+      "Developer API: Quota limit returns detailed upgrade error message",
+      quotaData
+    );
+
+    // 11b. Public Website Widget Visitor: gets polite visitor-friendly message
+    const visitorQuotaRes = await fetch(`${BASE_URL}/v1/chat/completions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Bot-Id": botId,
+        Origin: "https://myverifiedsite.com",
+      },
+      body: JSON.stringify({ messages: [{ role: "user", content: "test visitor quota" }] }),
+    });
+    const visitorQuotaData = await visitorQuotaRes.json();
+    assert(
+      visitorQuotaRes.status === 429 &&
+      visitorQuotaData.error?.type === "quota_exceeded" &&
+      visitorQuotaData.error?.message.includes("reached its monthly conversation limit"),
+      "Public Website Widget: Quota limit returns visitor-friendly error message",
+      visitorQuotaData
+    );
   } catch (e) {
     assert(false, "Quota enforcement test error", e);
   }

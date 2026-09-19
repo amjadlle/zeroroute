@@ -228,11 +228,16 @@ export async function POST(request: Request) {
     });
     const liveCust = (liveCustRes.rows[0] as any) || customer;
 
+    const isPublicWidget = Boolean(rawBotId && !bearerToken);
+
     if (liveCust.status !== "active") {
+      const errorMessage = isPublicWidget
+        ? "This assistant is temporarily unavailable. Please contact the website owner or try again later."
+        : `Your ZeroRoute subscription is currently inactive (${liveCust.status}). Please visit your dashboard to manage billing.`;
       return NextResponse.json(
         {
           error: {
-            message: `Your ZeroRoute subscription is currently inactive (${liveCust.status}). Please visit your dashboard to manage billing.`,
+            message: errorMessage,
             type: "subscription_inactive"
           }
         },
@@ -244,10 +249,13 @@ export async function POST(request: Request) {
     const limit = Number(liveCust.monthly_limit !== undefined ? liveCust.monthly_limit : 500);
 
     if (currentUsage >= limit) {
+      const errorMessage = isPublicWidget
+        ? "This assistant has reached its monthly conversation limit and is temporarily unavailable. Please contact the website owner or check back next month."
+        : `Monthly request quota of ${limit.toLocaleString()} requests reached (${currentUsage}/${limit} used). Please upgrade to ZeroRoute Pro for 10,000 requests/month.`;
       return NextResponse.json(
         {
           error: {
-            message: `Monthly request quota of ${limit.toLocaleString()} requests reached (${currentUsage}/${limit} used). Please upgrade to ZeroRoute Pro for 10,000 requests/month.`,
+            message: errorMessage,
             type: "quota_exceeded",
             limit,
             current: currentUsage
