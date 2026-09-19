@@ -8,7 +8,7 @@ interface PricingProps {
 
 export function Pricing({ onOpenCheckout }: PricingProps) {
   return (
-    <section id="pricing" className="space-y-10 scroll-mt-20 max-w-5xl mx-auto">
+    <section id="pricing" className="space-y-10 scroll-mt-20 max-w-7xl mx-auto">
       <div className="text-center space-y-3">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-400 text-xs font-semibold">
           <span>⚡ Simple, Transparent Options</span>
@@ -21,16 +21,74 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6 lg:gap-8 items-stretch">
-        {/* Free Forever Plan */}
-        <div className="relative flex flex-col justify-between p-6 sm:p-8 bg-dark-card/90 border border-dark-border rounded-3xl backdrop-blur-xl shadow-xl space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-7 items-stretch">
+        {/* 1. DIY Self-Hosted Plan */}
+        <div className="relative flex flex-col justify-between p-6 sm:p-7 bg-dark-card/90 border border-dark-border rounded-3xl backdrop-blur-xl shadow-xl space-y-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                  Starter Plan
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono">
+                  Open-Source
                 </span>
-                <h3 className="text-2xl font-bold text-white mt-1">Free Forever</h3>
+                <h3 className="text-2xl font-bold text-white mt-1">DIY Self-Hosted</h3>
+              </div>
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+                100% FREE
+              </span>
+            </div>
+            <p className="text-xs sm:text-sm text-slate-400">
+              For tinkerers and developers who want complete control and full source code on their own infrastructure.
+            </p>
+            <div className="text-3xl sm:text-4xl font-extrabold text-white font-mono pt-2">
+              $0 <span className="text-sm font-normal text-slate-400 font-sans">/ forever</span>
+            </div>
+
+            <ul className="space-y-3 text-xs sm:text-sm text-slate-300 pt-4 border-t border-dark-border">
+              <li className="flex items-center gap-2.5">
+                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Full TypeScript source code (MIT License)</span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Deploy to Cloudflare Workers / Docker / VPS</span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Bring your own 11 provider API keys (BYOK)</span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Unlimited requests on your own infrastructure</span>
+              </li>
+              <li className="flex items-center gap-2.5 text-slate-400">
+                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Community GitHub issues &amp; discussions</span>
+              </li>
+            </ul>
+          </div>
+
+          <a
+            href="https://github.com/amjadlle/zeroroute"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold bg-white/[0.08] hover:bg-white/[0.15] text-white border border-white/15 transition-all active:scale-95 shadow-md min-h-[44px] touch-manipulation cursor-pointer"
+          >
+            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+            </svg>
+            <span>GitHub Repo (Free)</span>
+          </a>
+        </div>
+
+        {/* 2. Free Hosted Plan */}
+        <div className="relative flex flex-col justify-between p-6 sm:p-7 bg-dark-card/90 border border-dark-border rounded-3xl backdrop-blur-xl shadow-xl space-y-6">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono">
+                  Starter Cloud
+                </span>
+                <h3 className="text-2xl font-bold text-white mt-1">Free Hosted</h3>
               </div>
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
                 $0 FOREVER
@@ -40,7 +98,7 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
               Perfect for testing, personal projects, and launching your first embeddable AI website assistant.
             </p>
             <div className="text-3xl sm:text-4xl font-extrabold text-white font-mono pt-2">
-              $0 <span className="text-sm font-normal text-slate-400 font-sans">/ month (No credit card needed)</span>
+              $0 <span className="text-sm font-normal text-slate-400 font-sans">/ month (No card needed)</span>
             </div>
 
             <ul className="space-y-3 text-xs sm:text-sm text-slate-300 pt-4 border-t border-dark-border">
@@ -79,8 +137,8 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
           </a>
         </div>
 
-        {/* Managed ZeroRoute Pro Plan - Radiant Violet Theme */}
-        <div className="relative flex flex-col justify-between p-6 sm:p-8 bg-gradient-to-b from-[#180e2b] via-[#120a21] to-[#0a0514] border-2 border-violet-500/70 rounded-3xl shadow-2xl shadow-violet-500/20 ring-1 ring-violet-400/30 space-y-6">
+        {/* 3. Managed ZeroRoute Pro Plan - Radiant Violet Theme */}
+        <div className="relative flex flex-col justify-between p-6 sm:p-7 bg-gradient-to-b from-[#180e2b] via-[#120a21] to-[#0a0514] border-2 border-violet-500/70 rounded-3xl shadow-2xl shadow-violet-500/20 ring-1 ring-violet-400/30 space-y-6 md:col-span-2 lg:col-span-1">
           {/* Subtle Ambient Violet Glow */}
           <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
             <div className="absolute -top-24 -right-24 w-64 h-64 bg-violet-600/20 rounded-full blur-3xl" />
