@@ -246,33 +246,50 @@ export function OverviewTab({
           </div>
         </div>
 
-        {/* Subscription / Trial Status */}
+        {/* Subscription / Plan Status */}
         <div className="p-6 bg-dark-card border border-dark-border rounded-2xl space-y-3 shadow-xl">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
               Subscription Status
             </span>
-            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-mono">
-              Active Pro
+            <span className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
+              monthlyLimit >= 10000
+                ? "bg-violet-500/15 text-violet-300 border border-violet-500/30"
+                : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
+            }`}>
+              {monthlyLimit >= 10000 ? "Active Pro" : "Free Forever"}
             </span>
           </div>
 
           <div className="text-3xl font-extrabold text-emerald-400 font-mono flex items-baseline gap-2">
-            <span>{daysRemaining}</span>
-            <span className="text-sm font-normal text-slate-400">Days Remaining</span>
+            {monthlyLimit >= 10000 ? (
+              <>
+                <span>{daysRemaining}</span>
+                <span className="text-sm font-normal text-slate-400">Days Remaining</span>
+              </>
+            ) : (
+              <>
+                <span className="text-2xl sm:text-3xl">Perpetual</span>
+                <span className="text-sm font-normal text-slate-400">Free Access</span>
+              </>
+            )}
           </div>
 
           <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
             <div
-              className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500"
+              className={`h-full rounded-full transition-all duration-500 ${
+                monthlyLimit >= 10000
+                  ? "bg-gradient-to-r from-violet-500 to-indigo-400"
+                  : "bg-gradient-to-r from-emerald-500 to-teal-400"
+              }`}
               style={{
-                width: `${Math.min(100, Math.max(5, (daysRemaining / 30) * 100))}%`,
+                width: monthlyLimit >= 10000 ? `${Math.min(100, Math.max(5, (daysRemaining / 30) * 100))}%` : "100%",
               }}
             />
           </div>
 
           <div className="text-[11px] text-slate-400 pt-1">
-            Current Plan: <strong className="text-white font-semibold">ZeroRoute Cloud Pro ($3.99/mo)</strong>
+            Current Plan: <strong className="text-white font-semibold">{monthlyLimit >= 10000 ? "ZeroRoute Pro ($2.00/mo)" : "ZeroRoute Free ($0/mo)"}</strong>
           </div>
         </div>
       </div>

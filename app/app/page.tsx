@@ -182,6 +182,7 @@ export default function AppDashboard() {
         name={profile?.name}
         email={profile?.email}
         isAdmin={Boolean(profile?.is_admin)}
+        isPro={Boolean(profile?.monthly_limit && profile.monthly_limit >= 10000)}
         onLogout={handleLogout}
         onOpenBilling={() => setBillingOpen(true)}
       />
@@ -216,7 +217,7 @@ export default function AppDashboard() {
             apiKey={profile?.key || "zr_live_demo"}
             botId={profile?.bot_id || "bot_live_demo"}
             monthlyRequests={profile?.monthly_requests || 0}
-            monthlyLimit={profile?.monthly_limit || 2000}
+            monthlyLimit={profile?.monthly_limit || 500}
             daysRemaining={profile?.days_remaining || 0}
             onRotateKey={handleRotateKey}
             rotatingKey={rotatingKey}

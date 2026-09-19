@@ -122,7 +122,7 @@ export function BillingModal({
           ) : (
             <a
               href="/api/checkout"
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-lg shadow-red-500/20 active:scale-95 transition-all cursor-pointer touch-manipulation"
+              className="w-full flex items-center justify-center gap-2 py-3.5 px-4 min-h-[44px] rounded-xl text-xs sm:text-sm font-extrabold bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-xl shadow-violet-600/35 border border-violet-400/30 active:scale-95 transition-all cursor-pointer touch-manipulation"
             >
               <span>⚡ Upgrade to Pro ($2.00 / month)</span>
               <ExternalLink className="w-3.5 h-3.5" />

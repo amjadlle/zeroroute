@@ -8,11 +8,12 @@ interface DashboardHeaderProps {
   name?: string;
   email?: string;
   isAdmin?: boolean;
+  isPro?: boolean;
   onLogout: () => void;
   onOpenBilling?: () => void;
 }
 
-export function DashboardHeader({ name, email, isAdmin, onLogout, onOpenBilling }: DashboardHeaderProps) {
+export function DashboardHeader({ name, email, isAdmin, isPro, onLogout, onOpenBilling }: DashboardHeaderProps) {
   return (
     <header className="sticky top-0 z-40 bg-[#080a0f]/90 backdrop-blur-xl border-b border-dark-border px-3 sm:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-2">
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -44,10 +45,14 @@ export function DashboardHeader({ name, email, isAdmin, onLogout, onOpenBilling 
           <button
             type="button"
             onClick={onOpenBilling}
-            className="px-2.5 sm:px-3 py-1.5 min-h-[44px] rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 hover:border-red-500/30 transition-all text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-sm touch-manipulation"
+            className={`px-2.5 sm:px-3 py-1.5 min-h-[44px] rounded-xl transition-all text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm touch-manipulation ${
+              isPro
+                ? "bg-violet-500/15 hover:bg-violet-500/25 text-violet-300 border border-violet-500/30"
+                : "bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+            }`}
           >
-            <CreditCard className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-            <span>Plan</span>
+            <CreditCard className="w-3.5 h-3.5 shrink-0" />
+            <span>{isPro ? "Pro Plan" : "Free Plan"}</span>
           </button>
         )}
 
