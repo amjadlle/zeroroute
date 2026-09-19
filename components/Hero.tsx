@@ -50,7 +50,7 @@ export function Hero({ onOpenCheckout }: HeroProps) {
           className="inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-extrabold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white rounded-xl transition-all shadow-xl shadow-red-500/30 active:scale-95 cursor-pointer touch-manipulation min-h-[46px]"
         >
           <Zap className="w-4 h-4 fill-white" />
-          <span>⚡ Upgrade to Pro ($2.00/mo)</span>
+          <span>Upgrade to Pro ($2.00/mo)</span>
         </button>
 
         {/* Free Plan CTA */}
