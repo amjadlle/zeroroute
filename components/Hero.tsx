@@ -43,23 +43,23 @@ export function Hero({ onOpenCheckout }: HeroProps) {
 
       {/* Clean Action Buttons */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2.5 sm:gap-4 pt-2 max-w-md sm:max-w-none mx-auto w-full">
-        {/* Primary CTA */}
-        <Link
-          href="/login?tab=signup"
-          className="inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-bold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white rounded-xl transition-all shadow-xl shadow-red-500/20 active:scale-95 cursor-pointer touch-manipulation min-h-[44px]"
-        >
-          <Zap className="w-4 h-4 fill-white" />
-          <span>Get Started Free (500 req/mo)</span>
-        </Link>
-
-        {/* Pro Upgrade CTA */}
+        {/* Primary Pro Upgrade CTA in Signature Red */}
         <button
           type="button"
           onClick={onOpenCheckout}
-          className="inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-extrabold bg-gradient-to-r from-violet-600/30 via-purple-600/30 to-indigo-600/30 hover:from-violet-600/50 hover:to-indigo-600/50 text-violet-200 hover:text-white border border-violet-500/40 hover:border-violet-400/70 rounded-xl transition-all shadow-lg shadow-violet-500/20 active:scale-95 cursor-pointer touch-manipulation min-h-[44px]"
+          className="inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-extrabold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white rounded-xl transition-all shadow-xl shadow-red-500/30 active:scale-95 cursor-pointer touch-manipulation min-h-[46px]"
         >
+          <Zap className="w-4 h-4 fill-white" />
           <span>⚡ Upgrade to Pro ($2.00/mo)</span>
         </button>
+
+        {/* Free Plan CTA */}
+        <Link
+          href="/login?tab=signup"
+          className="inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-bold bg-white/10 hover:bg-white/15 text-white border border-white/15 rounded-xl transition-all active:scale-95 cursor-pointer touch-manipulation min-h-[46px]"
+        >
+          <span>🚀 Get Started Free (500 req/mo)</span>
+        </Link>
 
         {/* Live Chatbot Demo Trigger */}
         <button
@@ -79,7 +79,7 @@ export function Hero({ onOpenCheckout }: HeroProps) {
               }
             }
           }}
-          className="inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/30 rounded-xl transition-all active:scale-95 cursor-pointer touch-manipulation min-h-[44px]"
+          className="inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/30 rounded-xl transition-all active:scale-95 cursor-pointer touch-manipulation min-h-[46px]"
         >
           <MessageSquare className="w-4 h-4 text-red-400" />
           <span>Test Live Bot</span>
@@ -87,13 +87,13 @@ export function Hero({ onOpenCheckout }: HeroProps) {
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 text-xs text-slate-400 font-medium pt-1">
-        <span className="inline-flex items-center gap-1.5 text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span>Free Plan (500 req/mo)</span>
+        <span className="inline-flex items-center gap-1.5 text-red-400 font-bold bg-red-500/15 border border-red-500/30 px-2.5 py-0.5 rounded-full shadow-sm">
+          <span>Pro Tier: $2.00 / mo (10,000 req)</span>
         </span>
         <span className="text-slate-600">•</span>
-        <span className="inline-flex items-center gap-1.5 text-violet-300 font-bold bg-violet-500/15 border border-violet-500/30 px-2.5 py-0.5 rounded-full shadow-sm">
-          <span>Pro Tier: $2.00 / mo (10,000 req)</span>
+        <span className="inline-flex items-center gap-1.5 text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span>Free Forever (500 req/mo)</span>
         </span>
         <span className="text-slate-600">•</span>
         <span>No Credit Card Required</span>

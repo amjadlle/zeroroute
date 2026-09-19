@@ -134,19 +134,19 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
 
         {/* Right Column: Standalone Featured ZeroRoute Pro Plan */}
         <div className="lg:col-span-6 flex flex-col">
-          <div className="relative flex flex-col justify-between flex-1 p-6 sm:p-8 bg-gradient-to-b from-[#180e2b] via-[#120a21] to-[#0a0514] border-2 border-violet-500/70 rounded-3xl shadow-2xl shadow-violet-500/20 ring-1 ring-violet-400/30 space-y-6">
+          <div className="relative flex flex-col justify-between flex-1 p-6 sm:p-8 bg-gradient-to-b from-[#1c080a] via-[#130507] to-[#070203] border-2 border-red-500/80 rounded-3xl shadow-2xl shadow-red-500/25 ring-1 ring-red-400/40 space-y-6">
             {/* Popular Ribbon */}
-            <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 text-white shadow-lg shadow-purple-500/40 border border-violet-300/30 flex items-center gap-1 z-20">
+            <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 text-white shadow-lg shadow-red-500/40 border border-red-300/30 flex items-center gap-1 z-20">
               <span>★ Most Popular • White-Label</span>
             </div>
 
             <div className="space-y-4 relative z-10">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-violet-400 font-mono">
+                  <span className="text-xs font-bold uppercase tracking-wider text-red-400 font-mono">
                     Pro Cloud
                   </span>
-                  <h3 className="text-2xl sm:text-3xl font-extrabold text-white mt-1 bg-gradient-to-r from-white via-violet-100 to-violet-300 bg-clip-text text-transparent">
+                  <h3 className="text-2xl sm:text-3xl font-extrabold text-white mt-1 bg-gradient-to-r from-white via-rose-100 to-red-200 bg-clip-text text-transparent">
                     ZeroRoute Pro
                   </h3>
                 </div>
@@ -155,12 +155,12 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
                 For businesses and developers wanting 100% white-label branding, high traffic volume, and multi-domain support.
               </p>
               <div className="text-3xl sm:text-4xl font-extrabold text-white font-mono pt-1 flex items-baseline gap-1.5">
-                <span className="bg-gradient-to-r from-violet-200 to-white bg-clip-text text-transparent">$2.00</span>
-                <span className="text-sm font-normal text-violet-300/70 font-sans">
+                <span className="bg-gradient-to-r from-rose-200 to-white bg-clip-text text-transparent">$2.00</span>
+                <span className="text-sm font-normal text-rose-300/70 font-sans">
                   / month
                 </span>
               </div>
-              <div className="text-[11px] text-violet-300/70 font-mono -mt-1">
+              <div className="text-[11px] text-rose-300/70 font-mono -mt-1">
                 Apple Pay, Google Pay, Cards &amp; UPI Supported
               </div>
 
@@ -195,7 +195,7 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
               </div>
 
               {/* Pro Feature Checklist */}
-              <ul className="space-y-2.5 text-xs sm:text-sm text-slate-200 pt-2 border-t border-violet-500/20">
+              <ul className="space-y-2.5 text-xs sm:text-sm text-slate-200 pt-2 border-t border-red-500/20">
                 <li className="flex items-center gap-2.5">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span>
@@ -203,7 +203,7 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
                   </span>
                 </li>
                 <li className="flex items-center gap-2.5">
-                  <span className="text-[10px] font-mono font-bold bg-violet-500/25 text-violet-300 border border-violet-400/30 px-2 py-0.5 rounded-full shrink-0">
+                  <span className="text-[10px] font-mono font-bold bg-red-500/25 text-red-300 border border-red-400/30 px-2 py-0.5 rounded-full shrink-0">
                     PRO
                   </span>
                   <span>
@@ -211,37 +211,37 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
                   </span>
                 </li>
                 <li className="flex items-center gap-2.5">
-                  <Check className="w-4 h-4 text-violet-400 shrink-0" />
+                  <Check className="w-4 h-4 text-red-400 shrink-0" />
                   <span>
                     <strong>Up to 3 Whitelisted Domains</strong> (Anti-hijack security)
                   </span>
                 </li>
                 <li className="flex items-center gap-2.5">
-                  <Check className="w-4 h-4 text-violet-400 shrink-0" />
+                  <Check className="w-4 h-4 text-red-400 shrink-0" />
                   <span>
                     <strong>11 Clouds Pooled &amp; Managed</strong> for 99.9% uptime
                   </span>
                 </li>
                 <li className="flex items-center gap-2.5">
-                  <Check className="w-4 h-4 text-violet-400 shrink-0" />
+                  <Check className="w-4 h-4 text-red-400 shrink-0" />
                   <span>
                     <strong>Knowledge Base &amp; Semantic RAG</strong> (Docs &amp; FAQs)
                   </span>
                 </li>
                 <li className="flex items-center gap-2.5">
-                  <Check className="w-4 h-4 text-violet-400 shrink-0" />
+                  <Check className="w-4 h-4 text-red-400 shrink-0" />
                   <span>
                     <strong>Custom AI Brand Persona</strong> &amp; Tone customizer
                   </span>
                 </li>
                 <li className="flex items-center gap-2.5">
-                  <Check className="w-4 h-4 text-violet-400 shrink-0" />
+                  <Check className="w-4 h-4 text-red-400 shrink-0" />
                   <span>
                     <strong>Private Visitor Chat Logs</strong> &amp; Question History
                   </span>
                 </li>
                 <li className="flex items-center gap-2.5">
-                  <Check className="w-4 h-4 text-violet-400 shrink-0" />
+                  <Check className="w-4 h-4 text-red-400 shrink-0" />
                   <span>
                     <strong>Sub-8ms High Speed Routing</strong> with automatic failover
                   </span>
@@ -253,11 +253,11 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
               <button
                 type="button"
                 onClick={onOpenCheckout}
-                className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-xs sm:text-sm font-extrabold bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-xl shadow-violet-600/35 border border-violet-400/30 transition-all active:scale-95 cursor-pointer min-h-[46px] touch-manipulation"
+                className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-xs sm:text-sm font-extrabold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-xl shadow-red-600/35 border border-red-400/30 transition-all active:scale-95 cursor-pointer min-h-[46px] touch-manipulation"
               >
                 <span>⚡ Upgrade to Pro ($2.00 / month)</span>
               </button>
-              <div className="flex items-center justify-center gap-3 text-[11px] text-violet-300/60 font-mono">
+              <div className="flex items-center justify-center gap-3 text-[11px] text-rose-300/60 font-mono">
                 <span>Instant automated activation</span>
                 <span>•</span>
                 <span>Cancel anytime</span>
