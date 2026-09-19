@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import { 
-  Copy, Bot, Send, Check, Sparkles, ShieldCheck, 
+  Copy, Send, Check, Sparkles, ShieldCheck, 
   User, CornerDownLeft, RefreshCw 
 } from "lucide-react";
 
@@ -203,7 +204,8 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
     if (!textToSend.trim() || chatStreaming) return;
 
     const newHistory = [...chatMessages, { role: "user" as const, content: textToSend.trim() }];
-    setChatMessages(newHistory);
+    // Instantly add assistant placeholder so thinking animation starts in the reply bubble immediately
+    setChatMessages([...newHistory, { role: "assistant", content: "" }]);
     setChatInput("");
     setChatStreaming(true);
 
@@ -238,9 +240,6 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
       const decoder = new TextDecoder();
       let buffer = "";
       let streamedResponse = "";
-
-      // Add empty assistant response slot (shows animated Thinking state while content is empty)
-      setChatMessages([...newHistory, { role: "assistant", content: "" }]);
 
       while (true) {
         const { done, value } = await reader.read();
@@ -306,8 +305,15 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
       {/* ChatGPT-Style Top Header Bar */}
       <div className="px-5 py-3.5 bg-dark-card/90 backdrop-blur-md border-b border-dark-border flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-600/25 to-rose-600/10 border border-red-500/30 flex items-center justify-center text-red-400 shadow-md">
-            <Bot className="w-5 h-5" />
+          <div className="w-9 h-9 rounded-xl bg-[#0e131f] border border-white/15 flex items-center justify-center p-1.5 shadow-md shrink-0">
+            <Image
+              src="/logo.png"
+              alt="ZeroRoute Logo"
+              width={24}
+              height={24}
+              className="w-5 h-5 object-contain"
+              priority
+            />
           </div>
           <div>
             <div className="flex items-center gap-2">
@@ -351,10 +357,16 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
                 key={i}
                 className={`flex gap-3.5 ${m.role === "user" ? "justify-end" : "justify-start"} animate-in fade-in duration-200 group`}
               >
-                {/* Assistant Avatar */}
+                {/* Assistant Avatar with ZeroRoute Logo */}
                 {m.role === "assistant" && (
-                  <div className="w-8 h-8 rounded-xl bg-red-600/15 border border-red-500/25 flex items-center justify-center text-red-400 shrink-0 mt-0.5">
-                    <Bot className="w-4 h-4" />
+                  <div className="w-8 h-8 rounded-xl bg-[#0d121d] border border-white/15 flex items-center justify-center p-1 shrink-0 mt-0.5 shadow-sm">
+                    <Image
+                      src="/logo.png"
+                      alt="ZeroRoute"
+                      width={20}
+                      height={20}
+                      className="w-4 h-4 object-contain"
+                    />
                   </div>
                 )}
 
@@ -369,17 +381,17 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
                   ) : (
                     <div className="p-4 rounded-2xl rounded-tl-sm bg-[#0c1018] border border-white/10 text-slate-200 shadow-md w-full">
                       {isThinking ? (
-                        /* Thinking State Indicator */
-                        <div className="flex items-center gap-2.5 py-1 text-xs text-slate-300">
-                          <div className="w-5 h-5 rounded-lg bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-400">
-                            <Sparkles className="w-3.5 h-3.5 animate-spin" />
+                        /* Thinking State Indicator in Reply Box */
+                        <div className="flex items-center gap-3 py-1.5 px-0.5 text-xs text-slate-300">
+                          <div className="flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse [animation-duration:900ms]" />
+                            <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse [animation-duration:900ms] [animation-delay:200ms]" />
+                            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse [animation-duration:900ms] [animation-delay:400ms]" />
                           </div>
-                          <span className="font-semibold text-slate-300">Thinking</span>
-                          <div className="flex items-center gap-1 pl-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-bounce [animation-delay:-0.3s]" />
-                            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-bounce [animation-delay:-0.15s]" />
-                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-bounce" />
-                          </div>
+                          <span className="font-semibold text-slate-300 text-xs tracking-wide flex items-center gap-1.5">
+                            <Sparkles className="w-3.5 h-3.5 text-red-400 animate-spin" />
+                            <span>Thinking...</span>
+                          </span>
                         </div>
                       ) : (
                         <div className="relative">
@@ -499,17 +511,8 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
                   : "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-md shadow-red-500/20 active:scale-95 cursor-pointer"
               }`}
             >
-              {chatStreaming ? (
-                <>
-                  <Sparkles className="w-3.5 h-3.5 animate-spin text-red-300" />
-                  <span>Thinking...</span>
-                </>
-              ) : (
-                <>
-                  <Send className={`w-3.5 h-3.5 ${!chatInput.trim() ? "text-slate-600" : "text-white"}`} />
-                  <span className="font-bold hidden sm:inline">Send</span>
-                </>
-              )}
+              <Send className={`w-3.5 h-3.5 ${!chatInput.trim() || chatStreaming ? "text-slate-600" : "text-white"}`} />
+              <span className="font-bold hidden sm:inline">Send</span>
             </button>
           </form>
 
