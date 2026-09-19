@@ -129,6 +129,12 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                   <strong>1-Line Chatbot Widget</strong> with custom RAG knowledge
                 </span>
               </li>
+              <li className="flex items-center gap-2.5 text-emerald-300 font-medium bg-emerald-500/10 -mx-1 px-2 py-1 rounded-lg border border-emerald-500/25">
+                <Sparkles className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                <span>
+                  <strong>Free 1-on-1 Setup &amp; Installation</strong> (We install it for you)
+                </span>
+              </li>
             </ul>
           </div>
 

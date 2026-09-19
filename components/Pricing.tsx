@@ -22,9 +22,62 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
-        {/* Left Column: Stacked Free Options (DIY Self-Hosted + Free Hosted) */}
+        {/* Left Column: Stacked Free Options (Free Hosted on top, DIY Self-Hosted below) */}
         <div className="lg:col-span-6 flex flex-col gap-6 justify-between">
-          {/* 1. DIY Self-Hosted Plan */}
+          {/* 1. Free Hosted Plan */}
+          <div className="flex-1 relative flex flex-col justify-between p-6 sm:p-7 bg-dark-card/90 border border-dark-border rounded-3xl backdrop-blur-xl shadow-xl space-y-5">
+            <div className="space-y-3.5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono">
+                    Starter Cloud
+                  </span>
+                  <h3 className="text-xl sm:text-2xl font-bold text-white mt-0.5">Free Hosted</h3>
+                </div>
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+                  $0 FOREVER
+                </span>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-400">
+                Perfect for testing, personal projects, and launching your first embeddable AI website assistant.
+              </p>
+              <div className="text-2xl sm:text-3xl font-extrabold text-white font-mono">
+                $0 <span className="text-xs sm:text-sm font-normal text-slate-400 font-sans">/ month (No card needed)</span>
+              </div>
+
+              <ul className="space-y-2.5 text-xs sm:text-sm text-slate-300 pt-3 border-t border-dark-border">
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span><strong>500 Monthly AI Requests</strong> (Free forever)</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span><strong>1 Whitelisted Website Domain</strong></span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span><strong>11-Cloud Multi-Cloud Gateway</strong> (Zero setup)</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span><strong>Embeddable 1-Line Chat Widget</strong> &amp; Knowledge Base</span>
+                </li>
+                <li className="flex items-center gap-2.5 text-slate-400">
+                  <span className="text-xs font-mono bg-white/5 px-2 py-0.5 rounded text-slate-400">Badge</span>
+                  <span>Includes subtle &quot;Powered by ZeroRoute&quot; footer</span>
+                </li>
+              </ul>
+            </div>
+
+            <a
+              href="/login?tab=signup"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold bg-white/[0.08] hover:bg-white/[0.15] text-white border border-white/15 transition-all active:scale-95 shadow-md min-h-[42px] touch-manipulation cursor-pointer"
+            >
+              <span>🚀 Get Started Free (No Card Needed)</span>
+            </a>
+          </div>
+
+          {/* 2. DIY Self-Hosted Plan */}
           <div className="flex-1 relative flex flex-col justify-between p-6 sm:p-7 bg-dark-card/90 border border-dark-border rounded-3xl backdrop-blur-xl shadow-xl space-y-5">
             <div className="space-y-3.5">
               <div className="flex items-center justify-between">
@@ -77,59 +130,6 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
               <span>GitHub Repo (Free)</span>
             </a>
           </div>
-
-          {/* 2. Free Hosted Plan */}
-          <div className="flex-1 relative flex flex-col justify-between p-6 sm:p-7 bg-dark-card/90 border border-dark-border rounded-3xl backdrop-blur-xl shadow-xl space-y-5">
-            <div className="space-y-3.5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono">
-                    Starter Cloud
-                  </span>
-                  <h3 className="text-xl sm:text-2xl font-bold text-white mt-0.5">Free Hosted</h3>
-                </div>
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
-                  $0 FOREVER
-                </span>
-              </div>
-              <p className="text-xs sm:text-sm text-slate-400">
-                Perfect for testing, personal projects, and launching your first embeddable AI website assistant.
-              </p>
-              <div className="text-2xl sm:text-3xl font-extrabold text-white font-mono">
-                $0 <span className="text-xs sm:text-sm font-normal text-slate-400 font-sans">/ month (No card needed)</span>
-              </div>
-
-              <ul className="space-y-2.5 text-xs sm:text-sm text-slate-300 pt-3 border-t border-dark-border">
-                <li className="flex items-center gap-2.5">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span><strong>500 Monthly AI Requests</strong> (Free forever)</span>
-                </li>
-                <li className="flex items-center gap-2.5">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span><strong>1 Whitelisted Website Domain</strong></span>
-                </li>
-                <li className="flex items-center gap-2.5">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span><strong>11-Cloud Multi-Cloud Gateway</strong> (Zero setup)</span>
-                </li>
-                <li className="flex items-center gap-2.5">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span><strong>Embeddable 1-Line Chat Widget</strong> &amp; Knowledge Base</span>
-                </li>
-                <li className="flex items-center gap-2.5 text-slate-400">
-                  <span className="text-xs font-mono bg-white/5 px-2 py-0.5 rounded text-slate-400">Badge</span>
-                  <span>Includes subtle &quot;Powered by ZeroRoute&quot; footer</span>
-                </li>
-              </ul>
-            </div>
-
-            <a
-              href="/login?tab=signup"
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold bg-white/[0.08] hover:bg-white/[0.15] text-white border border-white/15 transition-all active:scale-95 shadow-md min-h-[42px] touch-manipulation cursor-pointer"
-            >
-              <span>🚀 Get Started Free (No Card Needed)</span>
-            </a>
-          </div>
         </div>
 
         {/* Right Column: Standalone Featured ZeroRoute Pro Plan */}
@@ -154,7 +154,7 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
               <p className="text-xs sm:text-sm text-slate-300">
                 For businesses and developers wanting 100% white-label branding, high traffic volume, and multi-domain support.
               </p>
-              <div className="text-3xl sm:text-4xl font-extrabold text-white font-mono pt-2 flex items-baseline gap-1.5">
+              <div className="text-3xl sm:text-4xl font-extrabold text-white font-mono pt-1 flex items-baseline gap-1.5">
                 <span className="bg-gradient-to-r from-violet-200 to-white bg-clip-text text-transparent">$2.00</span>
                 <span className="text-sm font-normal text-violet-300/70 font-sans">
                   / month
@@ -164,7 +164,38 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
                 Apple Pay, Google Pay, Cards &amp; UPI Supported
               </div>
 
-              <ul className="space-y-3 text-xs sm:text-sm text-slate-200 pt-4 border-t border-violet-500/20">
+              {/* Prominent White-Glove Setup Highlight Box */}
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500/15 via-teal-500/10 to-emerald-950/30 border border-emerald-500/35 shadow-lg shadow-emerald-950/30 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-300">
+                      <Sparkles className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-extrabold text-emerald-300 uppercase tracking-wide">
+                      Free 1-on-1 Setup &amp; Installation
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-emerald-400 text-black">
+                    $150 Value • FREE
+                  </span>
+                </div>
+                <p className="text-xs text-slate-200 font-normal leading-relaxed">
+                  We install &amp; test it on your live website for free. Our team personally embeds the 1-line script, fine-tunes your knowledge base, and tests it with you.
+                </p>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-0.5 text-[11px] text-emerald-300 font-medium">
+                  <span className="flex items-center gap-1.5">
+                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>WordPress / Shopify / React / Custom</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Zero technical effort needed</span>
+                  </span>
+                </div>
+              </div>
+
+              {/* Pro Feature Checklist */}
+              <ul className="space-y-2.5 text-xs sm:text-sm text-slate-200 pt-2 border-t border-violet-500/20">
                 <li className="flex items-center gap-2.5">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span>
@@ -182,7 +213,7 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
                 <li className="flex items-center gap-2.5">
                   <Check className="w-4 h-4 text-violet-400 shrink-0" />
                   <span>
-                    <strong>Up to 3 Whitelisted Domains</strong>
+                    <strong>Up to 3 Whitelisted Domains</strong> (Anti-hijack security)
                   </span>
                 </li>
                 <li className="flex items-center gap-2.5">
@@ -194,7 +225,7 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
                 <li className="flex items-center gap-2.5">
                   <Check className="w-4 h-4 text-violet-400 shrink-0" />
                   <span>
-                    <strong>Knowledge Base &amp; Semantic RAG</strong> (Upload docs &amp; FAQs)
+                    <strong>Knowledge Base &amp; Semantic RAG</strong> (Docs &amp; FAQs)
                   </span>
                 </li>
                 <li className="flex items-center gap-2.5">
@@ -209,26 +240,28 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
                     <strong>Private Visitor Chat Logs</strong> &amp; Question History
                   </span>
                 </li>
-                <li className="flex items-center gap-2.5 bg-emerald-500/10 -mx-2 px-2.5 py-1.5 rounded-xl border border-emerald-500/25 text-emerald-300">
-                  <Sparkles className="w-4 h-4 text-emerald-400 shrink-0" />
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-violet-400 shrink-0" />
                   <span>
-                    <strong>Free 1-on-1 Setup &amp; Installation</strong> (We install &amp; test it on your site for free)
+                    <strong>Sub-8ms High Speed Routing</strong> with automatic failover
                   </span>
                 </li>
               </ul>
             </div>
 
-            <div className="space-y-2 pt-2 relative z-10">
+            <div className="space-y-2.5 pt-2 relative z-10">
               <button
                 type="button"
                 onClick={onOpenCheckout}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-xl shadow-violet-600/35 border border-violet-400/30 transition-all active:scale-95 cursor-pointer min-h-[44px] touch-manipulation"
+                className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-xs sm:text-sm font-extrabold bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-xl shadow-violet-600/35 border border-violet-400/30 transition-all active:scale-95 cursor-pointer min-h-[46px] touch-manipulation"
               >
                 <span>⚡ Upgrade to Pro ($2.00 / month)</span>
               </button>
-              <p className="text-[11px] text-center text-violet-300/60 font-mono">
-                Cancel anytime. Instant automated activation.
-              </p>
+              <div className="flex items-center justify-center gap-3 text-[11px] text-violet-300/60 font-mono">
+                <span>Instant automated activation</span>
+                <span>•</span>
+                <span>Cancel anytime</span>
+              </div>
             </div>
           </div>
         </div>
