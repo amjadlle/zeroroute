@@ -25,27 +25,65 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "ZeroRoute — 1-Line Custom AI Chatbot & Multi-Cloud Gateway",
-  description: "Add a custom AI chatbot to your website in 1 minute. Intelligent multi-cloud routing across 11 pooled AI providers (Gemini, Groq, Cerebras, Mistral, SambaNova, Cohere, and more). 10,000 monthly requests included.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://zeroroute.mapki.in"),
+  title: {
+    default: "ZeroRoute — 1-Line Custom AI Chatbot & Multi-Cloud Gateway",
+    template: "%s | ZeroRoute",
+  },
+  description:
+    "Add a custom AI chatbot to your website in 1 minute. Intelligent multi-cloud routing across 11 pooled AI providers (Gemini, Groq, Cerebras, Mistral, SambaNova, Cohere, and more). 10,000 monthly requests included.",
+  keywords: [
+    "AI chatbot",
+    "embeddable chatbot",
+    "website chatbot",
+    "multi-cloud LLM gateway",
+    "AI router",
+    "OpenAI compatible",
+    "Groq",
+    "Cerebras",
+    "Gemini",
+    "Mistral",
+    "SambaNova",
+    "white-label AI",
+    "free AI API",
+  ],
+  authors: [{ name: "Amjad P A", url: "https://github.com/amjadlle" }],
+  creator: "Amjad P A",
+  publisher: "ZeroRoute",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   icons: {
     icon: [
       { url: "/favicon.png", sizes: "any" },
-      { url: "/icon.png", type: "image/png" }
+      { url: "/icon.png", type: "image/png" },
     ],
     shortcut: "/logo.png",
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
     title: "ZeroRoute — 1-Line Custom AI Chatbot & Multi-Cloud Gateway",
-    description: "Embed an AI customer chatbot in 1 minute. Intelligent routing across 11 pooled AI cloud providers with sub-8ms fallback. 10,000 monthly requests included.",
+    description:
+      "Embed a custom AI chatbot in 1 minute. Intelligent routing across 11 pooled AI cloud providers with sub-8ms fallback. 10,000 monthly requests included.",
     url: "https://zeroroute.mapki.in",
     siteName: "ZeroRoute",
+    locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "ZeroRoute — 1-Line Custom AI Chatbot & Multi-Cloud Gateway",
-    description: "Embed a custom AI chatbot in 1 minute. Intelligent routing across 11 pooled AI cloud providers with sub-8ms fallback.",
+    description:
+      "Embed a custom AI chatbot in 1 minute. Intelligent routing across 11 pooled AI cloud providers with sub-8ms fallback.",
+    creator: "@amjadlle",
   },
 };
 
