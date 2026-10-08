@@ -1,7 +1,7 @@
 <div align="center">
 
 # ⚡ ZeroRoute SaaS
-### Open-Source Multi-Cloud AI Gateway & Autonomous Embeddable Widget Platform
+### 1-Line Custom AI Chatbot & OpenAI-Compatible Multi-Cloud API Gateway
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-red.svg)](https://opensource.org/licenses/MIT)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16.3.5_(Turbopack)-black.svg)](https://nextjs.org/)
@@ -10,9 +10,9 @@
 [![Cloudflare D1](https://img.shields.io/badge/Database-Cloudflare_D1_%2B_SQLite-F38020.svg)](https://developers.cloudflare.com/d1/)
 [![Dodo Payments](https://img.shields.io/badge/Billing-Dodo_Payments-00E599.svg)](https://dodopayments.com/)
 
-**Zero Cost. Max Route. 100% Uptime Across 11 Free AI Cloud Providers.**
+**Zero Cost. Max Route. 100% Uptime Across 11 Pooled AI Cloud Providers.**
 
-[Live Demo](https://zeroroute.mapki.in) • [Documentation](DEPLOYMENT.md) • [Report Bug](https://github.com/amjadlle/zeroroute/issues)
+[Live SaaS](https://zeroroute.mapki.in) • [Subscriber Console](https://zeroroute.mapki.in/app) • [Master Admin](https://zeroroute.mapki.in/admin) • [Buy Me a Coffee](https://buymeacoffee.com/amjadlle)
 
 </div>
 
@@ -20,21 +20,17 @@
 
 ## 🌟 What is ZeroRoute?
 
-**ZeroRoute** is a production-grade, OpenAI-compatible AI API Gateway and turnkey SaaS platform built on **Next.js 16 (Turbopack)**. It intelligently aggregates **11 high-performance AI cloud provider free tiers** into a unified, zero-cost, high-availability cluster with sub-8ms dynamic load balancing.
+**ZeroRoute** is a production-ready, dual-purpose AI platform built on **Next.js 16 (Turbopack)**, **React 19**, and **Tailwind CSS v4**:
 
-Whether you need a **1-line embeddable AI customer support chatbot** trained on your live website, or a **resilient OpenAI-compatible gateway** for your Cursor, Claude Code, Python, or TypeScript applications, ZeroRoute ensures you enjoy continuous, uninterrupted uptime.
+1. **1-Line Embeddable AI Chatbot**: Add a custom AI customer assistant to any website in under 60 seconds. Supports automated website scraping, Notion/Google Docs syncing, custom personas, brand colors, and streaming token responses.
+2. **OpenAI-Compatible Multi-Cloud Gateway**: An ultra-fast drop-in replacement for OpenAI API endpoints (`https://zeroroute.mapki.in/v1`) that intelligently pools free tier quotas across **11 major AI clouds** with sub-8ms auto-failover, zero rate-limit queuing, and 0ms RAM caching.
 
 ---
 
-## ✨ Key Features
+## ✨ Core Features
 
-### 🌐 1. High-Availability Multi-Cloud Routing Matrix
-- **11 Configured Free AI Cloud Providers:** Groq, Cerebras, SambaNova, Mistral AI, Cohere, Google Gemini, OpenRouter, NVIDIA NIM, Cloudflare Workers AI, Hugging Face, and BazaarLink AI.
-- **Intra-Provider Model Chains:** Each provider has an optimized model chain that dynamically routes through models for maximum speed and throughput.
-- **Dynamic Smart Routing Engine:** Dynamically routes requests across healthy clouds in <8ms with zero downtime.
-
-### 💬 2. 1-Line Embeddable Chatbot Widget
-- Embed on any website with a single `<script>` tag:
+### 💬 1. 1-Line Embeddable Chatbot
+- Embed anywhere with a single script tag before `</body>`:
   ```html
   <script
     src="https://zeroroute.mapki.in/widget.js"
@@ -42,155 +38,120 @@ Whether you need a **1-line embeddable AI customer support chatbot** trained on 
     defer
   ></script>
   ```
-- Floating glassmorphism chat window, live streaming SSE token typewriter effect, customizable quick-action pills, brand accent colors, and custom avatar.
+- **Live SSE Streaming**: Fluid, token-by-token typewriter effect.
+- **Customization**: Configure bot name, role, tone, greeting, avatar, brand accent colors, and quick prompt pills.
+- **Domain Whitelisting (CORS)**: Restrict widget execution to authorized customer domains.
+- **White-Label Branding**: Pro subscribers enjoy 100% clean white-labeling with no external badge.
 
-### 🧠 3. Smart Semantic RAG & 1-Click URL Crawler
-- **1-Click Web Scraper:** Index public websites, Notion documents, Google Docs (`/pub`), and GitHub raw markdown (`.md`) with built-in SSRF protection.
-- **BM25 Token Scorer:** Retrieves relevant context snippets based on user queries and injects verified business details directly into system prompts.
-- **Zero Hallucination Directives:** Restricts the AI from inventing fake prices, phone numbers, or URLs not present in the verified knowledge base.
+### 🧠 2. Semantic Document RAG & URL Crawler
+- **1-Click Live Web Scraper**: Crawl websites, Google Docs (`/pub`), Notion public pages, and GitHub raw Markdown (`.md`) with built-in SSRF protection.
+- **Context Injection**: Intelligently retrieves verified facts and injects them directly into system prompts.
+- **Zero Hallucination Guardrails**: Strictly instructs the model to refuse off-topic inquiries or fabricated information.
 
-### 👑 4. Master Admin Console (`/admin`)
-- **Visual Fallback Chain Reordering:** Drag-and-drop or use 1-click controls to promote/demote clouds and models.
-- **Multi-Cloud Benchmark Race:** Race all 11 clouds simultaneously with 1 click to measure live latencies.
-- **Subscriber Directory & Quota Management:** Monitor paying tenants, rotate API keys, inspect usage meters, and suspend/activate tenants.
-- **Live Gateway Traffic & Failover Log Inspector:** Inspect full user prompts, model responses, tokens, and multi-cloud failover trails.
+### 🌐 3. 11-Provider Multi-Cloud Gateway Pool
+- **11 Configured Providers**: Groq, Cerebras, SambaNova, Mistral AI, Google Gemini, NVIDIA NIM, Cohere, OpenRouter, Cloudflare Workers AI, Hugging Face, and BazaarLink AI.
+- **Sub-8ms Auto-Failover**: Instantly reroutes queries to the next healthy provider if rate-limited (HTTP 429) or during provider downtime (HTTP 5xx).
+- **0ms RAM Caching**: Identical prompts are served instantly from RAM without consuming provider tokens.
 
-### 👤 5. Subscriber Console (`/app`) & 10,000 Monthly Quota
-- **10,000 Monthly AI Requests (~330 req/day):** Generous multi-cloud allocation per subscriber with automated monthly cycle resets.
-- **Self-Service Dashboard:** Rotate live API keys, customize AI persona/tone/greetings, manage knowledge docs, and copy integration code.
-- **Domain Whitelisting (CORS):** Lock down widget usage to authorized customer domains.
-- **Turnkey Subscription Billing:** Powered by Dodo Payments with automated activation, renewal, and cancellation webhooks.
+### 💳 4. Turnkey SaaS Billing & Console
+- **Subscriber Dashboard (`/app`)**: Manage API keys, customize chatbot persona, index knowledge bases, and monitor monthly requests.
+- **Pro Tier ($2.00 / month)**: 10,000 monthly requests (~330 req/day), white-label widget, 3 domain whitelists, and priority routing.
+- **Free Tier ($0 / month)**: 500 monthly requests with automatic 30-day billing cycle resets.
+- **Dodo Payments Integration**: Webhook synchronization with HMAC-SHA256 signature verification and replay protection.
 
-### 🗄️ 6. Dual-Engine Database Architecture
-- **Edge Mode:** Zero-cold-start Cloudflare D1 Serverless Database.
-- **Local / Node.js Mode:** Embedded high-speed SQLite via `@libsql/client` (`data/zeroroute.db`).
+### 👑 5. Master Admin Console (`/admin`)
+- **Multi-Cloud Benchmark Race**: Test and measure live latencies across all 11 clouds in parallel with 1 click.
+- **Model Catalog Explorer**: Browse and configure supported models per provider.
+- **Live Traffic & Failover Log Inspector**: Real-time audit logs of requests, latencies, tokens, and multi-cloud fallback trails.
+- **Tenant Directory**: Manage subscribers, quotas, and API keys.
 
 ---
 
-## 🏗️ Architecture & Fallback Hierarchy
+## 🏗️ Gateway Multi-Cloud Hierarchy
 
 ```mermaid
 flowchart TD
-    User["Client / Widget / OpenAI SDK"] --> Gateway["ZeroRoute API Gateway (/v1/chat/completions)"]
+    Client["Client / Widget / OpenAI SDK"] --> Gateway["ZeroRoute API Gateway (/v1/chat/completions)"]
     
     Gateway --> RAG["RAG Retrieval Engine"]
-    RAG --> Cache{"Response Cache"}
+    RAG --> Cache{"RAM Cache"}
     
-    Cache -->|"Cache Hit (0ms)"| Immediate["Cached Instant Response"]
+    Cache -->|"Cache Hit (0ms)"| Immediate["Instant Cached Response"]
     Cache -->|"Cache Miss"| ProviderPool["Dynamic Multi-Cloud Pool"]
 
-    subgraph Matrix["11 Cloud Routing Matrix"]
-        P1["1. Groq — Llama 3.3 / GPT-OSS"]
-        P2["2. Cerebras — Ultra-Fast 120B"]
-        P3["3. SambaNova — MiniMax / Gemma 4"]
-        P4["4. Mistral AI — Nemo / Ministral"]
-        P5["5. Cohere — Command R+"]
-        P6["6. Google Gemini — 2.0 / 2.5 Flash"]
-        P7["7. OpenRouter — Nemotron Super 120B"]
-        P8["8. NVIDIA NIM — Nemotron 30B"]
-        P9["9. Cloudflare AI — Llama 3.1 8B"]
-        P10["10. Hugging Face — Llama 3.1 8B"]
+    subgraph Matrix["11 Pooled AI Clouds"]
+        P1["1. Groq — ~100ms (Llama 3.3 / GPT-OSS)"]
+        P2["2. Cerebras — ~80ms (Wafer-Scale 70B)"]
+        P3["3. SambaNova — ~360ms (Gemma 4 / MiniMax)"]
+        P4["4. Mistral AI — ~390ms (Mistral Small / Nemo)"]
+        P5["5. Google Gemini — ~710ms (Flash 2.0 / 2.5)"]
+        P6["6. NVIDIA NIM — ~260ms (Nemotron 30B)"]
+        P7["7. Cohere — Conversational Reasoning"]
+        P8["8. OpenRouter — Free Model Pool"]
+        P9["9. Cloudflare AI — Edge Llama 3.1"]
+        P10["10. Hugging Face — Serverless Router"]
         P11["11. BazaarLink AI — Qwen 2.5"]
     end
 
     ProviderPool --> P1
-    P1 -->|"Sub-8ms Route"| P2
-    P2 -->|"Sub-8ms Route"| P3
-    P3 -->|"Sub-8ms Route"| P4
-    P4 -->|"Sub-8ms Route"| P5
-    P5 -->|"Sub-8ms Route"| P6
-    P6 -->|"Sub-8ms Route"| P7
-    P7 -->|"Sub-8ms Route"| P8
-    P8 -->|"Sub-8ms Route"| P9
-    P9 -->|"Sub-8ms Route"| P10
-    P10 -->|"Sub-8ms Route"| P11
+    P1 -->|"Failover"| P2
+    P2 -->|"Failover"| P3
+    P3 -->|"Failover"| P4
+    P4 -->|"Failover"| P5
+    P5 -->|"Failover"| P6
+    P6 -->|"Failover"| P7
+    P7 -->|"Failover"| P8
+    P8 -->|"Failover"| P9
+    P9 -->|"Failover"| P10
+    P10 -->|"Failover"| P11
 ```
 
 ---
 
 ## ⚡ Quickstart & Local Setup
 
-### 1. Clone the Repository
+### 1. Clone & Install
 ```bash
 git clone https://github.com/amjadlle/zeroroute.git
 cd zeroroute
-```
-
-### 2. Install Dependencies
-```bash
 npm install
 ```
 
-### 3. Configure Environment Variables
-Copy `.env.example` to `.env.local`:
+### 2. Configure Environment
 ```bash
 cp .env.example .env.local
 ```
 
-Edit `.env.local` with your configuration:
+Fill in `.env.local`:
 ```env
-# Application Base URL
 APP_URL=http://localhost:3000
-
-# Superadmin Access
 ADMIN_EMAIL=mapkisolutions@gmail.com
 ADMIN_PASSWORD=your_secure_password
-ADMIN_KEY=zr_admin_master_secret_key
-ROUTER_API_KEY=zr_admin_master_secret_key
+ADMIN_KEY=zr_admin_master_secret
+ROUTER_API_KEY=zr_admin_master_secret
 
-# (Optional) Add your free provider API keys
+# (Optional) Cloud Provider API Keys
 GROQ_API_KEY=gsk_...
 GEMINI_API_KEY=...
 MISTRAL_API_KEY=...
 CEREBRAS_API_KEY=...
 ```
 
-### 4. Run the Development Server
+### 3. Run Development Server
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser:
-* **Landing Page:** `http://localhost:3000`
-* **Subscriber Console:** `http://localhost:3000/app`
-* **Master Admin Console:** `http://localhost:3000/admin`
+* **Landing Page:** [http://localhost:3000](http://localhost:3000)
+* **Subscriber Console:** [http://localhost:3000/app](http://localhost:3000/app)
+* **Master Admin:** [http://localhost:3000/admin](http://localhost:3000/admin)
 
 ---
 
-## 💻 API Gateway Usage (OpenAI Compatible)
-
-ZeroRoute is a drop-in replacement for `https://api.openai.com/v1`.
-
-### JavaScript / TypeScript (Official OpenAI SDK)
-```typescript
-import OpenAI from "openai";
-
-const openai = new OpenAI({
-  baseURL: "https://zeroroute.mapki.in/v1", // or http://localhost:3000/v1
-  apiKey: "zr_live_YOUR_API_KEY",
-});
-
-async function main() {
-  const completion = await openai.chat.completions.create({
-    model: "auto", // Automatically routes across 11 pooled AI clouds with zero downtime
-    messages: [
-      { role: "system", content: "You are a helpful assistant." },
-      { role: "user", content: "Explain quantum computing in one sentence." }
-    ],
-    stream: true,
-  });
-
-  for await (const chunk of completion) {
-    process.stdout.write(chunk.choices[0]?.delta?.content || "");
-  }
-}
-
-main();
-```
+## 💻 API Gateway Usage
 
 ### Python (Official OpenAI SDK)
 ```python
-import os
 from openai import OpenAI
 
 client = OpenAI(
@@ -199,37 +160,47 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="auto",
+    model="auto", # Automatically routes across 11 clouds
     messages=[
-        {"role": "user", "content": "How does intelligent multi-cloud routing work?"}
+        {"role": "user", "content": "How does ZeroRoute multi-cloud auto-failover work?"}
     ]
 )
 
 print(response.choices[0].message.content)
 ```
 
-### cURL
-```bash
-curl -X POST https://zeroroute.mapki.in/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer zr_live_YOUR_API_KEY" \
-  -d '{
-    "model": "auto",
-    "messages": [
-      {"role": "user", "content": "Ping test"}
-    ],
-    "stream": false
-  }'
+### TypeScript / JavaScript (Official OpenAI SDK)
+```typescript
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  baseURL: "https://zeroroute.mapki.in/v1",
+  apiKey: "zr_live_YOUR_API_KEY",
+});
+
+async function main() {
+  const stream = await openai.chat.completions.create({
+    model: "auto",
+    messages: [{ role: "user", content: "Tell me about quantum computing." }],
+    stream: true,
+  });
+
+  for await (const chunk of stream) {
+    process.stdout.write(chunk.choices[0]?.delta?.content || "");
+  }
+}
+
+main();
 ```
 
 ---
 
-## 🚀 Production Deployment
-
-See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment walkthroughs across:
-- **Vercel** (1-Click Deployment)
-- **Cloudflare Pages / OpenNext** (Cloudflare D1 edge database)
-- **Docker / VPS / PM2** (Node.js standalone server)
+## 🔒 Security Architecture
+- **Next.js 16 Edge Proxy (`proxy.ts`)**: Edge route protection on administrative and subscriber endpoints.
+- **Atomic Quota Counters**: Prevents concurrent request quota race conditions.
+- **Cryptographic CSPRNG**: Safe generation of session tokens and OTPs with `crypto.randomInt` and `crypto.randomBytes`.
+- **SSRF Hardened Web Scraper**: Blocks private IPv4/IPv6, loopback, and metadata network endpoints.
+- **Standard HTTP Security Headers**: HSTS, X-Frame-Options: SAMEORIGIN, X-Content-Type-Options: nosniff.
 
 ---
 
@@ -246,5 +217,4 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment walkthroughs across:
 
 ## 📄 License
 
-This project is open-source and licensed under the [MIT License](LICENSE).
-
+This project is licensed under the [MIT License](LICENSE).
