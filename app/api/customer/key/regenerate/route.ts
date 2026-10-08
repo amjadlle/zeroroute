@@ -43,8 +43,9 @@ export async function POST(req: NextRequest) {
     });
 
     const { invalidateSessionCache, invalidateCustomerLookupCache } = await import("@/lib/auth/session");
-    invalidateSessionCache();
-    invalidateCustomerLookupCache();
+    if (customer.session_token) invalidateSessionCache(customer.session_token);
+    invalidateCustomerLookupCache(customer.key);
+    invalidateCustomerLookupCache(newKey);
 
     return NextResponse.json({
       success: true,

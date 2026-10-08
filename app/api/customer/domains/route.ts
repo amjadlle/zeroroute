@@ -60,8 +60,8 @@ export async function POST(request: Request) {
       args: [JSON.stringify(cleanedDomains), Date.now(), session.id],
     });
 
-    invalidateCustomerLookupCache();
-    invalidateSessionCache();
+    invalidateCustomerLookupCache(session.key);
+    if (session.session_token) invalidateSessionCache(session.session_token);
 
     return NextResponse.json({
       success: true,

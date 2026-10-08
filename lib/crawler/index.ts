@@ -14,6 +14,7 @@ export interface CrawlResult {
  */
 export function isSsrfSafeUrl(rawUrl: string): boolean {
   try {
+    if (!rawUrl || typeof rawUrl !== "string" || rawUrl.length > 2048) return false;
     const parsed = new URL(rawUrl);
     if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return false;
 
@@ -24,6 +25,9 @@ export function isSsrfSafeUrl(rawUrl: string): boolean {
       host === "0.0.0.0" ||
       host.startsWith("127.") ||
       host === "::1" ||
+      host.startsWith("fe80:") || // IPv6 link-local
+      host.startsWith("fd00:") || // IPv6 unique local
+      host.startsWith("::ffff:127.") ||
       host.startsWith("169.254.") || // Cloud metadata
       host.startsWith("10.") || // RFC 1918 Class A
       host.startsWith("192.168.") || // RFC 1918 Class C
