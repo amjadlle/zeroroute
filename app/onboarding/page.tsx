@@ -120,9 +120,13 @@ function OnboardingContent() {
     setCrawlingUrl(true);
     setError("");
     try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (customerKey || tokenFromUrl) {
+        headers["Authorization"] = `Bearer ${customerKey || tokenFromUrl}`;
+      }
       const res = await fetch("/api/knowledge/crawl", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ url: cleanUrl }),
       });
       const data = await res.json();

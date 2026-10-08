@@ -165,6 +165,54 @@ export function cleanHtmlToMarkdown(html: string): string {
     .trim();
 }
 
+export interface ExtractedMeta {
+  title?: string;
+  description?: string;
+  keywords?: string;
+  jsonLd?: string;
+}
+
+/**
+ * Extracts rich metadata from <head> (meta tags, OpenGraph, JSON-LD)
+ * for Single Page Applications (SPAs) and JavaScript-heavy sites.
+ */
+export function extractHtmlMetadata(html: string): ExtractedMeta {
+  const result: ExtractedMeta = {};
+
+  // Title
+  const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  if (titleMatch && titleMatch[1]) {
+    result.title = titleMatch[1].replace(/ - Google Docs$/i, "").replace(/ \| Notion$/i, "").trim();
+  }
+
+  // Meta Description / OpenGraph / Twitter description
+  const descMatch =
+    html.match(/<meta\b[^>]*?\b(?:name|property)=["'](?:description|og:description|twitter:description)["'][^>]*?\bcontent=["']([\s\S]*?)["']/i) ||
+    html.match(/<meta\b[^>]*?\bcontent=["']([\s\S]*?)["'][^>]*?\b(?:name|property)=["'](?:description|og:description|twitter:description)["']/i);
+  if (descMatch && descMatch[1]) {
+    result.description = descMatch[1].trim();
+  }
+
+  // Keywords
+  const kwMatch =
+    html.match(/<meta\b[^>]*?\bname=["']keywords["'][^>]*?\bcontent=["']([\s\S]*?)["']/i) ||
+    html.match(/<meta\b[^>]*?\bcontent=["']([\s\S]*?)["'][^>]*?\bname=["']keywords["']/i);
+  if (kwMatch && kwMatch[1]) {
+    result.keywords = kwMatch[1].trim();
+  }
+
+  // JSON-LD structured schemas
+  try {
+    const jsonLdMatch = html.match(/<script\b[^>]*?\btype=["']application\/ld\+json["'][^>]*?>([\s\S]*?)<\/script>/i);
+    if (jsonLdMatch && jsonLdMatch[1]) {
+      const parsed = JSON.parse(jsonLdMatch[1].trim());
+      result.jsonLd = typeof parsed === "object" ? JSON.stringify(parsed, null, 2) : String(parsed);
+    }
+  } catch {}
+
+  return result;
+}
+
 /**
  * Fetches and parses a single live URL across any of the 5 supported source types.
  */
@@ -191,6 +239,7 @@ export async function crawlSourceUrl(rawUrl: string, customTitle?: string): Prom
   const rawBody = await fetchRes.text();
 
   let cleanedContent = "";
+  let extractedTitle = customTitle || suggestedTitle || "";
 
   if (
     sourceType === "github_raw" ||
@@ -200,23 +249,31 @@ export async function crawlSourceUrl(rawUrl: string, customTitle?: string): Prom
   ) {
     cleanedContent = rawBody.trim();
   } else {
-    cleanedContent = cleanHtmlToMarkdown(rawBody);
+    // Extract metadata first (essential for Single Page Applications like Angular, React, Vue)
+    const meta = extractHtmlMetadata(rawBody);
+    const bodyContent = cleanHtmlToMarkdown(rawBody);
+
+    if (meta.title && !customTitle) {
+      extractedTitle = meta.title;
+    }
+
+    if (bodyContent && bodyContent.length >= 40) {
+      cleanedContent = bodyContent;
+    } else {
+      // Client-Side Rendered (CSR) SPA fallback: assemble structured knowledge from meta tags
+      const sections: string[] = [];
+      if (meta.title) sections.push(`# ${meta.title}`);
+      if (meta.description) sections.push(`## Description & Overview\n${meta.description}`);
+      if (meta.keywords) sections.push(`## Topics & Keywords\n${meta.keywords}`);
+      if (meta.jsonLd) sections.push(`## Structured Application Data\n\`\`\`json\n${meta.jsonLd}\n\`\`\``);
+      if (bodyContent && bodyContent.length > 0) sections.push(`## Page Content\n${bodyContent}`);
+
+      cleanedContent = sections.join("\n\n").trim();
+    }
   }
 
   if (!cleanedContent || cleanedContent.length < 15) {
     throw new Error("Could not extract meaningful text from URL. Ensure the page is publicly accessible.");
-  }
-
-  // Extract page title from HTML <title> tag if not provided
-  let extractedTitle = customTitle || suggestedTitle || "";
-  if (!customTitle) {
-    const titleMatch = rawBody.match(/<title[^>]*>(.*?)<\/title>/i);
-    if (titleMatch && titleMatch[1]) {
-      const docTitle = titleMatch[1].replace(/ - Google Docs$/i, "").replace(/ \| Notion$/i, "").trim();
-      if (docTitle.length > 2) {
-        extractedTitle = docTitle;
-      }
-    }
   }
 
   const finalTitle = extractedTitle.length > 60 ? extractedTitle.substring(0, 60) + "..." : extractedTitle;
