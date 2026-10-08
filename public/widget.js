@@ -35,8 +35,6 @@
     var b = parseInt(hex.substring(4, 6), 16);
     // Perceived luminance formula (ITU-R BT.709)
     var luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
-    // If brand color is too dark on dark background (#111622) or heavily blue-shifted,
-    // use high-contrast vibrant electric sky blue #38bdf8
     if (luminance < 0.52 || (b > 115 && r < 110)) {
       return "#38bdf8";
     }
@@ -68,65 +66,111 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     #zr-widget-btn {
-      width: 56px;
-      height: 56px;
+      width: 58px;
+      height: 58px;
       border-radius: 50%;
-      background: ${customColor};
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: linear-gradient(145deg, #ff4d56 0%, ${customColor} 55%, #a81018 100%);
+      box-shadow: 
+        0 8px 28px rgba(229, 37, 49, 0.42),
+        0 2px 6px rgba(0, 0, 0, 0.25),
+        inset 0 1.5px 2px rgba(255, 255, 255, 0.6),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.32);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
+      position: relative;
+      overflow: hidden;
+    }
+    #zr-widget-btn::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 8px;
+      right: 8px;
+      height: 45%;
+      border-radius: 50px 50px 30px 30px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 100%);
+      pointer-events: none;
     }
     #zr-widget-btn:hover {
-      transform: scale(1.06);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+      transform: scale(1.08) translateY(-2px);
+      box-shadow: 
+        0 12px 34px rgba(229, 37, 49, 0.55),
+        0 4px 10px rgba(0, 0, 0, 0.3),
+        inset 0 1.5px 2px rgba(255, 255, 255, 0.75),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.4);
+    }
+    #zr-widget-btn:active {
+      transform: scale(0.96);
     }
     #zr-widget-btn svg {
-      width: 26px;
-      height: 26px;
+      width: 25px;
+      height: 25px;
       fill: #ffffff;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
       transition: transform 0.2s ease;
+      position: relative;
+      z-index: 1;
     }
     #zr-widget-box {
       position: absolute;
-      bottom: 72px;
+      bottom: 74px;
       right: 0;
-      width: 380px;
-      height: 560px;
-      max-height: calc(100vh - 100px);
+      width: 390px;
+      height: 580px;
+      max-height: calc(100vh - 105px);
       max-width: calc(100vw - 32px);
-      background: #080a0f;
+      background: rgba(11, 15, 23, 0.88);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 20px;
-      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.85);
+      border-radius: 22px;
+      box-shadow: 
+        0 28px 75px rgba(0, 0, 0, 0.85),
+        0 8px 24px rgba(0, 0, 0, 0.4),
+        inset 0 1px 1.5px rgba(255, 255, 255, 0.15);
       display: none;
       flex-direction: column;
       overflow: hidden;
-      animation: zrFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: zrFadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
     }
     @keyframes zrFadeIn {
-      from { opacity: 0; transform: translateY(16px) scale(0.96); }
+      from { opacity: 0; transform: translateY(18px) scale(0.95); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
     #zr-header {
-      padding: 12px 16px;
-      background: ${customColor};
+      padding: 13px 16px;
+      background: linear-gradient(180deg, rgba(235, 45, 56, 0.96) 0%, ${customColor} 60%, rgba(185, 20, 28, 0.98) 100%);
       color: #ffffff;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.18);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      box-shadow: 
+        inset 0 1px 1.5px rgba(255, 255, 255, 0.45),
+        0 4px 18px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+    #zr-header::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 100%);
+      pointer-events: none;
     }
     #zr-header .title-box {
       display: flex;
       align-items: center;
       gap: 10px;
+      z-index: 1;
     }
     #zr-header .zr-logo {
       height: 28px;
@@ -137,50 +181,61 @@
       border: none;
       background: transparent;
       flex-shrink: 0;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));
     }
     #zr-header .title-wrap {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 1.5px;
     }
     #zr-header .title {
       font-weight: 700;
-      font-size: 14px;
+      font-size: 14.5px;
       color: #ffffff;
       letter-spacing: -0.01em;
       line-height: 1.2;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
     }
     #zr-header .status-wrap {
       display: flex;
       align-items: center;
-      gap: 5px;
-      font-size: 10px;
-      color: rgba(255, 255, 255, 0.85);
+      gap: 5.5px;
+      font-size: 10.5px;
+      color: rgba(255, 255, 255, 0.9);
       font-weight: 500;
     }
     #zr-header .status-dot {
-      width: 6px;
-      height: 6px;
+      width: 6.5px;
+      height: 6.5px;
       background: #10b981;
       border-radius: 50%;
-      box-shadow: 0 0 8px #10b981;
+      box-shadow: 0 0 10px #10b981, 0 0 3px #10b981;
       display: inline-block;
+      animation: zrPulse 2s infinite ease-in-out;
+    }
+    @keyframes zrPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.65; transform: scale(0.85); }
     }
     #zr-header .close-btn {
-      background: rgba(255, 255, 255, 0.15);
-      border: none;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       color: #ffffff;
       cursor: pointer;
       width: 28px;
       height: 28px;
-      border-radius: 8px;
+      border-radius: 9px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.15s;
+      transition: all 0.15s ease;
+      z-index: 1;
     }
     #zr-header .close-btn:hover {
-      background: rgba(255, 255, 255, 0.28);
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
     }
     #zr-messages {
       flex: 1;
@@ -188,7 +243,7 @@
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
       scroll-behavior: smooth;
       scrollbar-width: thin;
       scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
@@ -216,20 +271,57 @@
     #zr-messages::-webkit-scrollbar-corner {
       background: transparent;
     }
+
+    /* Bot message row with Mascot Icon */
+    .zr-msg-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      width: 100%;
+    }
+    .zr-msg-row.user-row {
+      justify-content: flex-end;
+    }
+    .zr-bot-avatar {
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255, 77, 86, 0.25) 0%, rgba(229, 37, 49, 0.4) 100%);
+      border: 1px solid rgba(255, 77, 86, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(229, 37, 49, 0.25);
+    }
+    .zr-bot-avatar svg {
+      width: 13px;
+      height: 13px;
+      fill: #ff6b72;
+    }
+
+    /* Message Bubbles */
     .zr-msg {
       max-width: 88%;
       padding: 11px 15px;
       font-size: 13px;
       line-height: 1.55;
-      border-radius: 16px;
       word-break: break-word;
     }
+
+    /* Liquid Glass Bot Bubble */
     .zr-msg.bot {
-      align-self: flex-start;
-      background: #111622;
+      background: rgba(16, 22, 34, 0.78);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       color: #e2e8f0;
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-bottom-left-radius: 4px;
+      border-radius: 18px 18px 18px 4px;
+      box-shadow: 
+        inset 0 1px 1px rgba(255, 255, 255, 0.07),
+        0 4px 16px rgba(0, 0, 0, 0.35);
     }
     .zr-msg.bot strong {
       color: #ffffff;
@@ -258,7 +350,7 @@
     .zr-msg.bot a:hover, .zr-link:hover {
       color: #ffffff;
       text-decoration-color: #ffffff;
-      text-shadow: 0 0 8px ${linkColor}66;
+      text-shadow: 0 0 8px ${linkColor}88;
     }
     .zr-msg.bot p {
       margin: 0 0 8px 0;
@@ -266,13 +358,58 @@
     .zr-msg.bot p:last-child {
       margin-bottom: 0;
     }
+    .zr-msg.bot ul, .zr-msg.bot ol {
+      margin: 6px 0 8px 0;
+      padding-left: 0;
+      list-style: none;
+    }
+    .zr-msg.bot ul li {
+      position: relative;
+      padding-left: 16px;
+      margin-bottom: 5px;
+    }
+    .zr-msg.bot ul li::before {
+      content: "•";
+      position: absolute;
+      left: 3px;
+      top: -1px;
+      color: #ff4d56;
+      font-size: 15px;
+      line-height: 1;
+    }
+    .zr-msg.bot ol {
+      counter-reset: zr-counter;
+    }
+    .zr-msg.bot ol li {
+      position: relative;
+      padding-left: 20px;
+      margin-bottom: 5px;
+      counter-increment: zr-counter;
+    }
+    .zr-msg.bot ol li::before {
+      content: counter(zr-counter) ".";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: #ff6b72;
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    /* Beveled Liquid Red User Pill */
     .zr-msg.user {
       align-self: flex-end;
-      background: ${customColor};
+      background: linear-gradient(180deg, #ff4d56 0%, ${customColor} 48%, #ba121b 100%);
       color: #ffffff;
-      border-bottom-right-radius: 4px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      border-radius: 18px 18px 4px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      box-shadow: 
+        inset 0 1.5px 2px rgba(255, 255, 255, 0.55),
+        inset 0 -1.5px 2px rgba(0, 0, 0, 0.25),
+        0 4px 14px rgba(229, 37, 49, 0.35);
       white-space: pre-wrap;
+      font-weight: 500;
+      text-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.2);
     }
     .zr-inline-code {
       background: rgba(255, 255, 255, 0.08);
@@ -284,25 +421,27 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
     .zr-code-block {
-      background: #06080d;
+      background: rgba(6, 8, 14, 0.9);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 8px 10px;
-      border-radius: 8px;
+      padding: 9px 12px;
+      border-radius: 10px;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       font-size: 11.5px;
       overflow-x: auto;
-      margin: 6px 0;
+      margin: 7px 0;
       color: #e2e8f0;
       white-space: pre-wrap;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
     }
     .zr-cursor {
       display: inline-block;
       width: 2px;
       height: 13px;
-      background: ${customColor};
+      background: #ff4d56;
       margin-left: 3px;
       vertical-align: middle;
       animation: zrBlink 0.8s infinite;
+      box-shadow: 0 0 6px rgba(255, 77, 86, 0.8);
     }
     @keyframes zrBlink {
       0%, 100% { opacity: 1; }
@@ -319,9 +458,10 @@
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: ${customColor};
+      background: #ff4d56;
       opacity: 0.4;
       animation: zrTypingBounce 1.4s infinite ease-in-out both;
+      box-shadow: 0 0 4px rgba(255, 77, 86, 0.5);
     }
     .zr-typing-dots .zr-dot:nth-child(1) {
       animation-delay: -0.32s;
@@ -343,64 +483,77 @@
       padding: 0 16px 12px 16px;
     }
     #zr-suggestions-label {
-      font-size: 9px;
+      font-size: 9.5px;
       text-transform: uppercase;
       font-weight: 700;
-      color: #64748b;
+      color: #94a3b8;
       letter-spacing: 0.05em;
-      margin-bottom: 6px;
+      margin-bottom: 7px;
       display: block;
     }
     #zr-suggestions {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
+      gap: 6.5px;
     }
     .zr-pill {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #cbd5e1;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #e2e8f0;
       font-size: 11.5px;
-      padding: 6px 12px;
-      border-radius: 12px;
+      padding: 6.5px 12.5px;
+      border-radius: 14px;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.18s ease;
       text-align: left;
     }
     .zr-pill:hover {
-      background: ${customColor}22;
-      border-color: ${customColor}66;
+      background: rgba(255, 77, 86, 0.15);
+      border-color: rgba(255, 77, 86, 0.45);
       color: #ffffff;
       transform: translateY(-1px);
+      box-shadow: 0 3px 10px rgba(229, 37, 49, 0.2);
     }
     #zr-input-area {
       padding: 12px 16px;
       padding-bottom: max(14px, env(safe-area-inset-bottom, 14px));
-      background: rgba(12, 16, 26, 0.98);
+      background: rgba(12, 16, 26, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-top: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       gap: 8px;
+      align-items: center;
     }
     #zr-input {
       flex: 1;
-      background: #080a0f;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 12px;
-      padding: 10px 14px;
+      background: rgba(7, 10, 16, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      border-radius: 14px;
+      padding: 10.5px 15px;
       color: #ffffff;
-      font-size: 14px;
+      font-size: 13.5px;
       outline: none;
-      transition: border-color 0.2s;
+      transition: all 0.2s ease;
       -webkit-appearance: none;
       touch-action: manipulation;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
+    }
+    #zr-input::placeholder {
+      color: rgba(148, 163, 184, 0.7);
     }
     #zr-input:focus {
-      border-color: ${customColor};
+      border-color: rgba(255, 77, 86, 0.65);
+      box-shadow: 
+        0 0 12px rgba(229, 37, 49, 0.25),
+        inset 0 1px 3px rgba(0, 0, 0, 0.35);
     }
     #zr-send-btn {
-      background: ${customColor};
-      border: none;
-      border-radius: 12px;
+      background: linear-gradient(145deg, #ff4d56 0%, ${customColor} 55%, #ba121b 100%);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 13px;
       width: 44px;
       height: 44px;
       min-width: 44px;
@@ -409,22 +562,32 @@
       justify-content: center;
       cursor: pointer;
       color: #ffffff;
-      transition: transform 0.15s, opacity 0.15s;
+      box-shadow: 
+        0 4px 14px rgba(229, 37, 49, 0.35),
+        inset 0 1px 1.5px rgba(255, 255, 255, 0.5);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
     }
     #zr-send-btn:hover {
-      transform: scale(1.05);
+      transform: scale(1.05) translateY(-1px);
+      box-shadow: 
+        0 6px 18px rgba(229, 37, 49, 0.5),
+        inset 0 1px 1.5px rgba(255, 255, 255, 0.6);
+    }
+    #zr-send-btn:active {
+      transform: scale(0.96);
     }
     #zr-send-btn:disabled {
-      opacity: 0.5;
+      opacity: 0.45;
       cursor: not-allowed;
       transform: none;
+      box-shadow: none;
     }
     #zr-footer-badge {
       text-align: center;
       padding: 5px 0 7px 0;
-      background: rgba(12, 16, 26, 0.98);
+      background: rgba(12, 16, 26, 0.85);
       border-top: 1px solid rgba(255, 255, 255, 0.04);
     }
     #zr-footer-badge a {
@@ -470,7 +633,7 @@
           </div>
         </div>
         <button class="close-btn" id="zr-close-btn" aria-label="Close chat">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
       </div>
       <div id="zr-messages"></div>
@@ -638,7 +801,6 @@
 
     // 4. Auto-link Standalone Raw URLs (https://... or http://...)
     escaped = escaped.replace(/(https?:\/\/[^\s<)]+)/g, function (m, url) {
-      // Strip trailing punctuation like .,;:!? from url
       var cleanUrl = url.replace(/[.,!?;:]+$/, '');
       var trailing = url.slice(cleanUrl.length);
       var targetAttr = getLinkTargetAttr(cleanUrl);
@@ -656,23 +818,61 @@
     // 7. Italic *text* or _text_
     escaped = escaped.replace(/\*([^*]+)\*/g, '<em class="zr-italic">$1</em>');
 
-    // 7. Split paragraphs
+    // 8. Process Unordered and Ordered Lists
+    var lines = escaped.split('\n');
+    var inUl = false;
+    var inOl = false;
+    var processedLines = [];
+
+    for (var l = 0; l < lines.length; l++) {
+      var line = lines[l];
+      var ulMatch = line.match(/^[\s]*[-*+]\s+(.+)$/);
+      var olMatch = line.match(/^[\s]*\d+\.\s+(.+)$/);
+
+      if (ulMatch) {
+        if (inOl) { processedLines.push('</ol>'); inOl = false; }
+        if (!inUl) { processedLines.push('<ul>'); inUl = true; }
+        processedLines.push('<li>' + ulMatch[1] + '</li>');
+      } else if (olMatch) {
+        if (inUl) { processedLines.push('</ul>'); inUl = false; }
+        if (!inOl) { processedLines.push('<ol>'); inOl = true; }
+        processedLines.push('<li>' + olMatch[1] + '</li>');
+      } else {
+        if (inUl) { processedLines.push('</ul>'); inUl = false; }
+        if (inOl) { processedLines.push('</ol>'); inOl = false; }
+        processedLines.push(line);
+      }
+    }
+    if (inUl) processedLines.push('</ul>');
+    if (inOl) processedLines.push('</ol>');
+
+    escaped = processedLines.join('\n');
+
+    // 9. Split paragraphs
     var paragraphs = escaped.split(/\n\s*\n/);
     var html = paragraphs.length > 1
-      ? paragraphs.map(function (p) { return '<p>' + p.replace(/\n/g, '<br/>') + '</p>'; }).join('')
+      ? paragraphs.map(function (p) { 
+          if (p.startsWith('<ul>') || p.startsWith('<ol>') || p.startsWith('<pre')) return p;
+          return '<p>' + p.replace(/\n/g, '<br/>') + '</p>'; 
+        }).join('')
       : escaped.replace(/\n/g, '<br/>');
 
-    // 8. Restore Links
+    // Clean up br tags inside list tags if any
+    html = html.replace(/<\/li><br\/>/g, '</li>');
+    html = html.replace(/<ul><br\/>/g, '<ul>');
+    html = html.replace(/<ol><br\/>/g, '<ol>');
+
+    // 10. Restore Links
     for (var i = 0; i < links.length; i++) {
       html = html.split('§§ZRLINK' + i + '§§').join(links[i]);
     }
 
-    // 9. Restore Inline Codes
+    // 11. Restore Inline Codes
     for (var j = 0; j < inlineCodes.length; j++) {
       html = html.split('§§ZRCODE' + j + '§§').join(inlineCodes[j]);
     }
 
-    // 10. Restore Code Blocks
+    // 12. Restore Code Blocks
     for (var k = 0; k < codeBlocks.length; k++) {
       html = html.split('§§ZRBLOCK' + k + '§§').join(codeBlocks[k]);
     }
@@ -684,7 +884,16 @@
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
   }
 
+  var mascotIconSvg = '<div class="zr-bot-avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2L14.39 8.26L21 9.27L16.2 13.97L17.33 20.6L12 17.27L6.67 20.6L7.8 13.97L3 9.27L9.61 8.26L12 2Z"/></svg></div>';
+
   function appendMessage(role, text, isRawHtml) {
+    var rowDiv = document.createElement("div");
+    rowDiv.className = "zr-msg-row " + (role === "user" ? "user-row" : "bot-row");
+
+    if (role !== "user") {
+      rowDiv.innerHTML = mascotIconSvg;
+    }
+
     var msgDiv = document.createElement("div");
     msgDiv.className = "zr-msg " + (role === "user" ? "user" : "bot");
     if (role === "user") {
@@ -694,7 +903,8 @@
     } else {
       msgDiv.innerHTML = renderMarkdown(text);
     }
-    messagesContainer.appendChild(msgDiv);
+    rowDiv.appendChild(msgDiv);
+    messagesContainer.appendChild(rowDiv);
     scrollToBottom();
     return msgDiv;
   }
@@ -851,3 +1061,4 @@
     sendMessage(inputField.value);
   });
 })();
+
