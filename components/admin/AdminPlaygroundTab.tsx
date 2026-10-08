@@ -484,10 +484,10 @@ export function AdminPlaygroundTab({ providers }: AdminPlaygroundTabProps) {
               type="button"
               onClick={handleRunTest}
               disabled={loading}
-              className={`inline-flex items-center justify-center gap-2 px-5 py-2 min-h-[44px] text-xs font-bold rounded-xl shadow-md transition-all shrink-0 touch-manipulation ${
+              className={`inline-flex items-center justify-center gap-2 px-5 py-2 min-h-[44px] text-xs font-bold rounded-xl transition-all shrink-0 touch-manipulation ${
                 loading
                   ? "bg-white/10 text-slate-400 border border-white/10 cursor-not-allowed"
-                  : "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-red-500/20 active:scale-95 cursor-pointer"
+                  : "bg-gradient-to-b from-[#e5333b] to-[#c71d25] hover:from-[#f03e46] hover:to-[#d6232b] text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_6px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
               }`}
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin text-red-400" /> : <Play className="w-4 h-4 fill-white text-white" />}

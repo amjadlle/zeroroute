@@ -247,7 +247,7 @@ export function AdminKnowledgeTab({ customers = [] }: AdminKnowledgeTabProps) {
         {/* Header Banner */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-white/10">
           <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-[10.5px] font-semibold">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-[10.5px] font-semibold">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Smart BM25 Semantic RAG</span>
             </div>
@@ -352,7 +352,7 @@ export function AdminKnowledgeTab({ customers = [] }: AdminKnowledgeTabProps) {
                   type="button"
                   onClick={handleSaveSnippet}
                   disabled={savingSnippet}
-                  className="px-4 py-2 min-h-[44px] text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl shadow-md shadow-red-500/20 transition-all active:scale-95 cursor-pointer disabled:opacity-50 touch-manipulation w-full sm:w-auto"
+                  className="px-4 py-2 min-h-[44px] text-xs font-bold bg-gradient-to-b from-[#e5333b] to-[#c71d25] hover:from-[#f03e46] hover:to-[#d6232b] text-white rounded-xl border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_4px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all cursor-pointer disabled:opacity-50 touch-manipulation w-full sm:w-auto"
                 >
                   {savingSnippet ? "Indexing…" : "Save Snippet →"}
                 </button>
@@ -401,7 +401,7 @@ export function AdminKnowledgeTab({ customers = [] }: AdminKnowledgeTabProps) {
                   type="button"
                   onClick={handleCrawlUrl}
                   disabled={crawling}
-                  className="px-5 py-2.5 min-h-[44px] text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl transition-all active:scale-95 shadow-lg shadow-red-500/20 shrink-0 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 touch-manipulation"
+                  className="px-5 py-2.5 min-h-[44px] text-xs font-bold bg-gradient-to-b from-[#e5333b] to-[#c71d25] hover:from-[#f03e46] hover:to-[#d6232b] text-white rounded-xl border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_4px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all shrink-0 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 touch-manipulation"
                 >
                   {crawling ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
                   <span>{crawling ? "Crawling…" : "Crawl URL"}</span>
@@ -416,7 +416,7 @@ export function AdminKnowledgeTab({ customers = [] }: AdminKnowledgeTabProps) {
                 <h4 className="text-xs font-bold text-white flex items-center gap-2">
                   <Layers className="w-4 h-4 text-purple-400" />
                   <span>Active Knowledge Sources</span>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                  <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono bg-purple-500/10 text-purple-300 border border-purple-500/20">
                     {docs.length}
                   </span>
                 </h4>

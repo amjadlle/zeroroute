@@ -128,7 +128,7 @@ export function PersonaTab({
           <button
             type="submit"
             disabled={saving}
-            className="w-full sm:w-auto px-6 py-3 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-lg shadow-red-500/20 active:scale-95 cursor-pointer transition-all disabled:opacity-70 flex items-center justify-center gap-2 touch-manipulation"
+            className="w-full sm:w-auto px-6 py-3 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-b from-[#e5333b] to-[#c71d25] hover:from-[#f03e46] hover:to-[#d6232b] text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_6px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 transition-all active:translate-y-0 active:scale-95 cursor-pointer disabled:opacity-70 flex items-center justify-center gap-2 touch-manipulation"
           >
             {saving ? (
               <>

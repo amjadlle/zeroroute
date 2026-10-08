@@ -267,7 +267,7 @@ export function AdminProvidersTab({ providers, onUpdateProviders }: AdminProvide
             type="button"
             onClick={handleRunBenchmark}
             disabled={benchmarking}
-            className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-lg shadow-red-500/20 active:scale-95 transition-all cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed touch-manipulation"
+            className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-b from-[#e5333b] to-[#c71d25] hover:from-[#f03e46] hover:to-[#d6232b] text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_6px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed touch-manipulation"
           >
             {benchmarking ? (
               <>
@@ -314,7 +314,7 @@ export function AdminProvidersTab({ providers, onUpdateProviders }: AdminProvide
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-white">{r.providerName}</span>
                   <span
-                    className={`font-mono text-[11px] font-semibold px-2 py-0.5 rounded-full ${
+                    className={`font-mono text-[11px] font-semibold px-2 py-0.5 rounded-lg ${
                       r.status === "ok" ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"
                     }`}
                   >
@@ -400,7 +400,7 @@ export function AdminProvidersTab({ providers, onUpdateProviders }: AdminProvide
                       </a>
 
                       <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                        className={`inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-semibold ${
                           p.configured
                             ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                             : "bg-amber-500/10 text-amber-400 border border-amber-500/20"

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
-import { TerminalFailover } from "@/components/TerminalFailover";
+import { GatewaySection } from "@/components/GatewaySection";
 import { ChatWidgetSection } from "@/components/ChatWidgetSection";
 import { Features } from "@/components/Features";
 import { ProviderMarquee } from "@/components/ProviderMarquee";
@@ -23,7 +23,7 @@ export default function Home() {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-4 sm:pb-6">
         <div className="space-y-24 sm:space-y-32 mt-6 sm:mt-10">
           <Hero onOpenCheckout={() => setCheckoutOpen(true)} />
-          <TerminalFailover />
+          <GatewaySection />
           <ChatWidgetSection />
           <Features />
           <ProviderMarquee />

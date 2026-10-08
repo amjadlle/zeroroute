@@ -221,7 +221,7 @@ export function AdminCustomersTab({ customers, onRefresh }: AdminCustomersTabPro
               setCreatedBot(null);
               setIsModalOpen(true);
             }}
-            className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-semibold text-xs transition-all shadow-lg shadow-red-500/20 flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+            className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] rounded-xl bg-gradient-to-b from-[#e5333b] to-[#c71d25] hover:from-[#f03e46] hover:to-[#d6232b] text-white font-semibold text-xs border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_6px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 shrink-0 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Create Unlimited Bot</span>
@@ -270,7 +270,7 @@ export function AdminCustomersTab({ customers, onRefresh }: AdminCustomersTabPro
                 {/* Status Pill */}
                 <div className="flex items-center gap-2">
                   <span
-                    className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${
+                    className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold ${
                       c.status === "active"
                         ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
                         : c.status === "paused"
@@ -610,7 +610,7 @@ export function AdminCustomersTab({ customers, onRefresh }: AdminCustomersTabPro
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-5 py-2.5 text-xs font-semibold rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white transition-all shadow-lg shadow-red-500/20 disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+                    className="px-5 py-2.5 text-xs font-semibold rounded-xl bg-gradient-to-b from-[#e5333b] to-[#c71d25] hover:from-[#f03e46] hover:to-[#d6232b] text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_6px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer"
                   >
                     {isSubmitting ? (
                       <>

@@ -362,7 +362,7 @@ export function ProviderModelCatalogModal({
             <div className="p-4 bg-black/40 border border-white/10 rounded-2xl space-y-2.5">
               <div className="flex items-center justify-between gap-3 flex-wrap">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <span className="px-2.5 py-0.5 rounded-lg text-[11px] font-bold font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                     {catalogData.poolBadge}
                   </span>
                   <span className="text-xs font-semibold text-slate-300">
@@ -537,7 +537,7 @@ export function ProviderModelCatalogModal({
                     <h3 className="text-xs font-extrabold text-white uppercase tracking-wider">{cat.name}</h3>
                     <p className="text-[11px] text-slate-400">{cat.description}</p>
                   </div>
-                  <span className="text-[10px] font-mono text-slate-400 font-semibold bg-white/5 px-2.5 py-0.5 rounded-full border border-white/5">
+                  <span className="text-[10px] font-mono text-slate-400 font-semibold bg-white/5 px-2.5 py-0.5 rounded-lg border border-white/5">
                     {cat.models.length} Models
                   </span>
                 </div>
@@ -568,12 +568,12 @@ export function ProviderModelCatalogModal({
                               {m.brain}
                             </span>
                             {isPrimary && (
-                              <span className="text-[10px] font-bold text-red-300 bg-red-500/20 border border-red-500/40 px-2 py-0.5 rounded-full uppercase">
+                              <span className="text-[10px] font-bold text-red-300 bg-red-500/20 border border-red-500/40 px-2 py-0.5 rounded-lg uppercase">
                                 🏆 Primary
                               </span>
                             )}
                             {inChain && !isPrimary && (
-                              <span className="text-[10px] font-bold text-amber-300 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded-full">
+                              <span className="text-[10px] font-bold text-amber-300 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded-lg">
                                 #{chainIndex + 1} Chain
                               </span>
                             )}
@@ -681,7 +681,7 @@ export function ProviderModelCatalogModal({
                                     type="button"
                                     disabled={Boolean(savingAction)}
                                     onClick={() => handleAddToChain(m.id)}
-                                    className="inline-flex items-center justify-center gap-1 px-4 py-2 min-h-[44px] text-xs font-bold rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-md shadow-red-500/20 transition-all active:scale-95 disabled:opacity-50 cursor-pointer touch-manipulation flex-1 sm:flex-initial"
+                                    className="inline-flex items-center justify-center gap-1 px-4 py-2 min-h-[44px] text-xs font-bold rounded-xl bg-gradient-to-b from-[#e5333b] to-[#c71d25] hover:from-[#f03e46] hover:to-[#d6232b] text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_4px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 disabled:opacity-50 cursor-pointer touch-manipulation flex-1 sm:flex-initial"
                                   >
                                     {isAddingToChain ? (
                                       <Loader2 className="w-3.5 h-3.5 animate-spin" />

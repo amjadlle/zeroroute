@@ -25,14 +25,14 @@ export function ChatWidgetSection() {
   return (
     <section id="widget" className="space-y-8 scroll-mt-20">
       <div className="text-center space-y-3 max-w-2xl mx-auto">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold">
           <span>✨</span> Embed Anywhere in 10 Seconds
         </div>
         <h2 className="text-3xl sm:text-4xl font-extrabold text-white">
           The 1-Line Website AI Chatbot
         </h2>
         <p className="text-sm text-slate-400">
-          Turn your multi-cloud free quota into a smart, floating AI assistant on your portfolio, Webflow, WordPress, Next.js, or React site.
+          Turn your multi-cloud pooled quota into a smart, floating AI assistant on your portfolio, Webflow, WordPress, Next.js, or React site.
         </p>
       </div>
 
@@ -66,8 +66,8 @@ export function ChatWidgetSection() {
               <div className="text-[10px] text-slate-400 mt-0.5">XSS Immune</div>
             </div>
             <div className="p-3 bg-dark-card border border-dark-border rounded-xl">
-              <div className="text-base font-bold text-red-400 font-mono">$0/mo</div>
-              <div className="text-[10px] text-slate-400 mt-0.5">Unlimited Visitors</div>
+              <div className="text-base font-bold text-red-400 font-mono">&lt;8ms</div>
+              <div className="text-[10px] text-slate-400 mt-0.5">Instant Response</div>
             </div>
           </div>
         </div>
@@ -87,22 +87,16 @@ export function ChatWidgetSection() {
             type="button"
             onClick={() => {
               if (typeof window !== "undefined") {
-                const widgetBox = document.getElementById("zr-widget-box");
-                const widgetBtn = document.getElementById("zr-widget-btn") || document.getElementById("zr-chat-bubble");
-                if (widgetBox && widgetBox.style.display !== "flex") {
-                  if (widgetBtn) widgetBtn.click();
-                } else if (widgetBtn) {
-                  widgetBtn.click();
-                }
-                const inputField = document.getElementById("zr-input");
-                if (inputField) {
-                  setTimeout(() => inputField.focus(), 100);
+                if ((window as any).ZeroRoute?.open) {
+                  (window as any).ZeroRoute.open();
+                } else {
+                  window.dispatchEvent(new CustomEvent("zeroroute:open"));
                 }
               }
             }}
-            className="inline-flex items-center gap-2 px-5 py-3 text-xs font-bold bg-red-600 hover:bg-red-500 text-white rounded-xl shadow-lg shadow-red-500/25 transition-all active:scale-95 cursor-pointer min-h-[44px] touch-manipulation"
+            className="inline-flex items-center gap-2 px-6 py-3 text-xs sm:text-sm font-bold bg-gradient-to-b from-[#e5333b] to-[#c71d25] hover:from-[#f03e46] hover:to-[#d6232b] text-white rounded-xl border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_6px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 transition-all active:translate-y-0 active:scale-95 cursor-pointer min-h-[44px] touch-manipulation"
           >
-            <MessageSquare className="w-4 h-4" />
+            <MessageSquare className="w-4 h-4 fill-white" />
             <span>Open Chatbot Widget</span>
           </button>
         </div>

@@ -49,11 +49,11 @@ export function Features() {
   return (
     <section id="features" className="space-y-12 scroll-mt-20">
       <div className="text-center space-y-3 max-w-2xl mx-auto">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold">
           <span>⚡</span> Built for Solo Founders &amp; Startups
         </div>
         <h2 className="text-3xl sm:text-4xl font-extrabold text-white">
-          Everything You Need to Scale for Free
+          Everything You Need to Launch &amp; Scale at 99% Lower Cost
         </h2>
         <p className="text-sm text-slate-400">
           Enterprise-grade multi-cloud routing without the $500/month OpenAI or Anthropic bills.

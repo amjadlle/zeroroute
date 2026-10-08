@@ -188,7 +188,7 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
               setMode("text");
               setModalOpen(true);
             }}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-lg cursor-pointer transition-all touch-manipulation"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-b from-[#e5333b] to-[#c71d25] hover:from-[#f03e46] hover:to-[#d6232b] text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_6px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 active:translate-y-0 cursor-pointer transition-all touch-manipulation"
           >
             <Plus className="w-3.5 h-3.5 shrink-0" />
             <span>Add Text Doc</span>
@@ -457,7 +457,7 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
                   <button
                     type="submit"
                     disabled={crawling}
-                    className="px-5 py-2.5 min-h-[44px] rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer touch-manipulation"
+                    className="px-5 py-2.5 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-b from-[#2563eb] to-[#1d4ed8] hover:from-[#3b82f6] hover:to-[#2563eb] text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_6px_rgba(0,0,0,0.4)] flex items-center justify-center gap-1.5 disabled:opacity-50 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer touch-manipulation"
                   >
                     {crawling ? (
                       <>
@@ -513,7 +513,7 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
                   <button
                     type="submit"
                     disabled={addingDoc}
-                    className="px-5 py-2.5 min-h-[44px] rounded-xl text-xs font-bold bg-red-600 hover:bg-red-500 text-white disabled:opacity-50 cursor-pointer touch-manipulation"
+                    className="px-5 py-2.5 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-b from-[#e5333b] to-[#c71d25] hover:from-[#f03e46] hover:to-[#d6232b] text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_6px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 cursor-pointer touch-manipulation"
                   >
                     {addingDoc ? "Saving…" : "Add to Knowledge Base"}
                   </button>

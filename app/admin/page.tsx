@@ -160,7 +160,7 @@ export default function AdminDashboardPage() {
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`flex items-center gap-2 px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all whitespace-nowrap cursor-pointer touch-manipulation shrink-0 ${
                   isSelected
-                    ? "bg-red-600 text-white font-bold shadow-lg shadow-red-600/20"
+                    ? "bg-gradient-to-b from-[#e5333b] to-[#c71d25] text-white font-bold border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_4px_rgba(0,0,0,0.4)]"
                     : "text-slate-400 hover:text-white hover:bg-white/5 border border-transparent"
                 }`}
               >

@@ -192,7 +192,7 @@ curl ${hostUrl}/v1/chat/completions \\
             <button
               type="button"
               onClick={handleCopy}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 min-h-[44px] text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl shadow-md transition-all active:scale-95 shrink-0 cursor-pointer touch-manipulation"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 min-h-[44px] text-xs font-bold bg-gradient-to-b from-[#e5333b] to-[#c71d25] hover:from-[#f03e46] hover:to-[#d6232b] text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_6px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 transition-all active:translate-y-0 active:scale-95 shrink-0 cursor-pointer touch-manipulation"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? "Copied!" : "Copy Code"}</span>
@@ -217,7 +217,7 @@ curl ${hostUrl}/v1/chat/completions \\
                 onClick={() => setActiveSnippet(tab.id as any)}
                 className={`px-3.5 py-2 min-h-[44px] text-xs rounded-xl font-semibold transition-all cursor-pointer touch-manipulation flex items-center shrink-0 ${
                   isSelected
-                    ? "bg-red-600 text-white font-bold shadow-md shadow-red-600/25"
+                    ? "bg-gradient-to-b from-[#e5333b] to-[#c71d25] text-white font-bold border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_4px_rgba(0,0,0,0.4)]"
                     : "bg-[#080a0f] border border-dark-border text-slate-300 hover:text-white hover:bg-white/5"
                 }`}
               >
@@ -328,7 +328,7 @@ curl ${hostUrl}/v1/chat/completions \\
                   <span>Real-Time Widget Preview</span>
                 </span>
                 <span
-                  className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full"
+                  className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-lg"
                   style={{ backgroundColor: `${brandColor}20`, color: brandColor, border: `1px solid ${brandColor}40` }}
                 >
                   Live Theme
@@ -432,7 +432,7 @@ curl ${hostUrl}/v1/chat/completions \\
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-3.5 border-b border-white/10">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-red-600 to-rose-600 flex items-center justify-center text-white shadow-lg shadow-red-500/25">
+                <div className="w-9 h-9 rounded-xl bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-400">
                   <BookOpen className="w-4 h-4" />
                 </div>
                 <div>
@@ -469,7 +469,7 @@ curl ${hostUrl}/v1/chat/completions \\
                     onClick={() => setGuidePlatform(p.id as any)}
                     className={`px-3 py-2 min-h-[44px] text-xs rounded-xl font-semibold transition-all shrink-0 cursor-pointer touch-manipulation flex items-center ${
                       isSelected
-                        ? "bg-red-600 text-white font-bold shadow-md shadow-red-600/25"
+                        ? "bg-gradient-to-b from-[#e5333b] to-[#c71d25] text-white font-bold border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_4px_rgba(0,0,0,0.4)]"
                         : "bg-[#080a0f] border border-dark-border text-slate-300 hover:text-white hover:bg-white/5"
                     }`}
                   >

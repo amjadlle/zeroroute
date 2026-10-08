@@ -64,7 +64,7 @@ export function AdminHeader({
                 ZeroRoute
               </span>
             </Link>
-            <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-bold uppercase tracking-wider shrink-0">
+            <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-bold uppercase tracking-wider shrink-0">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>Master Admin</span>
             </div>
@@ -74,7 +74,7 @@ export function AdminHeader({
           <div className="hidden md:flex items-center gap-2 sm:gap-3 shrink-0">
             <Link
               href="/app"
-              className="inline-flex items-center gap-1.5 px-3 py-2 min-h-[38px] text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 rounded-xl transition-all shadow-sm touch-manipulation"
+              className="inline-flex items-center gap-1.5 px-3 py-2 min-h-[38px] text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 rounded-xl transition-all shadow-sm touch-manipulation hover:-translate-y-0.5 active:translate-y-0"
             >
               <LayoutDashboard className="w-3.5 h-3.5 text-slate-400" />
               <span>Subscriber View (/app)</span>
@@ -83,7 +83,7 @@ export function AdminHeader({
             <Link
               href="/"
               target="_blank"
-              className="inline-flex items-center gap-1.5 px-3 py-2 min-h-[38px] text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 rounded-xl transition-all shadow-sm touch-manipulation"
+              className="inline-flex items-center gap-1.5 px-3 py-2 min-h-[38px] text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 rounded-xl transition-all shadow-sm touch-manipulation hover:-translate-y-0.5 active:translate-y-0"
             >
               <Globe className="w-3.5 h-3.5 text-slate-400" />
               <span>Public Site</span>
@@ -93,7 +93,7 @@ export function AdminHeader({
               href="https://buymeacoffee.com/amjadlle"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-2 min-h-[38px] text-xs font-bold bg-[#FFDD00] hover:bg-[#FFEA47] text-zinc-950 rounded-xl transition-all active:scale-95 shadow-md shadow-amber-500/20 whitespace-nowrap cursor-pointer touch-manipulation"
+              className="inline-flex items-center gap-1.5 px-3 py-2 min-h-[38px] text-xs font-bold bg-gradient-to-b from-[#ffd700] to-[#e6b800] hover:from-[#ffe033] hover:to-[#cca300] text-zinc-950 rounded-xl border border-white/40 shadow-[inset_0_1px_1px_rgba(255,255,255,0.6),0_2px_4px_rgba(0,0,0,0.4)] transition-all hover:-translate-y-0.5 active:translate-y-0 active:scale-95 whitespace-nowrap cursor-pointer touch-manipulation"
               title="Buy Me a Coffee"
             >
               <span>☕</span>
@@ -103,7 +103,7 @@ export function AdminHeader({
             <button
               type="button"
               onClick={onOpenKeysModal}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[38px] text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl shadow-md shadow-red-500/25 transition-all active:scale-95 cursor-pointer touch-manipulation shrink-0"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[38px] text-xs font-bold bg-gradient-to-b from-[#e5333b] to-[#c71d25] hover:from-[#f03e46] hover:to-[#d6232b] text-white rounded-xl border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_4px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 transition-all active:translate-y-0 active:scale-95 cursor-pointer touch-manipulation shrink-0"
             >
               <KeyRound className="w-3.5 h-3.5 shrink-0" />
               <span>API Keys</span>
@@ -112,7 +112,7 @@ export function AdminHeader({
             <button
               type="button"
               onClick={onLogout}
-              className="flex items-center justify-center p-2 sm:p-2.5 min-w-[38px] sm:min-w-[44px] min-h-[38px] sm:min-h-[44px] rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer touch-manipulation shrink-0"
+              className="flex items-center justify-center p-2 sm:p-2.5 min-w-[38px] sm:min-w-[44px] min-h-[38px] sm:min-h-[44px] rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-all hover:-translate-y-0.5 active:translate-y-0 cursor-pointer touch-manipulation shrink-0"
               title="Sign Out"
               aria-label="Sign Out"
             >
@@ -126,7 +126,7 @@ export function AdminHeader({
             <button
               type="button"
               onClick={onOpenKeysModal}
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 min-h-[36px] text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-lg shadow-sm transition-all active:scale-95 cursor-pointer touch-manipulation"
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 min-h-[36px] text-xs font-bold bg-gradient-to-b from-[#e5333b] to-[#c71d25] hover:from-[#f03e46] hover:to-[#d6232b] text-white rounded-lg border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_4px_rgba(0,0,0,0.4)] transition-all active:scale-95 cursor-pointer touch-manipulation"
             >
               <KeyRound className="w-3.5 h-3.5 shrink-0" />
               <span>Keys</span>
@@ -148,7 +148,7 @@ export function AdminHeader({
           <div className="md:hidden border-t border-white/10 bg-[#080b12] px-4 py-3 space-y-2 animate-in slide-in-from-top-2 duration-200 shadow-2xl">
             <div className="flex items-center justify-between pb-2 border-b border-white/5 text-xs">
               <span className="text-slate-400 font-medium">Role:</span>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-bold uppercase tracking-wider">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-bold uppercase tracking-wider">
                 <ShieldCheck className="w-3.5 h-3.5" />
                 <span>Master Admin</span>
               </div>

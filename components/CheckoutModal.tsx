@@ -67,7 +67,7 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
         <div className="p-5 sm:p-7 space-y-5">
           {/* Header & Value Prop */}
           <div className="space-y-2 pr-6">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide bg-red-500/20 text-red-300 border border-red-400/30">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold tracking-wide bg-red-500/20 text-red-300 border border-red-400/30">
               <Sparkles className="w-3.5 h-3.5 text-red-300" />
               <span>ZeroRoute Pro Plan</span>
             </div>
@@ -144,7 +144,7 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
               type="button"
               onClick={handleStartCheckout}
               disabled={loading}
-              className="group w-full flex items-center justify-center gap-2 py-3.5 px-5 rounded-xl text-sm font-extrabold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-xl shadow-red-600/35 border border-red-400/30 hover:scale-[1.01] active:scale-[0.98] transition-all cursor-pointer disabled:brightness-95 disabled:cursor-wait"
+              className="group w-full flex items-center justify-center gap-2 py-3.5 px-5 rounded-xl text-sm font-bold bg-gradient-to-b from-[#e5333b] to-[#c71d25] hover:from-[#f03e46] hover:to-[#d6232b] text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_6px_rgba(0,0,0,0.4)] transition-all active:scale-95 cursor-pointer disabled:brightness-95 disabled:cursor-wait touch-manipulation min-h-[46px]"
             >
               {loading ? (
                 <>

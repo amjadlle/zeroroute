@@ -474,7 +474,7 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
                 type="button"
                 disabled={chatStreaming}
                 onClick={() => handleSendTestChat(p)}
-                className="px-3 py-1 min-h-[32px] rounded-full bg-white/5 hover:bg-red-500/15 hover:border-red-500/30 border border-white/10 text-[11px] text-slate-300 hover:text-red-300 whitespace-nowrap cursor-pointer transition-all active:scale-95 disabled:opacity-50 touch-manipulation shrink-0"
+                className="px-3 py-1 min-h-[32px] rounded-lg bg-white/5 hover:bg-red-500/15 hover:border-red-500/30 border border-white/10 text-[11px] text-slate-300 hover:text-red-300 whitespace-nowrap cursor-pointer hover:-translate-y-0.5 transition-all active:translate-y-0 active:scale-95 disabled:opacity-50 touch-manipulation shrink-0"
               >
                 {p}
               </button>
@@ -508,7 +508,7 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
               className={`px-4 py-2.5 min-h-[40px] rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 touch-manipulation shrink-0 ${
                 !chatInput.trim() || chatStreaming
                   ? "bg-white/5 text-slate-600 border border-white/5 cursor-not-allowed"
-                  : "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-md shadow-red-500/20 active:scale-95 cursor-pointer"
+                  : "bg-gradient-to-b from-[#e5333b] to-[#c71d25] hover:from-[#f03e46] hover:to-[#d6232b] text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_6px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
               }`}
             >
               <Send className={`w-3.5 h-3.5 ${!chatInput.trim() || chatStreaming ? "text-slate-600" : "text-white"}`} />

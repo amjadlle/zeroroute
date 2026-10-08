@@ -143,7 +143,7 @@ export function AdminLogsTab({ logs, onRefresh, loading }: AdminLogsTabProps) {
                   >
                     <td className="py-3 px-4 font-mono whitespace-nowrap">
                       <span
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold ${
                           isSuccess
                             ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                             : "bg-rose-500/10 text-rose-400 border border-rose-500/20"
@@ -171,7 +171,7 @@ export function AdminLogsTab({ logs, onRefresh, loading }: AdminLogsTabProps) {
                     </td>
 
                     <td className="py-3 px-4">
-                      <span className={`inline-block px-2 py-0.5 rounded-full font-mono text-[10.5px] font-bold border ${latencyColor}`}>
+                      <span className={`inline-block px-2 py-0.5 rounded-lg font-mono text-[10.5px] font-bold border ${latencyColor}`}>
                         {log.latency_ms}ms
                       </span>
                     </td>

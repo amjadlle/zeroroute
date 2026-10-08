@@ -131,7 +131,7 @@ print(response.choices[0].message.content)`;
             <button
               type="button"
               onClick={handleCopy}
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[44px] text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl shadow-md shadow-red-500/20 transition-all active:scale-95 cursor-pointer touch-manipulation flex-1 sm:flex-initial"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[44px] text-xs font-bold bg-gradient-to-b from-[#e5333b] to-[#c71d25] hover:from-[#f03e46] hover:to-[#d6232b] text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_4px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all cursor-pointer touch-manipulation flex-1 sm:flex-initial"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? "Copied Code!" : "Copy Code"}</span>
@@ -146,7 +146,7 @@ print(response.choices[0].message.content)`;
             onClick={() => setActiveFormat("widget")}
             className={`px-3.5 py-2 min-h-[44px] text-xs rounded-xl font-bold transition-all cursor-pointer touch-manipulation flex items-center ${
               activeFormat === "widget"
-                ? "bg-red-600 text-white shadow-md shadow-red-600/20"
+                ? "bg-gradient-to-b from-[#e5333b] to-[#c71d25] text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_4px_rgba(0,0,0,0.4)]"
                 : "bg-black/50 text-slate-300 hover:text-white border border-white/10"
             }`}
           >
@@ -157,7 +157,7 @@ print(response.choices[0].message.content)`;
             onClick={() => setActiveFormat("ai")}
             className={`px-3.5 py-2 min-h-[44px] text-xs rounded-xl font-bold transition-all cursor-pointer touch-manipulation flex items-center ${
               activeFormat === "ai"
-                ? "bg-red-600 text-white shadow-md shadow-red-600/20"
+                ? "bg-gradient-to-b from-[#e5333b] to-[#c71d25] text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_4px_rgba(0,0,0,0.4)]"
                 : "bg-black/50 text-slate-300 hover:text-white border border-white/10"
             }`}
           >
@@ -168,7 +168,7 @@ print(response.choices[0].message.content)`;
             onClick={() => setActiveFormat("js")}
             className={`px-3.5 py-2 min-h-[44px] text-xs rounded-xl font-bold transition-all cursor-pointer touch-manipulation flex items-center ${
               activeFormat === "js"
-                ? "bg-red-600 text-white shadow-md shadow-red-600/20"
+                ? "bg-gradient-to-b from-[#e5333b] to-[#c71d25] text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_4px_rgba(0,0,0,0.4)]"
                 : "bg-black/50 text-slate-300 hover:text-white border border-white/10"
             }`}
           >
@@ -179,7 +179,7 @@ print(response.choices[0].message.content)`;
             onClick={() => setActiveFormat("py")}
             className={`px-3.5 py-2 min-h-[44px] text-xs rounded-xl font-bold transition-all cursor-pointer touch-manipulation flex items-center ${
               activeFormat === "py"
-                ? "bg-red-600 text-white shadow-md shadow-red-600/20"
+                ? "bg-gradient-to-b from-[#e5333b] to-[#c71d25] text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_4px_rgba(0,0,0,0.4)]"
                 : "bg-black/50 text-slate-300 hover:text-white border border-white/10"
             }`}
           >
@@ -190,7 +190,7 @@ print(response.choices[0].message.content)`;
             onClick={() => setActiveFormat("curl")}
             className={`px-3.5 py-2 min-h-[44px] text-xs rounded-xl font-bold transition-all cursor-pointer touch-manipulation flex items-center ${
               activeFormat === "curl"
-                ? "bg-red-600 text-white shadow-md shadow-red-600/20"
+                ? "bg-gradient-to-b from-[#e5333b] to-[#c71d25] text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_4px_rgba(0,0,0,0.4)]"
                 : "bg-black/50 text-slate-300 hover:text-white border border-white/10"
             }`}
           >

@@ -25,8 +25,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "ZeroRoute — $0/mo Multi-Cloud AI Gateway for Solo Founders & Startups",
-  description: "Never pay for LLMs again. One OpenAI-compatible endpoint with intelligent dynamic routing across 11 pooled AI cloud providers and a 1-line website chatbot widget.",
+  title: "ZeroRoute — 1-Line Custom AI Chatbot & Multi-Cloud Gateway",
+  description: "Add a custom AI chatbot to your website in 1 minute. Intelligent multi-cloud routing across 11 pooled AI providers (Gemini, Groq, Cerebras, Mistral, SambaNova, Cohere, and more). 10,000 monthly requests included.",
   icons: {
     icon: [
       { url: "/favicon.png", sizes: "any" },
@@ -36,16 +36,16 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
-    title: "ZeroRoute — $0/mo Multi-Cloud AI Gateway",
-    description: "Never pay for LLMs again. Intelligent multi-cloud routing across 11 free AI providers (Groq, Cerebras, Mistral, Google Gemini, Cloudflare, SambaNova, NVIDIA, and more). 10,000 monthly requests included.",
+    title: "ZeroRoute — 1-Line Custom AI Chatbot & Multi-Cloud Gateway",
+    description: "Embed an AI customer chatbot in 1 minute. Intelligent routing across 11 pooled AI cloud providers with sub-8ms fallback. 10,000 monthly requests included.",
     url: "https://zeroroute.mapki.in",
     siteName: "ZeroRoute",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ZeroRoute — $0/mo Multi-Cloud AI Gateway",
-    description: "Intelligent routing across 11 free AI cloud providers. 10,000 requests/month, zero token costs, 100% reliable.",
+    title: "ZeroRoute — 1-Line Custom AI Chatbot & Multi-Cloud Gateway",
+    description: "Embed a custom AI chatbot in 1 minute. Intelligent routing across 11 pooled AI cloud providers with sub-8ms fallback.",
   },
 };
 

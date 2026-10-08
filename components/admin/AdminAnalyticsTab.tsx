@@ -198,7 +198,7 @@ export function AdminAnalyticsTab({ providers, logs, onRefresh, loading }: Admin
                   </div>
 
                   <span
-                    className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                    className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-lg ${
                       p.configured
                         ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                         : "bg-amber-500/10 text-amber-400 border border-amber-500/20"

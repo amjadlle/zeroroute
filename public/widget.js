@@ -562,6 +562,28 @@
     }
   }
 
+  function openChat() {
+    if (!isOpen) {
+      toggleChat();
+    }
+  }
+
+  function closeChat() {
+    if (isOpen) {
+      toggleChat();
+    }
+  }
+
+  // Global API & Custom Event Triggers for Host Pages
+  window.ZeroRoute = window.ZeroRoute || {};
+  window.ZeroRoute.open = openChat;
+  window.ZeroRoute.close = closeChat;
+  window.ZeroRoute.toggle = toggleChat;
+
+  window.addEventListener("zeroroute:open", openChat);
+  window.addEventListener("zeroroute:close", closeChat);
+  window.addEventListener("zeroroute:toggle", toggleChat);
+
   widgetBtn.addEventListener("click", toggleChat);
   closeBtn.addEventListener("click", toggleChat);
 

@@ -78,7 +78,7 @@ export function BillingModal({
                 {monthlyLimit >= 10000 ? "ZeroRoute Pro" : "ZeroRoute Free"}
               </span>
             </div>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-mono">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-mono">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>{monthlyLimit >= 10000 ? "Active Pro" : "Free Forever"}</span>
             </span>
@@ -122,7 +122,7 @@ export function BillingModal({
           ) : (
             <a
               href="/api/checkout"
-              className="w-full flex items-center justify-center gap-2 py-3.5 px-4 min-h-[44px] rounded-xl text-xs sm:text-sm font-extrabold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-xl shadow-red-600/35 border border-red-400/30 active:scale-95 transition-all cursor-pointer touch-manipulation"
+              className="w-full flex items-center justify-center gap-2 py-3.5 px-4 min-h-[44px] rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-b from-[#e5333b] to-[#c71d25] hover:from-[#f03e46] hover:to-[#d6232b] text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_6px_rgba(0,0,0,0.4)] active:scale-95 transition-all cursor-pointer touch-manipulation"
             >
               <span>⚡ Upgrade to Pro ($2.00 / month)</span>
               <ExternalLink className="w-3.5 h-3.5" />

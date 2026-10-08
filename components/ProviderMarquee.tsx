@@ -39,7 +39,7 @@ export function ProviderMarquee() {
     <>
       <section id="providers" className="space-y-6 scroll-mt-20 max-w-5xl mx-auto">
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
             <Zap className="w-3.5 h-3.5" />
             <span>11 Pooled AI Clouds</span>
           </div>
@@ -94,7 +94,7 @@ export function ProviderMarquee() {
           <button
             type="button"
             onClick={() => setModalOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white border border-white/10 transition-all active:scale-95 shadow-sm cursor-pointer min-h-[44px] touch-manipulation"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white border border-white/10 transition-all hover:-translate-y-0.5 active:translate-y-0 shadow-sm cursor-pointer min-h-[44px] touch-manipulation"
           >
             <BarChart2 className="w-3.5 h-3.5 text-red-400" />
             <span>Inspect All 11 Cloud AI Providers</span>

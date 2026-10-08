@@ -50,6 +50,7 @@ yarn-error.log*
 # development notes & scratch
 /dev
 /dev/
+.agents/
 
 # typescript
 *.tsbuildinfo

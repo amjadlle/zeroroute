@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, X, Headphones, Calendar, Mail, ExternalLink, Sparkles } from "lucide-react";
+import { Check, X, Headphones, Calendar, Mail, ExternalLink, Sparkles, Zap } from "lucide-react";
 
 interface PricingProps {
   onOpenCheckout: () => void;
@@ -10,7 +10,7 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
   return (
     <section id="pricing" className="space-y-10 scroll-mt-20 max-w-7xl mx-auto">
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-400 text-xs font-semibold">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-500/10 border border-amber-500/25 text-amber-400 text-xs font-semibold">
           <span>⚡ Simple, Transparent Options</span>
         </div>
         <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
@@ -34,7 +34,7 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
                   </span>
                   <h3 className="text-xl sm:text-2xl font-bold text-white mt-0.5">Free Hosted</h3>
                 </div>
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+                <span className="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
                   $0 FOREVER
                 </span>
               </div>
@@ -71,7 +71,7 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
 
             <a
               href="/login?tab=signup"
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold bg-white/[0.08] hover:bg-white/[0.15] text-white border border-white/15 transition-all active:scale-95 shadow-md min-h-[42px] touch-manipulation cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold bg-white/[0.08] hover:bg-white/[0.15] text-white border border-white/15 hover:border-white/25 hover:-translate-y-0.5 transition-all active:translate-y-0 active:scale-95 shadow-md min-h-[42px] touch-manipulation cursor-pointer"
             >
               <span>🚀 Get Started Free (No Card Needed)</span>
             </a>
@@ -87,7 +87,7 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
                   </span>
                   <h3 className="text-xl sm:text-2xl font-bold text-white mt-0.5">DIY Self-Hosted</h3>
                 </div>
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+                <span className="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
                   100% FREE
                 </span>
               </div>
@@ -122,7 +122,7 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
               href="https://github.com/amjadlle/zeroroute"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold bg-white/[0.08] hover:bg-white/[0.15] text-white border border-white/15 transition-all active:scale-95 shadow-md min-h-[42px] touch-manipulation cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold bg-white/[0.08] hover:bg-white/[0.15] text-white border border-white/15 hover:border-white/25 hover:-translate-y-0.5 transition-all active:translate-y-0 active:scale-95 shadow-md min-h-[42px] touch-manipulation cursor-pointer"
             >
               <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                 <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
@@ -134,9 +134,9 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
 
         {/* Right Column: Standalone Featured ZeroRoute Pro Plan */}
         <div className="lg:col-span-6 flex flex-col">
-          <div className="relative flex flex-col justify-between flex-1 p-6 sm:p-8 bg-gradient-to-b from-[#1c080a] via-[#130507] to-[#070203] border-2 border-red-500/80 rounded-3xl shadow-2xl shadow-red-500/25 ring-1 ring-red-400/40 space-y-6">
+          <div className="relative flex flex-col justify-between flex-1 p-6 sm:p-8 bg-gradient-to-b from-[#1c080a] via-[#130507] to-[#070203] border-2 border-red-500/80 rounded-3xl shadow-2xl shadow-black/80 ring-1 ring-red-400/40 space-y-6">
             {/* Popular Ribbon */}
-            <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 text-white shadow-lg shadow-red-500/40 border border-red-300/30 flex items-center gap-1 z-20">
+            <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-wider bg-gradient-to-b from-[#f59e0b] to-[#d97706] text-zinc-950 shadow-md border border-white/40 flex items-center gap-1 z-20">
               <span>★ Most Popular • White-Label</span>
             </div>
 
@@ -175,7 +175,7 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
                       Free 1-on-1 Setup &amp; Installation
                     </span>
                   </div>
-                  <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-emerald-400 text-black">
+                  <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded-lg bg-emerald-400 text-black">
                     $150 Value • FREE
                   </span>
                 </div>
@@ -203,7 +203,7 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
                   </span>
                 </li>
                 <li className="flex items-center gap-2.5">
-                  <span className="text-[10px] font-mono font-bold bg-red-500/25 text-red-300 border border-red-400/30 px-2 py-0.5 rounded-full shrink-0">
+                  <span className="text-[10px] font-mono font-bold bg-red-500/25 text-red-300 border border-red-400/30 px-2 py-0.5 rounded-lg shrink-0">
                     PRO
                   </span>
                   <span>
@@ -253,9 +253,10 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
               <button
                 type="button"
                 onClick={onOpenCheckout}
-                className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-xs sm:text-sm font-extrabold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-xl shadow-red-600/35 border border-red-400/30 transition-all active:scale-95 cursor-pointer min-h-[46px] touch-manipulation"
+                className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-xs sm:text-sm font-extrabold bg-gradient-to-b from-[#f59e0b] to-[#d97706] hover:from-[#fbbf24] hover:to-[#b45309] text-zinc-950 border border-white/40 shadow-[inset_0_1px_1px_rgba(255,255,255,0.6),0_2px_6px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 transition-all active:translate-y-0 active:scale-95 cursor-pointer min-h-[46px] touch-manipulation"
               >
-                <span>⚡ Upgrade to Pro ($2.00 / month)</span>
+                <Zap className="w-4 h-4 fill-zinc-950 text-zinc-950" />
+                <span>Get ZeroRoute Pro ($2.00 / month) →</span>
               </button>
               <div className="flex items-center justify-center gap-3 text-[11px] text-rose-300/60 font-mono">
                 <span>Instant automated activation</span>
@@ -268,7 +269,7 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
       </div>
 
       {/* Free Setup & Call Booking Banner */}
-      <div className="p-6 sm:p-7 bg-[#0b0e14] border border-emerald-500/25 bg-gradient-to-r from-emerald-500/[0.08] via-teal-500/[0.04] to-cyan-500/[0.02] rounded-3xl flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-2xl relative overflow-hidden">
+      <div className="p-6 sm:p-7 bg-[#0b0e14] border border-emerald-500/25 bg-gradient-to-r from-emerald-500/[0.08] via-teal-500/[0.04] to-cyan-500/[0.02] rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-2xl relative overflow-hidden">
         <div className="space-y-2 relative z-10 max-w-2xl">
           <div className="flex flex-wrap items-center gap-2">
             <div className="w-7 h-7 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
@@ -277,7 +278,7 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
             <h3 className="text-base sm:text-lg font-bold text-white">
               Need Help Setting Up? We&apos;ll Do It For You — 100% Free!
             </h3>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+            <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
               Zero Extra Charge
             </span>
           </div>
@@ -290,7 +291,7 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
         <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0 relative z-10">
           <a
             href="mailto:mapkisolutions@gmail.com?subject=ZeroRoute%20Free%20Setup%20Assistance"
-            className="flex-1 sm:flex-initial px-4 py-3 min-h-[44px] rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all hover:border-emerald-500/40 cursor-pointer touch-manipulation"
+            className="flex-1 sm:flex-initial px-4 py-3 min-h-[44px] rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 hover:border-white/25 text-white text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 hover:-translate-y-0.5 transition-all active:translate-y-0 cursor-pointer touch-manipulation"
           >
             <Mail className="w-4 h-4 text-emerald-400" />
             <span>Email Setup Help</span>
@@ -300,7 +301,7 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
             href="https://cal.com/mapki/zeroroute-setup"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 sm:flex-initial px-5 py-3 min-h-[44px] rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/40 transition-all active:scale-95 cursor-pointer touch-manipulation"
+            className="flex-1 sm:flex-initial px-5 py-3 min-h-[44px] rounded-xl bg-gradient-to-b from-[#10b981] to-[#047857] hover:from-[#34d399] hover:to-[#059669] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_6px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 transition-all active:translate-y-0 active:scale-95 cursor-pointer touch-manipulation"
           >
             <Calendar className="w-4 h-4" />
             <span>Book a Free 1-on-1 Call</span>
