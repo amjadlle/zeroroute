@@ -22,6 +22,30 @@
   var customLinkColor = scriptTag ? scriptTag.getAttribute("data-link-color") : null;
   var customLogo = scriptTag ? scriptTag.getAttribute("data-logo") : null;
 
+  function adjustHex(hex, percent) {
+    if (!hex || typeof hex !== "string") return "#ef4444";
+    var clean = hex.replace("#", "").trim();
+    if (clean.length === 3) clean = clean[0] + clean[0] + clean[1] + clean[1] + clean[2] + clean[2];
+    if (clean.length !== 6) return hex;
+    var num = parseInt(clean, 16);
+    var r = Math.min(255, Math.max(0, (num >> 16) + Math.round(255 * (percent / 100))));
+    var g = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + Math.round(255 * (percent / 100))));
+    var b = Math.min(255, Math.max(0, (num & 0x0000FF) + Math.round(255 * (percent / 100))));
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  }
+
+  function hexToRgba(hex, alpha) {
+    if (!hex || typeof hex !== "string") return "rgba(239, 68, 68, " + alpha + ")";
+    var clean = hex.replace("#", "").trim();
+    if (clean.length === 3) clean = clean[0] + clean[0] + clean[1] + clean[1] + clean[2] + clean[2];
+    if (clean.length !== 6) return "rgba(239, 68, 68, " + alpha + ")";
+    var num = parseInt(clean, 16);
+    var r = (num >> 16);
+    var g = ((num >> 8) & 0x00FF);
+    var b = (num & 0x0000FF);
+    return "rgba(" + r + ", " + g + ", " + b + ", " + alpha + ")";
+  }
+
   function getAccessibleLinkColor(brandColor, explicitLinkColor) {
     if (explicitLinkColor && explicitLinkColor.trim()) return explicitLinkColor.trim();
     if (!brandColor || typeof brandColor !== "string") return "#38bdf8";
@@ -41,11 +65,14 @@
     return brandColor;
   }
 
-  var linkColor = getAccessibleLinkColor(customColor, customLinkColor);
+  function buildCss(themeColor, explicitLink) {
+    var colorLight = adjustHex(themeColor, 18);
+    var colorDark = adjustHex(themeColor, -22);
+    var colorAlpha15 = hexToRgba(themeColor, 0.15);
+    var colorAlpha60 = hexToRgba(themeColor, 0.65);
+    var linkColor = getAccessibleLinkColor(themeColor, explicitLink);
 
-  // Inject CSS Styles inside Shadow Root
-  var style = document.createElement("style");
-  style.textContent = `
+    return `
     :host {
       all: initial;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
@@ -69,7 +96,7 @@
       width: 58px;
       height: 58px;
       border-radius: 50%;
-      background: linear-gradient(145deg, #ff4d56 0%, ${customColor} 55%, #a81018 100%);
+      background: linear-gradient(145deg, ${colorLight} 0%, ${themeColor} 55%, ${colorDark} 100%);
       box-shadow: 
         0 4px 16px rgba(0, 0, 0, 0.35),
         0 1px 3px rgba(0, 0, 0, 0.2),
@@ -145,7 +172,7 @@
     }
     #zr-header {
       padding: 13px 16px;
-      background: linear-gradient(180deg, rgba(235, 45, 56, 0.96) 0%, ${customColor} 60%, rgba(185, 20, 28, 0.98) 100%);
+      background: linear-gradient(180deg, ${colorLight} 0%, ${themeColor} 55%, ${colorDark} 100%);
       color: #ffffff;
       border-bottom: 1px solid rgba(255, 255, 255, 0.18);
       display: flex;
@@ -344,7 +371,7 @@
       position: absolute;
       left: 3px;
       top: -1px;
-      color: #ff4d56;
+      color: ${themeColor};
       font-size: 15px;
       line-height: 1;
     }
@@ -362,15 +389,15 @@
       position: absolute;
       left: 0;
       top: 0;
-      color: #ff6b72;
+      color: ${colorLight};
       font-weight: 600;
       font-size: 12px;
     }
 
-    /* Beveled Liquid Red User Pill */
+    /* Beveled Liquid User Pill */
     .zr-msg.user {
       align-self: flex-end;
-      background: linear-gradient(180deg, #ff4d56 0%, ${customColor} 48%, #ba121b 100%);
+      background: linear-gradient(180deg, ${colorLight} 0%, ${themeColor} 50%, ${colorDark} 100%);
       color: #ffffff;
       border-radius: 18px 18px 4px 18px;
       border: 1px solid rgba(255, 255, 255, 0.28);
@@ -408,7 +435,7 @@
       display: inline-block;
       width: 2px;
       height: 13px;
-      background: #ff4d56;
+      background: ${themeColor};
       margin-left: 3px;
       vertical-align: middle;
       animation: zrBlink 0.8s infinite;
@@ -428,7 +455,7 @@
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: #ff4d56;
+      background: ${themeColor};
       opacity: 0.4;
       animation: zrTypingBounce 1.4s infinite ease-in-out both;
     }
@@ -479,8 +506,8 @@
       text-align: left;
     }
     .zr-pill:hover {
-      background: rgba(255, 77, 86, 0.15);
-      border-color: rgba(255, 77, 86, 0.45);
+      background: ${colorAlpha15};
+      border-color: ${colorAlpha60};
       color: #ffffff;
       transform: translateY(-1px);
     }
@@ -513,11 +540,11 @@
       color: rgba(148, 163, 184, 0.7);
     }
     #zr-input:focus {
-      border-color: rgba(255, 77, 86, 0.65);
+      border-color: ${colorAlpha60};
       box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
     }
     #zr-send-btn {
-      background: linear-gradient(145deg, #ff4d56 0%, ${customColor} 55%, #ba121b 100%);
+      background: linear-gradient(145deg, ${colorLight} 0%, ${themeColor} 55%, ${colorDark} 100%);
       border: 1px solid rgba(255, 255, 255, 0.28);
       border-radius: 13px;
       width: 44px;
@@ -574,7 +601,12 @@
       color: #f1f5f9;
       font-weight: 600;
     }
-  `;
+    `;
+  }
+
+  // Inject CSS Styles inside Shadow Root
+  var style = document.createElement("style");
+  style.textContent = buildCss(customColor, customLinkColor);
 
   // Mount Widget inside Closed Shadow DOM for absolute isolation from host page styles and tampering
   var hostElement = document.createElement("div");
