@@ -71,8 +71,8 @@
       border-radius: 50%;
       background: linear-gradient(145deg, #ff4d56 0%, ${customColor} 55%, #a81018 100%);
       box-shadow: 
-        0 8px 28px rgba(229, 37, 49, 0.42),
-        0 2px 6px rgba(0, 0, 0, 0.25),
+        0 4px 16px rgba(0, 0, 0, 0.35),
+        0 1px 3px rgba(0, 0, 0, 0.2),
         inset 0 1.5px 2px rgba(255, 255, 255, 0.6),
         inset 0 -2px 4px rgba(0, 0, 0, 0.35);
       border: 1px solid rgba(255, 255, 255, 0.32);
@@ -100,8 +100,8 @@
     #zr-widget-btn:hover {
       transform: scale(1.08) translateY(-2px);
       box-shadow: 
-        0 12px 34px rgba(229, 37, 49, 0.55),
-        0 4px 10px rgba(0, 0, 0, 0.3),
+        0 8px 24px rgba(0, 0, 0, 0.45),
+        0 2px 6px rgba(0, 0, 0, 0.3),
         inset 0 1.5px 2px rgba(255, 255, 255, 0.75),
         inset 0 -2px 4px rgba(0, 0, 0, 0.4);
     }
@@ -272,36 +272,6 @@
       background: transparent;
     }
 
-    /* Bot message row with Mascot Icon */
-    .zr-msg-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      width: 100%;
-    }
-    .zr-msg-row.user-row {
-      justify-content: flex-end;
-    }
-    .zr-bot-avatar {
-      width: 24px;
-      height: 24px;
-      min-width: 24px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, rgba(255, 77, 86, 0.25) 0%, rgba(229, 37, 49, 0.4) 100%);
-      border: 1px solid rgba(255, 77, 86, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 2px;
-      flex-shrink: 0;
-      box-shadow: 0 2px 8px rgba(229, 37, 49, 0.25);
-    }
-    .zr-bot-avatar svg {
-      width: 13px;
-      height: 13px;
-      fill: #ff6b72;
-    }
-
     /* Message Bubbles */
     .zr-msg {
       max-width: 88%;
@@ -313,6 +283,7 @@
 
     /* Liquid Glass Bot Bubble */
     .zr-msg.bot {
+      align-self: flex-start;
       background: rgba(16, 22, 34, 0.78);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -406,7 +377,7 @@
       box-shadow: 
         inset 0 1.5px 2px rgba(255, 255, 255, 0.55),
         inset 0 -1.5px 2px rgba(0, 0, 0, 0.25),
-        0 4px 14px rgba(229, 37, 49, 0.35);
+        0 2px 8px rgba(0, 0, 0, 0.3);
       white-space: pre-wrap;
       font-weight: 500;
       text-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.2);
@@ -441,7 +412,6 @@
       margin-left: 3px;
       vertical-align: middle;
       animation: zrBlink 0.8s infinite;
-      box-shadow: 0 0 6px rgba(255, 77, 86, 0.8);
     }
     @keyframes zrBlink {
       0%, 100% { opacity: 1; }
@@ -461,7 +431,6 @@
       background: #ff4d56;
       opacity: 0.4;
       animation: zrTypingBounce 1.4s infinite ease-in-out both;
-      box-shadow: 0 0 4px rgba(255, 77, 86, 0.5);
     }
     .zr-typing-dots .zr-dot:nth-child(1) {
       animation-delay: -0.32s;
@@ -514,7 +483,6 @@
       border-color: rgba(255, 77, 86, 0.45);
       color: #ffffff;
       transform: translateY(-1px);
-      box-shadow: 0 3px 10px rgba(229, 37, 49, 0.2);
     }
     #zr-input-area {
       padding: 12px 16px;
@@ -546,9 +514,7 @@
     }
     #zr-input:focus {
       border-color: rgba(255, 77, 86, 0.65);
-      box-shadow: 
-        0 0 12px rgba(229, 37, 49, 0.25),
-        inset 0 1px 3px rgba(0, 0, 0, 0.35);
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
     }
     #zr-send-btn {
       background: linear-gradient(145deg, #ff4d56 0%, ${customColor} 55%, #ba121b 100%);
@@ -563,7 +529,7 @@
       cursor: pointer;
       color: #ffffff;
       box-shadow: 
-        0 4px 14px rgba(229, 37, 49, 0.35),
+        0 2px 8px rgba(0, 0, 0, 0.35),
         inset 0 1px 1.5px rgba(255, 255, 255, 0.5);
       transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s;
       touch-action: manipulation;
@@ -572,7 +538,7 @@
     #zr-send-btn:hover {
       transform: scale(1.05) translateY(-1px);
       box-shadow: 
-        0 6px 18px rgba(229, 37, 49, 0.5),
+        0 4px 12px rgba(0, 0, 0, 0.45),
         inset 0 1px 1.5px rgba(255, 255, 255, 0.6);
     }
     #zr-send-btn:active {
@@ -884,16 +850,7 @@
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
   }
 
-  var mascotIconSvg = '<div class="zr-bot-avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2L14.39 8.26L21 9.27L16.2 13.97L17.33 20.6L12 17.27L6.67 20.6L7.8 13.97L3 9.27L9.61 8.26L12 2Z"/></svg></div>';
-
   function appendMessage(role, text, isRawHtml) {
-    var rowDiv = document.createElement("div");
-    rowDiv.className = "zr-msg-row " + (role === "user" ? "user-row" : "bot-row");
-
-    if (role !== "user") {
-      rowDiv.innerHTML = mascotIconSvg;
-    }
-
     var msgDiv = document.createElement("div");
     msgDiv.className = "zr-msg " + (role === "user" ? "user" : "bot");
     if (role === "user") {
@@ -903,8 +860,7 @@
     } else {
       msgDiv.innerHTML = renderMarkdown(text);
     }
-    rowDiv.appendChild(msgDiv);
-    messagesContainer.appendChild(rowDiv);
+    messagesContainer.appendChild(msgDiv);
     scrollToBottom();
     return msgDiv;
   }
