@@ -39,6 +39,7 @@
   ></script>
   ```
 - **Live SSE Streaming**: Fluid, token-by-token typewriter effect.
+- **Visitor Question Logs & Insights**: Real-time stream of all visitor questions and AI answers in your dashboard so you finally know what people actually want from your site.
 - **Customization**: Configure bot name, role, tone, greeting, avatar, brand accent colors, and quick prompt pills.
 - **Domain Whitelisting (CORS)**: Restrict widget execution to authorized customer domains.
 - **White-Label Branding**: Pro subscribers enjoy 100% clean white-labeling with no external badge.
@@ -53,8 +54,8 @@
 - **Sub-8ms Auto-Failover**: Instantly reroutes queries to the next healthy provider if rate-limited (HTTP 429) or during provider downtime (HTTP 5xx).
 - **0ms RAM Caching**: Identical prompts are served instantly from RAM without consuming provider tokens.
 
-### 💳 4. Turnkey SaaS Billing & Console
-- **Subscriber Dashboard (`/app`)**: Manage API keys, customize chatbot persona, index knowledge bases, and monitor monthly requests.
+### 💳 4. Turnkey SaaS Billing & Subscriber Console
+- **Subscriber Dashboard (`/app`)**: Manage API keys, customize chatbot persona, index knowledge bases, view **Visitor Question Logs**, search questions, and monitor monthly requests.
 - **Pro Tier ($2.00 / month)**: 10,000 monthly requests (~330 req/day), white-label widget, 3 domain whitelists, and priority routing.
 - **Free Tier ($0 / month)**: 500 monthly requests with automatic 30-day billing cycle resets.
 - **Dodo Payments Integration**: Webhook synchronization with HMAC-SHA256 signature verification and replay protection.

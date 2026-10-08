@@ -1,11 +1,18 @@
-import { Layers, ShieldCheck, Zap, Gauge, Key, Server } from "lucide-react";
+import { Layers, ShieldCheck, Zap, Gauge, Key, Server, MessageSquareText, FileText } from "lucide-react";
 
 export function Features() {
   const features = [
     {
-      icon: Layers,
+      icon: MessageSquareText,
       color: "red",
       iconBg: "bg-red-500/10 border-red-500/20 text-red-400",
+      title: "Visitor Question Logs & Insights",
+      description: "See every question your visitors ask in real-time, so you finally know what people actually want from your site. Search prompts, audit AI answers, and discover product gaps.",
+    },
+    {
+      icon: Layers,
+      color: "blue",
+      iconBg: "bg-blue-500/10 border-blue-500/20 text-blue-400",
       title: "10,000 Requests/Mo Pool",
       description: "Includes 10,000 monthly requests routed across Groq, Cloudflare, Gemini, Mistral, SambaNova & 6 more clouds with zero token overage fees.",
     },
@@ -17,6 +24,13 @@ export function Features() {
       description: "ZeroRoute dynamically distributes requests across the fastest, healthiest clouds in <8ms with automatic real-time high-availability load balancing.",
     },
     {
+      icon: FileText,
+      color: "purple",
+      iconBg: "bg-purple-500/10 border-purple-500/20 text-purple-400",
+      title: "Instant RAG & URL Crawler",
+      description: "Scrape websites, Google Docs, Notion, or raw markdown with SSRF protection. Your chatbot answers strictly using verified facts with zero hallucination.",
+    },
+    {
       icon: Zap,
       color: "amber",
       iconBg: "bg-amber-500/10 border-amber-500/20 text-amber-400",
@@ -25,24 +39,10 @@ export function Features() {
     },
     {
       icon: Gauge,
-      color: "blue",
-      iconBg: "bg-blue-500/10 border-blue-500/20 text-blue-400",
-      title: "Parallel Benchmark Suite",
-      description: "Race all 11 multi-cloud providers concurrently in real-time. Detect the fastest model and optimize your routing chain in 1-click.",
-    },
-    {
-      icon: Key,
-      color: "purple",
-      iconBg: "bg-purple-500/10 border-purple-500/20 text-purple-400",
-      title: "AES-256 Key Vault",
-      description: "Configure keys securely via environment variables or encrypted browser storage. Keys are masked and never exposed.",
-    },
-    {
-      icon: Server,
       color: "rose",
       iconBg: "bg-rose-500/10 border-rose-500/20 text-rose-400",
-      title: "Zero Dependencies",
-      description: "Engineered with pure native Node.js HTTP/Fetch. Instant cold starts on Vercel Serverless Edge, Docker, or bare metal.",
+      title: "Parallel Benchmark Suite",
+      description: "Race all 11 multi-cloud providers concurrently in real-time. Detect the fastest model and optimize your routing chain in 1-click.",
     },
   ];
 

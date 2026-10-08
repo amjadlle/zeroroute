@@ -13,7 +13,7 @@ ZeroRoute (https://zeroroute.mapki.in) is an open-source, multi-cloud AI Gateway
 - **Live Streaming SSE**: Token-by-token real-time typewriter response stream.
 - **Customizable UI**: Configure custom bot title, role, greeting, brand accent color, avatar, and quick suggestion pills in the Subscriber Console (`/app`).
 - **Semantic Document & URL Crawler**: Index public website URLs, Google Docs (`/pub`), Notion public pages, and GitHub raw Markdown (`.md`) with built-in SSRF protection.
-- **Zero Hallucination Policy**: Grounded to answer strictly using verified business documents without making up contact details, prices, or fake policies.
+- **Visitor Question Logs & Insights**: Real-time live question stream in the Subscriber Console (`/app`). See every question your visitors ask so you finally know what people actually want from your site, identify unaddressed product questions, and export audit history as JSON.
 - **White-Label Option**: Pro tier removes all "Powered by ZeroRoute" branding.
 
 ### 2. OpenAI-Compatible Multi-Cloud API Gateway
