@@ -205,10 +205,16 @@ export const initDb = async (): Promise<void> => {
     await Promise.allSettled([
       db.execute(`CREATE INDEX IF NOT EXISTS idx_customers_email ON customers(email);`),
       db.execute(`CREATE INDEX IF NOT EXISTS idx_customers_key ON customers(key);`),
+      db.execute(`CREATE INDEX IF NOT EXISTS idx_customers_bot_id ON customers(bot_id);`),
+      db.execute(`CREATE INDEX IF NOT EXISTS idx_customers_created ON customers(created_at DESC);`),
       db.execute(`CREATE INDEX IF NOT EXISTS idx_knowledge_customer ON knowledge_documents(customer_key);`),
       db.execute(`CREATE INDEX IF NOT EXISTS idx_knowledge_created ON knowledge_documents(created_at);`),
       db.execute(`CREATE INDEX IF NOT EXISTS idx_knowledge_type ON knowledge_documents(type);`),
       db.execute(`CREATE INDEX IF NOT EXISTS idx_logs_customer ON request_logs(customer_key);`),
+      db.execute(`CREATE INDEX IF NOT EXISTS idx_logs_timestamp ON request_logs(timestamp DESC);`),
+      db.execute(`CREATE INDEX IF NOT EXISTS idx_logs_origin ON request_logs(origin);`),
+      db.execute(`CREATE INDEX IF NOT EXISTS idx_logs_provider ON request_logs(provider);`),
+      db.execute(`CREATE INDEX IF NOT EXISTS idx_logs_status ON request_logs(status);`),
     ]);
 
     // Auto-upgrade existing customers to 10,000 monthly limit
