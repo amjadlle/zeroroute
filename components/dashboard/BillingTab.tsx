@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { X, CreditCard, ExternalLink, CheckCircle2 } from "lucide-react";
+import { X, CreditCard, ExternalLink, Mail } from "lucide-react";
 
 interface BillingModalProps {
   isOpen: boolean;
@@ -52,7 +52,7 @@ export function BillingModal({
               <CreditCard className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-white tracking-tight">Plan</h3>
+              <h3 className="text-sm font-bold text-white tracking-tight">Plan &amp; Billing</h3>
               <p className="text-[11px] text-slate-400 font-mono">{email || "Subscriber Account"}</p>
             </div>
           </div>
@@ -110,15 +110,18 @@ export function BillingModal({
         {/* Action CTA */}
         <div className="pt-1">
           {monthlyLimit >= 10000 ? (
-            <a
-              href="https://checkout.dodopayments.com/portal"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 min-h-[44px] rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 text-white border border-white/15 active:scale-95 transition-all cursor-pointer touch-manipulation"
-            >
-              <span>Manage Subscription</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
+            <div className="space-y-3">
+              <a
+                href={`mailto:mapkisolutions@gmail.com?subject=${encodeURIComponent("ZeroRoute Pro Subscription & Billing Assistance")}&body=${encodeURIComponent(`Hi ZeroRoute Team,\n\nI need assistance with my ZeroRoute Pro subscription (invoices, billing update, or plan changes).\n\nAccount Email: ${email || ""}\nDetails:\n\nThank you!`)}`}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 min-h-[44px] rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 text-white border border-white/15 active:scale-95 transition-all cursor-pointer touch-manipulation"
+              >
+                <Mail className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Contact Billing Support</span>
+              </a>
+              <p className="text-[11px] text-slate-400 text-center leading-relaxed">
+                Need to update billing, request custom invoices, or adjust your subscription? Contact us at <a href="mailto:mapkisolutions@gmail.com" className="text-white hover:underline font-mono">mapkisolutions@gmail.com</a>.
+              </p>
+            </div>
           ) : (
             <a
               href="/api/checkout"
