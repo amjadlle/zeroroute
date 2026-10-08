@@ -529,12 +529,24 @@
       border-radius: 14px;
       padding: 10.5px 15px;
       color: #ffffff;
-      font-size: 13.5px;
+      font-size: 14px;
       outline: none;
       transition: all 0.2s ease;
       -webkit-appearance: none;
+      -webkit-text-size-adjust: 100%;
       touch-action: manipulation;
       box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
+    }
+    /* Prevent iOS Safari automatic zoom when focusing input (< 16px causes zoom) */
+    @supports (-webkit-touch-callout: none) {
+      #zr-input {
+        font-size: 16px !important;
+      }
+    }
+    @media (max-width: 640px) {
+      #zr-input {
+        font-size: 16px !important;
+      }
     }
     #zr-input::placeholder {
       color: rgba(148, 163, 184, 0.7);
@@ -671,6 +683,13 @@
   var botTitleElem = getEl("zr-bot-title");
   var avatarLogoElem = getEl("zr-avatar-logo");
   var footerBadgeElem = getEl("zr-footer-badge");
+
+  // Prevent iOS Safari auto-viewport zoom on focus (< 16px triggers zoom)
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+              (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  if (isIOS && inputField) {
+    inputField.style.setProperty("font-size", "16px", "important");
+  }
 
   // Tamper-Proof Watchdog for Free Tier
   function initBrandingWatchdog() {
