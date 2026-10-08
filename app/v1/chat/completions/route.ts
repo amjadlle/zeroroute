@@ -221,9 +221,10 @@ export async function POST(request: Request) {
 
   // 3. Customer subscription & quota check
   if (customer && customer.key) {
-    // Query live real-time usage and limit from database for 100% precision
+    const now = Date.now();
+    // Query live real-time usage and limit from database
     const liveCustRes = await db.execute({
-      sql: `SELECT status, monthly_requests, monthly_limit FROM customers WHERE key = ? LIMIT 1`,
+      sql: `SELECT status, monthly_requests, monthly_limit, period_start, period_end, created_at FROM customers WHERE key = ? LIMIT 1`,
       args: [customer.key]
     });
     const liveCust = (liveCustRes.rows[0] as any) || customer;
@@ -245,31 +246,44 @@ export async function POST(request: Request) {
       );
     }
 
-    const currentUsage = Number(liveCust.monthly_requests || 0);
+    // Auto-reset monthly request counter when billing period expires (30 days cycle)
+    const periodEnd = Number(liveCust.period_end || 0);
+    let currentUsage = Number(liveCust.monthly_requests || 0);
+
+    if (periodEnd > 0 && now > periodEnd) {
+      const newPeriodStart = now;
+      const newPeriodEnd = now + 30 * 24 * 60 * 60 * 1000;
+      await db.execute({
+        sql: `UPDATE customers SET monthly_requests = 0, period_start = ?, period_end = ?, updated_at = ? WHERE key = ?`,
+        args: [newPeriodStart, newPeriodEnd, now, customer.key]
+      });
+      currentUsage = 0;
+    }
+
     const limit = Number(liveCust.monthly_limit !== undefined ? liveCust.monthly_limit : 500);
 
-    if (currentUsage >= limit) {
+    // Atomic conditional increment: ensures no race condition can bypass quota
+    const atomicUpdateRes = await db.execute({
+      sql: `UPDATE customers SET monthly_requests = monthly_requests + 1, updated_at = ? WHERE key = ? AND monthly_requests < ?`,
+      args: [now, customer.key, limit]
+    });
+
+    if (atomicUpdateRes.rowsAffected === 0 && currentUsage >= limit) {
       const errorMessage = isPublicWidget
         ? "This assistant has reached its monthly conversation limit and is temporarily unavailable. Please contact the website owner or check back next month."
-        : `Monthly request quota of ${limit.toLocaleString()} requests reached (${currentUsage}/${limit} used). Please upgrade to ZeroRoute Pro for 10,000 requests/month.`;
+        : `Monthly request quota of ${limit.toLocaleString()} requests reached (${limit}/${limit} used). Please upgrade to ZeroRoute Pro for 10,000 requests/month.`;
       return NextResponse.json(
         {
           error: {
             message: errorMessage,
             type: "quota_exceeded",
             limit,
-            current: currentUsage
+            current: limit
           }
         },
         { status: 429, headers: corsHdrs }
       );
     }
-
-    // Increment usage counter in DB
-    db.execute({
-      sql: `UPDATE customers SET monthly_requests = monthly_requests + 1, updated_at = ? WHERE key = ?`,
-      args: [Date.now(), customer.key]
-    }).catch((err: unknown) => console.error("[DB Usage Update Error]:", err));
   }
 
   // 4. Dynamic System Prompt & RAG Context Injection

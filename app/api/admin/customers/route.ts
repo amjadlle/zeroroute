@@ -177,17 +177,31 @@ export async function PATCH(request: Request) {
     }
 
     if (status) {
-      await db.execute({
-        sql: `UPDATE customers SET status = ?, updated_at = ? WHERE key = ? OR id = ?`,
-        args: [status, now, key || "", id || ""]
-      });
+      if (key) {
+        await db.execute({
+          sql: `UPDATE customers SET status = ?, updated_at = ? WHERE key = ?`,
+          args: [status, now, key]
+        });
+      } else if (id) {
+        await db.execute({
+          sql: `UPDATE customers SET status = ?, updated_at = ? WHERE id = ?`,
+          args: [status, now, id]
+        });
+      }
     }
 
     if (typeof monthly_limit === "number") {
-      await db.execute({
-        sql: `UPDATE customers SET monthly_limit = ?, updated_at = ? WHERE key = ? OR id = ?`,
-        args: [monthly_limit, now, key || "", id || ""]
-      });
+      if (key) {
+        await db.execute({
+          sql: `UPDATE customers SET monthly_limit = ?, updated_at = ? WHERE key = ?`,
+          args: [monthly_limit, now, key]
+        });
+      } else if (id) {
+        await db.execute({
+          sql: `UPDATE customers SET monthly_limit = ?, updated_at = ? WHERE id = ?`,
+          args: [monthly_limit, now, id]
+        });
+      }
     }
 
     return NextResponse.json({ success: true, message: "Customer updated successfully" });
@@ -207,33 +221,47 @@ export async function DELETE(request: Request) {
 
   try {
     const url = new URL(request.url);
-    const key = url.searchParams.get("key");
-    const id = url.searchParams.get("id");
+    const key = url.searchParams.get("key")?.trim();
+    const id = url.searchParams.get("id")?.trim();
 
     if (!key && !id) {
       return NextResponse.json({ error: "Customer key or ID is required" }, { status: 400 });
     }
 
     const db = getDb();
-    const custRes = await db.execute({
-      sql: `SELECT key FROM customers WHERE key = ? OR id = ? LIMIT 1`,
-      args: [key || "", id || ""]
-    });
+    const custRes = key
+      ? await db.execute({ sql: `SELECT key, id FROM customers WHERE key = ? LIMIT 1`, args: [key] })
+      : await db.execute({ sql: `SELECT key, id FROM customers WHERE id = ? LIMIT 1`, args: [id || ""] });
+
+    if (custRes.rows.length === 0) {
+      return NextResponse.json({ error: "Customer not found" }, { status: 404 });
+    }
+
     const targetKey = (custRes.rows[0] as any)?.key;
+    const targetId = (custRes.rows[0] as any)?.id;
 
-    await db.execute({
-      sql: `DELETE FROM customers WHERE key = ? OR id = ?`,
-      args: [key || "", id || ""]
-    });
-
+    // Purge related request logs and knowledge documents to ensure zero orphaned data
     if (targetKey) {
+      await db.execute({
+        sql: `DELETE FROM request_logs WHERE customer_key = ?`,
+        args: [targetKey]
+      });
       await db.execute({
         sql: `DELETE FROM knowledge_documents WHERE customer_key = ?`,
         args: [targetKey]
       });
     }
 
-    return NextResponse.json({ success: true, message: "Customer removed permanently" });
+    await db.execute({
+      sql: `DELETE FROM customers WHERE id = ?`,
+      args: [targetId]
+    });
+
+    const { invalidateSessionCache, invalidateCustomerLookupCache } = await import("@/lib/auth/session");
+    invalidateSessionCache();
+    invalidateCustomerLookupCache();
+
+    return NextResponse.json({ success: true, message: "Customer and associated logs removed permanently" });
   } catch (err) {
     console.error("[AdminCustomers Delete Error]:", err);
     return NextResponse.json({ error: "Failed to delete customer" }, { status: 500 });

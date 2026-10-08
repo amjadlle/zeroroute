@@ -26,11 +26,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const adminPassword = process.env.ADMIN_PASSWORD || process.env.ADMIN_KEY || process.env.ROUTER_API_KEY || "admin1234";
+    const adminPassword = (process.env.ADMIN_PASSWORD || process.env.ADMIN_KEY || process.env.ROUTER_API_KEY || "").trim();
     const isAdminEmail = ADMIN_EMAILS.includes(email);
 
-    // 1. Direct Admin Master Key / Password Check
-    if (isAdminEmail && (password === adminPassword || password === process.env.ADMIN_KEY || password === process.env.ROUTER_API_KEY)) {
+    // 1. Direct Admin Master Key / Password Check (strictly requires configured environment key)
+    if (isAdminEmail && adminPassword && (password === adminPassword || password === process.env.ADMIN_KEY || password === process.env.ROUTER_API_KEY)) {
       const adminSessionToken = `zr_admin_${crypto.randomBytes(24).toString("hex")}`;
       const response = NextResponse.json({
         success: true,

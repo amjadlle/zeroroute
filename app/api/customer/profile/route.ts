@@ -15,13 +15,6 @@ export async function GET(req: NextRequest) {
     }
 
     if (!customer) {
-      const urlKey = req.nextUrl.searchParams.get("key") || req.nextUrl.searchParams.get("token");
-      if (urlKey) {
-        customer = await getCustomerByTokenOrKey(urlKey);
-      }
-    }
-
-    if (!customer) {
       return NextResponse.json({ error: "Unauthorized. Please log in." }, { status: 401 });
     }
 

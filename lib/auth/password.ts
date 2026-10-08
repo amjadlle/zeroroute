@@ -1,4 +1,4 @@
-﻿import crypto from "crypto";
+import crypto from "crypto";
 
 export function generateSalt(): string {
   return crypto.randomBytes(16).toString("hex");
@@ -33,5 +33,5 @@ export function generateBotId(): string {
 }
 
 export function generateOtp(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return crypto.randomInt(100000, 1000000).toString();
 }

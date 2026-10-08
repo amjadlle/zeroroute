@@ -12,77 +12,95 @@ export async function GET(request: Request) {
   let emailParam = url.searchParams.get("email")?.trim().toLowerCase();
   const statusParam = (url.searchParams.get("status") || "").toLowerCase();
 
-  // If no identifiers provided at all, return 400
-  if (!sessionId && !subscriptionId && !paymentId && !emailParam) {
-    return NextResponse.json({ error: "Missing checkout session, subscription, or email parameter" }, { status: 400 });
-  }
-
   const apiKey = process.env.DODO_API_KEY;
   const isLive = process.env.DODO_ENVIRONMENT === "live_mode";
   const dodoApiBase = isLive ? "https://live.dodopayments.com" : "https://test.dodopayments.com";
 
-  let customerEmail = emailParam || "";
-  let customerName = "Subscriber";
-  let customerCompany = "My Application";
-  let isPaymentSuccessful = statusParam === "active" || statusParam === "succeeded" || statusParam === "paid" || statusParam === "complete";
-
-  // 1. Verify with Dodo API if apiKey is present and we have IDs
-  if (apiKey && apiKey.trim() !== "") {
-    try {
-      if (subscriptionId) {
-        const subRes = await fetch(`${dodoApiBase}/subscriptions/${subscriptionId}`, {
-          headers: { Authorization: `Bearer ${apiKey}` },
-        });
-        if (subRes.ok) {
-          const subData = await subRes.json();
-          if (subData.customer?.email) customerEmail = subData.customer.email.toLowerCase();
-          if (subData.customer?.name) customerName = subData.customer.name;
-          if (subData.status === "active" || subData.status === "on_trial") isPaymentSuccessful = true;
-        }
-      } else if (sessionId) {
-        const dodoRes = await fetch(`${dodoApiBase}/checkouts/${sessionId}`, {
-          headers: { Authorization: `Bearer ${apiKey}` },
-        });
-        if (dodoRes.ok) {
-          const sessionData = await dodoRes.json();
-          if (sessionData.customer?.email) customerEmail = sessionData.customer.email.toLowerCase();
-          if (sessionData.customer?.name) customerName = sessionData.customer.name;
-          const status = sessionData.payment_status || sessionData.status;
-          if (status === "succeeded" || status === "paid" || status === "complete" || status === "active") {
-            isPaymentSuccessful = true;
-          }
-        }
-      } else if (paymentId) {
-        const payRes = await fetch(`${dodoApiBase}/payments/${paymentId}`, {
-          headers: { Authorization: `Bearer ${apiKey}` },
-        });
-        if (payRes.ok) {
-          const payData = await payRes.json();
-          if (payData.customer?.email) customerEmail = payData.customer.email.toLowerCase();
-          if (payData.customer?.name) customerName = payData.customer.name;
-          if (payData.status === "succeeded" || payData.status === "paid") isPaymentSuccessful = true;
-        }
-      }
-    } catch (err) {
-      console.warn("[DodoVerification] API fetch warning:", err);
-    }
+  if (!apiKey || apiKey.trim() === "") {
+    return NextResponse.json(
+      { error: "Payment gateway is not configured on this server." },
+      { status: 503 }
+    );
   }
 
-  // If status is active from Dodo redirect parameters or email exists
-  if (customerEmail || isPaymentSuccessful) {
-    if (!customerEmail) {
-      customerEmail = "subscriber@example.com";
+  // Mandatory verification parameters
+  if (!sessionId && !subscriptionId && !paymentId) {
+    return NextResponse.json(
+      { error: "Missing required payment verification identifier (session_id, subscription_id, or payment_id)." },
+      { status: 400 }
+    );
+  }
+
+  let customerEmail = "";
+  let customerName = "Subscriber";
+  let customerCompany = "My Application";
+  let isPaymentSuccessful = false;
+
+  // 1. Strictly verify payment status with Dodo Payments API
+  try {
+    if (subscriptionId) {
+      const subRes = await fetch(`${dodoApiBase}/subscriptions/${subscriptionId}`, {
+        headers: { Authorization: `Bearer ${apiKey}` },
+      });
+      if (subRes.ok) {
+        const subData = await subRes.json();
+        if (subData.customer?.email) customerEmail = subData.customer.email.toLowerCase();
+        if (subData.customer?.name) customerName = subData.customer.name;
+        if (subData.status === "active" || subData.status === "on_trial") {
+          isPaymentSuccessful = true;
+        }
+      }
+    } else if (sessionId) {
+      const dodoRes = await fetch(`${dodoApiBase}/checkouts/${sessionId}`, {
+        headers: { Authorization: `Bearer ${apiKey}` },
+      });
+      if (dodoRes.ok) {
+        const sessionData = await dodoRes.json();
+        if (sessionData.customer?.email) customerEmail = sessionData.customer.email.toLowerCase();
+        if (sessionData.customer?.name) customerName = sessionData.customer.name;
+        const status = sessionData.payment_status || sessionData.status;
+        if (status === "succeeded" || status === "paid" || status === "complete" || status === "active") {
+          isPaymentSuccessful = true;
+        }
+      }
+    } else if (paymentId) {
+      const payRes = await fetch(`${dodoApiBase}/payments/${paymentId}`, {
+        headers: { Authorization: `Bearer ${apiKey}` },
+      });
+      if (payRes.ok) {
+        const payData = await payRes.json();
+        if (payData.customer?.email) customerEmail = payData.customer.email.toLowerCase();
+        if (payData.customer?.name) customerName = payData.customer.name;
+        if (payData.status === "succeeded" || payData.status === "paid") {
+          isPaymentSuccessful = true;
+        }
+      }
     }
+  } catch (err) {
+    console.error("[DodoVerification] API fetch error:", err);
+    return NextResponse.json(
+      { error: "Unable to verify payment with gateway. Please contact support." },
+      { status: 502 }
+    );
+  }
 
-    await initDb();
-    const db = getDb();
-    const existingRes = await db.execute({
-      sql: `SELECT * FROM customers WHERE email = ? LIMIT 1`,
-      args: [customerEmail],
-    });
+  // Only proceed if payment is confirmed successful and email is verified from Dodo
+  if (!isPaymentSuccessful || !customerEmail) {
+    return NextResponse.json(
+      { error: "Payment verification failed or payment is incomplete." },
+      { status: 400 }
+    );
+  }
 
-    let customer = existingRes.rows[0] as any;
-    const now = Date.now();
+  await initDb();
+  const db = getDb();
+  const existingRes = await db.execute({
+    sql: `SELECT * FROM customers WHERE email = ? LIMIT 1`,
+    args: [customerEmail],
+  });
+
+  let customer = existingRes.rows[0] as any;
+  const now = Date.now();
     const expiresAt = now + 30 * 24 * 60 * 60 * 1000;
 
     if (!customer) {
@@ -178,7 +196,4 @@ export async function GET(request: Request) {
     });
 
     return response;
-  }
-
-  return NextResponse.json({ error: "Session payment pending or incomplete" }, { status: 400 });
 }

@@ -59,8 +59,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "Password reset code sent to your email.",
-      // Include debug OTP in development mode for easy testing
-      debugOtp: process.env.NODE_ENV !== "production" ? otp : undefined,
     });
   } catch (err: unknown) {
     console.error("Forgot password error:", err);

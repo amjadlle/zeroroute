@@ -9,31 +9,49 @@ export async function POST(request: Request) {
     const rawBody = await request.text();
     const webhookSecret = process.env.DODO_WEBHOOK_SECRET;
 
-    // Verify Standard Webhook Signature if secret configured
-    if (webhookSecret && webhookSecret.trim() !== "") {
-      const webhookId = request.headers.get("webhook-id") || request.headers.get("webhook_id");
-      const webhookTimestamp = request.headers.get("webhook-timestamp") || request.headers.get("webhook_timestamp");
-      const webhookSignature = request.headers.get("webhook-signature") || request.headers.get("webhook_signature");
+    // Fail closed if webhook secret is not configured
+    if (!webhookSecret || webhookSecret.trim() === "") {
+      console.error("[DodoWebhook] Rejecting webhook: DODO_WEBHOOK_SECRET is not configured.");
+      return NextResponse.json({ error: "Webhook endpoint not configured" }, { status: 500 });
+    }
 
-      if (!webhookId || !webhookTimestamp || !webhookSignature) {
-        console.warn("[DodoWebhook] Missing webhook signature headers");
-        return NextResponse.json({ error: "Missing signature headers" }, { status: 401 });
+    const webhookId = request.headers.get("webhook-id") || request.headers.get("webhook_id");
+    const webhookTimestamp = request.headers.get("webhook-timestamp") || request.headers.get("webhook_timestamp");
+    const webhookSignature = request.headers.get("webhook-signature") || request.headers.get("webhook_signature");
+
+    if (!webhookId || !webhookTimestamp || !webhookSignature) {
+      console.warn("[DodoWebhook] Missing webhook signature headers");
+      return NextResponse.json({ error: "Missing signature headers" }, { status: 401 });
+    }
+
+    // Check timestamp drift to prevent replay attacks (max 5 minutes)
+    const ts = Number(webhookTimestamp);
+    if (isNaN(ts) || Math.abs(Date.now() / 1000 - ts) > 300) {
+      console.warn("[DodoWebhook] Webhook timestamp outside allowed 5-minute window");
+      return NextResponse.json({ error: "Webhook timestamp expired" }, { status: 401 });
+    }
+
+    const secretKey = webhookSecret.startsWith("whsec_")
+      ? Buffer.from(webhookSecret.slice(6), "base64")
+      : Buffer.from(webhookSecret, "utf-8");
+
+    const toSign = `${webhookId}.${webhookTimestamp}.${rawBody}`;
+    const expectedSig = crypto.createHmac("sha256", secretKey).update(toSign).digest("base64");
+
+    const signatures = webhookSignature.split(" ").map(s => s.replace(/^v\d+,/, "").trim());
+    const isValid = signatures.some(sig => {
+      try {
+        const sigBuf = Buffer.from(sig, "base64");
+        const expBuf = Buffer.from(expectedSig, "base64");
+        return sigBuf.length === expBuf.length && crypto.timingSafeEqual(sigBuf, expBuf);
+      } catch {
+        return false;
       }
+    });
 
-      const secretKey = webhookSecret.startsWith("whsec_")
-        ? Buffer.from(webhookSecret.slice(6), "base64")
-        : Buffer.from(webhookSecret, "utf-8");
-
-      const toSign = `${webhookId}.${webhookTimestamp}.${rawBody}`;
-      const expectedSig = crypto.createHmac("sha256", secretKey).update(toSign).digest("base64");
-
-      const signatures = webhookSignature.split(" ").map(s => s.replace(/^v\d+,/, "").trim());
-      const isValid = signatures.some(sig => sig === expectedSig);
-
-      if (!isValid) {
-        console.warn("[DodoWebhook] Invalid signature received");
-        return NextResponse.json({ error: "Invalid webhook signature" }, { status: 401 });
-      }
+    if (!isValid) {
+      console.warn("[DodoWebhook] Invalid signature received");
+      return NextResponse.json({ error: "Invalid webhook signature" }, { status: 401 });
     }
 
     const event = JSON.parse(rawBody);

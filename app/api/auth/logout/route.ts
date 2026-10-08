@@ -60,32 +60,3 @@ async function performLogout(req: NextRequest) {
 export async function POST(req: NextRequest) {
   return performLogout(req);
 }
-
-export async function GET(req: NextRequest) {
-  await performLogout(req);
-  const response = NextResponse.redirect(new URL("/login", req.url));
-
-  response.cookies.set({
-    name: SESSION_COOKIE_NAME,
-    value: "",
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    expires: new Date(0),
-    maxAge: 0,
-    path: "/",
-  });
-
-  response.cookies.set({
-    name: ROLE_COOKIE_NAME,
-    value: "",
-    httpOnly: false,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    expires: new Date(0),
-    maxAge: 0,
-    path: "/",
-  });
-
-  return response;
-}
