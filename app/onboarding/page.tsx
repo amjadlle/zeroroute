@@ -601,7 +601,7 @@ function OnboardingContent() {
                       type="button"
                       onClick={handleCrawlInWizard}
                       disabled={crawlingUrl || !knowledgeUrl.trim()}
-                      className="px-5 py-2.5 min-h-[44px] bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer touch-manipulation shrink-0"
+                      className="px-5 py-2.5 min-h-[44px] bg-gradient-to-b from-[#2563eb] to-[#1d4ed8] hover:from-[#3b82f6] hover:to-[#2563eb] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_6px_rgba(0,0,0,0.4)] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer touch-manipulation shrink-0"
                     >
                       {crawlingUrl ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                       <span>{crawlingUrl ? "Crawling…" : "Crawl & Index"}</span>
@@ -694,7 +694,7 @@ function OnboardingContent() {
                   <button
                     type="button"
                     onClick={copyKey}
-                    className="text-red-400 hover:text-red-300 font-semibold flex items-center gap-1 cursor-pointer min-h-[44px] px-2 touch-manipulation"
+                    className="px-2.5 py-1 min-h-[36px] rounded-lg bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 text-red-300 hover:text-red-200 font-semibold flex items-center gap-1.5 cursor-pointer transition-colors touch-manipulation"
                   >
                     {copiedKey ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copiedKey ? "Copied!" : "Copy Key"}</span>
@@ -712,7 +712,7 @@ function OnboardingContent() {
                   <button
                     type="button"
                     onClick={copyScript}
-                    className="text-red-400 hover:text-red-300 font-semibold flex items-center gap-1 cursor-pointer min-h-[44px] px-2 touch-manipulation"
+                    className="px-2.5 py-1 min-h-[36px] rounded-lg bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 text-red-300 hover:text-red-200 font-semibold flex items-center gap-1.5 cursor-pointer transition-colors touch-manipulation"
                   >
                     {copiedScript ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copiedScript ? "Copied!" : "Copy HTML"}</span>
@@ -731,7 +731,7 @@ function OnboardingContent() {
               <button
                 type="button"
                 onClick={handlePrevStep}
-                className="flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer touch-manipulation"
+                className="flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 active:scale-95 transition-all cursor-pointer touch-manipulation"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Back</span>
@@ -744,7 +744,7 @@ function OnboardingContent() {
               <button
                 type="button"
                 onClick={handleNextStep}
-                className="flex items-center justify-center gap-1.5 px-5 py-2.5 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-lg shadow-red-500/20 active:scale-95 transition-all cursor-pointer touch-manipulation"
+                className="flex items-center justify-center gap-1.5 px-6 py-2.5 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-b from-[#e5333b] to-[#c71d25] hover:from-[#f03e46] hover:to-[#d6232b] text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_6px_rgba(0,0,0,0.4)] active:scale-95 hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer touch-manipulation"
               >
                 <span>Continue</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -754,7 +754,7 @@ function OnboardingContent() {
                 type="button"
                 onClick={handleFinishSetup}
                 disabled={loading}
-                className="flex items-center justify-center gap-2 px-6 py-2.5 min-h-[44px] rounded-xl text-xs font-extrabold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-xl shadow-red-500/25 active:scale-95 transition-all cursor-pointer disabled:brightness-95 disabled:cursor-wait touch-manipulation drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
+                className="flex items-center justify-center gap-2 px-6 py-2.5 min-h-[44px] rounded-xl text-xs font-extrabold bg-gradient-to-b from-[#e5333b] via-[#c71d25] to-[#991b1b] hover:from-[#f03e46] hover:to-[#b91c1c] text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_4px_14px_rgba(229,51,59,0.35)] active:scale-95 hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-wait touch-manipulation"
               >
                 {loading ? (
                   <>
