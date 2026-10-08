@@ -93,9 +93,16 @@ function OnboardingContent() {
             if (data.customer.key) setCustomerKey(data.customer.key);
             if (data.customer.bot_id) setBotId(data.customer.bot_id);
             if (data.customer.email) setCustomerEmail(data.customer.email);
-            if (data.customer.name) setBotTitle(data.customer.bot_title || data.customer.name);
+            if (data.customer.bot_title) setBotTitle(data.customer.bot_title);
+            if (data.customer.bot_role) setBotRole(data.customer.bot_role);
             if (data.customer.company) setCompany(data.customer.company);
             if (data.customer.website) setWebsite(data.customer.website);
+            if (data.customer.greeting) setGreeting(data.customer.greeting);
+            if (data.customer.tone) setTone(data.customer.tone);
+            if (data.customer.persona) setPersona(data.customer.persona);
+            if (Array.isArray(data.customer.prompts) && data.customer.prompts.length > 0) {
+              setPrompts(data.customer.prompts);
+            }
           }
         }
       } catch {}
@@ -152,6 +159,53 @@ function OnboardingContent() {
         setError("Please enter your company or project name.");
         return;
       }
+      // Incrementally auto-save Step 1 to database
+      try {
+        const headers: Record<string, string> = { "Content-Type": "application/json" };
+        if (customerKey || tokenFromUrl) {
+          headers["Authorization"] = `Bearer ${customerKey || tokenFromUrl}`;
+        }
+        fetch("/api/onboarding/setup", {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            key: customerKey || tokenFromUrl,
+            token: tokenFromUrl || customerKey,
+            email: customerEmail || emailFromUrl,
+            name: company.trim(),
+            company: company.trim(),
+            website: website.trim(),
+            bot_title: botTitle.trim(),
+            bot_role: botRole.trim(),
+          }),
+        }).catch(() => {});
+      } catch {}
+    } else if (currentStep === 2) {
+      // Incrementally auto-save Step 2 to database
+      try {
+        const headers: Record<string, string> = { "Content-Type": "application/json" };
+        if (customerKey || tokenFromUrl) {
+          headers["Authorization"] = `Bearer ${customerKey || tokenFromUrl}`;
+        }
+        fetch("/api/onboarding/setup", {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            key: customerKey || tokenFromUrl,
+            token: tokenFromUrl || customerKey,
+            email: customerEmail || emailFromUrl,
+            name: company.trim(),
+            company: company.trim(),
+            website: website.trim(),
+            bot_title: botTitle.trim(),
+            bot_role: botRole.trim(),
+            greeting: greeting.trim(),
+            prompts,
+            tone: tone.trim(),
+            persona: persona.trim(),
+          }),
+        }).catch(() => {});
+      } catch {}
     }
     if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
@@ -196,21 +250,27 @@ function OnboardingContent() {
     setError("");
 
     try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (customerKey || tokenFromUrl) {
+        headers["Authorization"] = `Bearer ${customerKey || tokenFromUrl}`;
+      }
+
       const res = await fetch("/api/onboarding/setup", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           key: customerKey || tokenFromUrl,
           token: tokenFromUrl || customerKey,
           email: customerEmail || emailFromUrl,
-          company,
-          website,
-          bot_title: botTitle,
-          bot_role: botRole,
-          tone,
-          greeting,
+          name: company.trim() || botTitle.trim() || "Subscriber",
+          company: company.trim(),
+          website: website.trim(),
+          bot_title: botTitle.trim(),
+          bot_role: botRole.trim(),
+          tone: tone.trim(),
+          greeting: greeting.trim(),
           prompts,
-          persona,
+          persona: persona.trim(),
           knowledge_text: knowledgeText,
           password: password || undefined,
         }),

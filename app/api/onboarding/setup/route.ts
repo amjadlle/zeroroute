@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
 
     const activeCust: any = customer;
 
-    const name = (body.name ? String(body.name).trim() : activeCust.name || "Subscriber").slice(0, 100);
+    const name = (body.name || body.company || body.botTitle || body.bot_title ? String(body.name || body.company || body.botTitle || body.bot_title).trim() : activeCust.name || "Subscriber").slice(0, 100);
     const company = (body.company ? String(body.company).trim() : activeCust.company || "").slice(0, 100);
     const website = (body.website ? String(body.website).trim() : activeCust.website || "").slice(0, 255);
     const bot_title = (body.botTitle || body.bot_title ? String(body.botTitle || body.bot_title).trim() : activeCust.bot_title || "ZeroRoute AI").slice(0, 100);
@@ -87,6 +87,12 @@ export async function POST(req: NextRequest) {
         activeCust.id,
       ],
     });
+
+    // Invalidate session & customer lookup cache so changes reflect instantly in /app
+    const { invalidateSessionCache, invalidateCustomerLookupCache } = await import("@/lib/auth/session");
+    if (sessionToken) invalidateSessionCache(sessionToken);
+    if (activeCust.session_token) invalidateSessionCache(activeCust.session_token);
+    if (activeCust.key) invalidateCustomerLookupCache(activeCust.key);
 
     // Save initial knowledge text if provided
     const knowledgeContent = body.knowledgeText || body.knowledge_text;
