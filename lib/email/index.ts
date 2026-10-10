@@ -240,3 +240,84 @@ If you're not sure how to embed the widget into your website (WordPress, Webflow
   });
 }
 
+/**
+ * Send Subscription Cancelled Confirmation Email
+ */
+export async function sendSubscriptionCancelledEmail(params: {
+  email: string;
+  name?: string;
+  loginUrl?: string;
+}) {
+  const { email, name, loginUrl } = params;
+  const targetLoginUrl = loginUrl || (process.env.APP_URL ? `${process.env.APP_URL}/login` : "https://zeroroute.mapki.in/login");
+  const greeting = name ? `Hi ${name},` : "Hello,";
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ZeroRoute Pro Subscription Cancelled</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #050608; color: #f1f5f9; margin: 0; padding: 24px; }
+    .container { max-width: 560px; margin: 0 auto; background: #0c0f17; border: 1px solid #1e293b; border-radius: 16px; padding: 32px; }
+    .logo { color: #ef4444; font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+    .badge { display: inline-block; padding: 4px 12px; background: rgba(148, 163, 184, 0.15); color: #94a3b8; border-radius: 9999px; font-size: 11px; font-weight: 700; margin-bottom: 16px; }
+    .info-box { background: #050608; border: 1px solid #334155; border-radius: 12px; padding: 18px; font-size: 12px; color: #cbd5e1; margin: 20px 0; line-height: 1.6; }
+    .btn { display: inline-block; padding: 12px 24px; background: #1e293b; color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 13px; margin: 16px 0; border: 1px solid rgba(255,255,255,0.1); }
+    .footer { font-size: 11px; color: #64748b; margin-top: 32px; border-top: 1px solid #1e293b; padding-top: 16px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">⚡ ZeroRoute</div>
+    <div class="badge">SUBSCRIPTION UPDATE</div>
+    <h2 style="color: #ffffff; margin-top: 0;">Subscription Cancelled</h2>
+    <p>${greeting}</p>
+    <p>Your ZeroRoute Pro subscription has been cancelled. You will not be charged for any future billing cycles.</p>
+    
+    <div class="info-box">
+      <strong style="color: #ffffff; display: block; margin-bottom: 8px;">What happens to your account:</strong>
+      • Your account remains active on the <strong>Free Forever tier (500 requests/month)</strong>.<br>
+      • Your live chatbot widgets, knowledge documents, and API keys remain functional.<br>
+      • You can reactivate Pro anytime in 1 click from your console.
+    </div>
+
+    <p><a href="${targetLoginUrl}" class="btn">Open Subscriber Console</a></p>
+
+    <p style="font-size: 12px; color: #94a3b8; margin-top: 20px;">
+      If you cancelled by mistake or have feedback on how we can improve, please reply directly to this email or contact us at <a href="mailto:mapkisolutions@gmail.com" style="color: #cbd5e1;">mapkisolutions@gmail.com</a>. We'd love to hear from you!
+    </p>
+
+    <div class="footer">
+      ZeroRoute Cloud AI Gateway • Zero Cost. Max Route.<br>
+      Direct Support: <a href="mailto:mapkisolutions@gmail.com" style="color: #94a3b8; text-decoration: underline;">mapkisolutions@gmail.com</a>
+    </div>
+  </div>
+</body>
+</html>
+`;
+
+  const text = `ZeroRoute Pro Subscription Cancelled
+
+${greeting}
+
+Your ZeroRoute Pro subscription has been cancelled. You will not be billed for any future cycles.
+
+What happens now:
+- Your account remains active on the Free Forever tier (500 requests/month).
+- Your live chatbot widgets, knowledge documents, and API keys remain functional.
+- You can reactivate Pro anytime from your console: ${targetLoginUrl}
+
+If you cancelled by mistake or have any questions, reply to this email or write to mapkisolutions@gmail.com.
+
+Thank you for being part of ZeroRoute!`;
+
+  return sendEmail({
+    to: email,
+    subject: `ZeroRoute Pro Subscription Cancelled`,
+    html,
+    text,
+  });
+}
+

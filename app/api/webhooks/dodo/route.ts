@@ -72,22 +72,79 @@ export async function POST(request: Request) {
         args: [customerEmail]
       });
 
+      const dataStatus = (data.status || "").toLowerCase();
       const existing = existingRes.rows[0] as any;
       const now = Date.now();
 
-      // 1. Activation & Renewal Events
-      if (
-        eventType.includes("payment.succeeded") ||
-        eventType.includes("subscription.active") ||
-        eventType.includes("subscription.created") ||
-        eventType.includes("subscription.renewed") ||
-        eventType.includes("subscription.unpaused") ||
-        eventType.includes("subscription.updated")
-      ) {
+      // Check event categories accurately
+      const isCancellation =
+        eventType.includes("subscription.cancelled") ||
+        eventType.includes("subscription.canceled") ||
+        eventType.includes("subscription.expired") ||
+        eventType.includes("payment.cancelled") ||
+        eventType.includes("payment.canceled") ||
+        (eventType.includes("subscription.updated") && (dataStatus === "cancelled" || dataStatus === "canceled" || dataStatus === "expired"));
+
+      const isPaused =
+        eventType.includes("subscription.failed") ||
+        eventType.includes("subscription.past_due") ||
+        eventType.includes("subscription.on_hold") ||
+        eventType.includes("subscription.paused") ||
+        eventType.includes("payment.failed") ||
+        (eventType.includes("subscription.updated") && (dataStatus === "paused" || dataStatus === "on_hold" || dataStatus === "past_due" || dataStatus === "failed"));
+
+      const isRenewal = eventType.includes("subscription.renewed");
+
+      const isActivation =
+        !isCancellation &&
+        !isPaused &&
+        (
+          eventType.includes("payment.succeeded") ||
+          eventType.includes("subscription.active") ||
+          eventType.includes("subscription.created") ||
+          eventType.includes("subscription.unpaused") ||
+          (eventType.includes("subscription.updated") && (dataStatus === "active" || dataStatus === ""))
+        );
+
+      // 1. Cancellation Handling
+      if (isCancellation) {
+        if (existing) {
+          await db.execute({
+            sql: `UPDATE customers SET status = 'canceled', updated_at = ? WHERE email = ?`,
+            args: [now, customerEmail],
+          });
+          console.log(`[DodoWebhook] Canceled subscriber: ${customerEmail}`);
+        }
+
+        // Dispatch transactional cancellation confirmation email
+        try {
+          const { sendSubscriptionCancelledEmail } = await import("@/lib/email");
+          await sendSubscriptionCancelledEmail({
+            email: customerEmail,
+            name: existing?.name || customerName,
+          });
+          console.log(`[DodoWebhook] Dispatched cancellation email: ${customerEmail}`);
+        } catch (emailErr) {
+          console.warn("[DodoWebhook] Cancellation email error:", emailErr);
+        }
+      }
+      // 2. Past Due / Paused Handling
+      else if (isPaused) {
+        if (existing) {
+          await db.execute({
+            sql: `UPDATE customers SET status = 'paused', updated_at = ? WHERE email = ?`,
+            args: [now, customerEmail],
+          });
+          console.log(`[DodoWebhook] Paused subscriber: ${customerEmail}`);
+        }
+      }
+      // 3. Activation & Renewal Handling
+      else if (isActivation || isRenewal) {
         const expiresAt = data.next_billing_date ? new Date(data.next_billing_date).getTime() : now + 30 * 24 * 60 * 60 * 1000;
         let activeKey = "";
         let activeBotId = "";
         let activeName = customerName;
+        const isNewSubscriber = !existing;
 
         if (existing) {
           activeKey = existing.key || existing.api_key || `zr_live_${crypto.randomBytes(18).toString("hex")}`;
@@ -96,7 +153,7 @@ export async function POST(request: Request) {
 
           await db.execute({
             sql: `UPDATE customers SET status = 'active', monthly_limit = 10000, subscription_expires = ?, key = ?, bot_id = ?, monthly_requests = 0, updated_at = ? WHERE email = ?`,
-            args: [expiresAt, activeKey, activeBotId, now, customerEmail]
+            args: [expiresAt, activeKey, activeBotId, now, customerEmail],
           });
         } else {
           const id = crypto.randomUUID();
@@ -105,58 +162,27 @@ export async function POST(request: Request) {
 
           await db.execute({
             sql: `INSERT INTO customers (id, key, email, name, company, bot_id, status, subscription_expires, monthly_requests, monthly_limit, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, 0, 10000, ?, ?)`,
-            args: [id, activeKey, customerEmail, customerName, customerCompany, activeBotId, expiresAt, now, now]
+            args: [id, activeKey, customerEmail, customerName, customerCompany, activeBotId, expiresAt, now, now],
           });
         }
 
-        // Dispatch transactional welcome email on activation
-        try {
-          const { sendWelcomeCredentialsEmail } = await import("@/lib/email");
-          await sendWelcomeCredentialsEmail({
-            email: customerEmail,
-            name: activeName,
-            key: activeKey,
-            botId: activeBotId,
-          });
-        } catch (emailErr) {
-          console.warn("[DodoWebhook] Welcome email error:", emailErr);
+        // Only send welcome credentials email on new subscriptions or initial activation, NOT on recurring renewals
+        if (isNewSubscriber || eventType.includes("subscription.created") || eventType.includes("subscription.active")) {
+          try {
+            const { sendWelcomeCredentialsEmail } = await import("@/lib/email");
+            await sendWelcomeCredentialsEmail({
+              email: customerEmail,
+              name: activeName,
+              key: activeKey,
+              botId: activeBotId,
+            });
+            console.log(`[DodoWebhook] Dispatched welcome credentials email: ${customerEmail}`);
+          } catch (emailErr) {
+            console.warn("[DodoWebhook] Welcome email error:", emailErr);
+          }
         }
 
-        console.log(`[DodoWebhook] Activated subscriber & dispatched email: ${customerEmail}`);
-      }
-
-      // 2. Cancellation Events
-      if (
-        eventType.includes("subscription.cancelled") ||
-        eventType.includes("subscription.canceled") ||
-        eventType.includes("subscription.expired") ||
-        eventType.includes("payment.cancelled") ||
-        eventType.includes("payment.canceled")
-      ) {
-        if (existing) {
-          await db.execute({
-            sql: `UPDATE customers SET status = 'canceled', updated_at = ? WHERE email = ?`,
-            args: [now, customerEmail]
-          });
-          console.log(`[DodoWebhook] Canceled subscriber: ${customerEmail}`);
-        }
-      }
-
-      // 3. Past Due / Paused Events
-      if (
-        eventType.includes("subscription.failed") ||
-        eventType.includes("subscription.past_due") ||
-        eventType.includes("subscription.on_hold") ||
-        eventType.includes("subscription.paused") ||
-        eventType.includes("payment.failed")
-      ) {
-        if (existing) {
-          await db.execute({
-            sql: `UPDATE customers SET status = 'paused', updated_at = ? WHERE email = ?`,
-            args: [now, customerEmail]
-          });
-          console.log(`[DodoWebhook] Paused subscriber: ${customerEmail}`);
-        }
+        console.log(`[DodoWebhook] Processed subscriber ${isRenewal ? "renewal" : "activation"}: ${customerEmail}`);
       }
 
       const { invalidateSessionCache, invalidateCustomerLookupCache } = await import("@/lib/auth/session");
