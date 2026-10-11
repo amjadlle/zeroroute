@@ -42,16 +42,23 @@ interface AdminLogsTabProps {
   logs: GlobalLogItem[];
   onRefresh: () => Promise<void>;
   loading: boolean;
+  initialSearch?: string;
 }
 
-export function AdminLogsTab({ logs, onRefresh, loading }: AdminLogsTabProps) {
+export function AdminLogsTab({ logs, onRefresh, loading, initialSearch = "" }: AdminLogsTabProps) {
   const [selectedLog, setSelectedLog] = useState<GlobalLogItem | null>(null);
   const [originFilter, setOriginFilter] = useState("all");
   const [providerFilter, setProviderFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "success" | "error">("all");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (initialSearch) {
+      setSearchQuery(initialSearch);
+    }
+  }, [initialSearch]);
 
   // Auto-refresh interval (5 seconds) when active
   useEffect(() => {
@@ -107,7 +114,8 @@ export function AdminLogsTab({ logs, onRefresh, loading }: AdminLogsTabProps) {
         const model = (log.model || "").toLowerCase();
         const origin = (log.origin || "").toLowerCase();
         const id = (log.id || "").toLowerCase();
-        if (!prompt.includes(q) && !response.includes(q) && !model.includes(q) && !origin.includes(q) && !id.includes(q)) {
+        const custKey = (log.customer_key || "").toLowerCase();
+        if (!prompt.includes(q) && !response.includes(q) && !model.includes(q) && !origin.includes(q) && !id.includes(q) && !custKey.includes(q)) {
           return false;
         }
       }
@@ -444,10 +452,18 @@ export function AdminLogsTab({ logs, onRefresh, loading }: AdminLogsTabProps) {
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <span className="text-[11px] font-bold text-slate-400">Origin / Referer:</span>
-                <div className="p-2.5 bg-black/50 border border-white/5 rounded-xl font-mono text-emerald-400">
-                  {selectedLog.origin || "Direct API"}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div className="space-y-1">
+                  <span className="text-[11px] font-bold text-slate-400">Customer Key / Identity:</span>
+                  <div className="p-2.5 bg-black/50 border border-white/5 rounded-xl font-mono text-cyan-400 text-[11px] truncate" title={selectedLog.customer_key}>
+                    {selectedLog.customer_key || "demo"}
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-[11px] font-bold text-slate-400">Origin / Referer:</span>
+                  <div className="p-2.5 bg-black/50 border border-white/5 rounded-xl font-mono text-emerald-400 text-[11px]">
+                    {selectedLog.origin || "Direct API"}
+                  </div>
                 </div>
               </div>
 

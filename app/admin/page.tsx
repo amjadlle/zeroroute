@@ -46,6 +46,7 @@ export default function AdminDashboardPage() {
     cacheHitRatio: 0
   });
 
+  const [logsFilterKey, setLogsFilterKey] = useState("");
   const [loadedTabs, setLoadedTabs] = useState<Set<string>>(new Set());
 
   const getAdminHeaders = useCallback(() => {
@@ -255,7 +256,12 @@ export default function AdminDashboardPage() {
 
             {/* Tab 4: Logs & Failovers */}
             {activeTab === "logs" && (
-              <AdminLogsTab logs={logsList} onRefresh={handleRefreshData} loading={refreshing} />
+              <AdminLogsTab
+                logs={logsList}
+                onRefresh={handleRefreshData}
+                loading={refreshing}
+                initialSearch={logsFilterKey}
+              />
             )}
 
             {/* Tab 5: Knowledge Base */}
@@ -265,7 +271,14 @@ export default function AdminDashboardPage() {
 
             {/* Tab 6: Subscribers & Bots Directory */}
             {activeTab === "customers" && (
-              <AdminCustomersTab customers={customersList} onRefresh={handleRefreshData} />
+              <AdminCustomersTab
+                customers={customersList}
+                onRefresh={handleRefreshData}
+                onViewCustomerLogs={(key) => {
+                  setLogsFilterKey(key);
+                  handleTabChange("logs");
+                }}
+              />
             )}
           </>
         )}

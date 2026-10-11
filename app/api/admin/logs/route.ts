@@ -43,10 +43,16 @@ export async function GET(request: Request) {
       conditions.push("(status < 200 OR status >= 300)");
     }
 
+    const customerKey = url.searchParams.get("customer_key")?.trim();
+    if (customerKey) {
+      conditions.push("customer_key = ?");
+      params.push(customerKey);
+    }
+
     if (search) {
-      conditions.push("(prompt_preview LIKE ? OR response_preview LIKE ? OR model LIKE ? OR id LIKE ?)");
+      conditions.push("(prompt_preview LIKE ? OR response_preview LIKE ? OR model LIKE ? OR id LIKE ? OR customer_key LIKE ?)");
       const searchWildcard = `%${search}%`;
-      params.push(searchWildcard, searchWildcard, searchWildcard, searchWildcard);
+      params.push(searchWildcard, searchWildcard, searchWildcard, searchWildcard, searchWildcard);
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";

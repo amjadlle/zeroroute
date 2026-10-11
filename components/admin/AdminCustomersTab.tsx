@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { 
   Users, Search, Key, CheckCircle2, PauseCircle, RefreshCw, Trash2, 
-  Eye, EyeOff, Plus, Copy, Check, Globe, X, Bot, Shield, Code, Sparkles
+  Eye, EyeOff, Plus, Copy, Check, Globe, X, Bot, Shield, Code, Sparkles, Activity
 } from "lucide-react";
 
 export interface CustomerAdminItem {
@@ -27,9 +27,10 @@ export interface CustomerAdminItem {
 interface AdminCustomersTabProps {
   customers: CustomerAdminItem[];
   onRefresh: () => Promise<void>;
+  onViewCustomerLogs?: (customerKey: string) => void;
 }
 
-export function AdminCustomersTab({ customers, onRefresh }: AdminCustomersTabProps) {
+export function AdminCustomersTab({ customers, onRefresh, onViewCustomerLogs }: AdminCustomersTabProps) {
   const [search, setSearch] = useState("");
   const [revealedKeys, setRevealedKeys] = useState<Record<string, boolean>>({});
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -328,6 +329,18 @@ export function AdminCustomersTab({ customers, onRefresh }: AdminCustomersTabPro
 
               {/* Row Bottom: Actions */}
               <div className="pt-2 border-t border-white/5 flex items-center justify-end gap-2 text-xs flex-wrap">
+                {onViewCustomerLogs && (
+                  <button
+                    type="button"
+                    onClick={() => onViewCustomerLogs(c.key)}
+                    className="px-3.5 py-2 min-h-[44px] rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 hover:text-white border border-purple-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation flex-1 sm:flex-initial"
+                    title="Inspect API requests and prompts for this customer"
+                  >
+                    <Activity className="w-3.5 h-3.5 text-purple-400" />
+                    <span>View Logs ({c.monthly_requests})</span>
+                  </button>
+                )}
+
                 {c.bot_id && (
                   <button
                     type="button"

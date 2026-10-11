@@ -419,9 +419,6 @@ export async function POST(request: Request) {
                   fullContent += chunk.choices[0]?.delta?.content ?? "";
                   controller.enqueue(encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`));
                 }
-                controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-                controller.close();
-
                 // Cache reconstructed response
                 const reconstructed: ChatResponse = {
                   id: first.value.id,
@@ -433,8 +430,8 @@ export async function POST(request: Request) {
                 };
                 responseCache.set(cacheKey, reconstructed);
 
-                // Log request telemetry
-                db.execute({
+                // Log request telemetry before closing stream
+                await db.execute({
                   sql: `INSERT INTO request_logs (id, customer_key, timestamp, origin, prompt_preview, response_preview, provider, model, latency_ms, status, is_stream, is_cache_hit, failovers, prompt_tokens, completion_tokens, total_tokens) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                   args: [
                     first.value.id || crypto.randomUUID(),
@@ -455,6 +452,9 @@ export async function POST(request: Request) {
                     0
                   ]
                 }).catch((e: unknown) => console.error("[Telemetry Log Error]:", e));
+
+                controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+                controller.close();
               } catch (err) {
                 console.error("[Stream Pipe Error]:", err);
                 controller.close();
@@ -485,6 +485,29 @@ export async function POST(request: Request) {
       }
     }
 
+    // Log failure telemetry
+    await db.execute({
+      sql: `INSERT INTO request_logs (id, customer_key, timestamp, origin, prompt_preview, response_preview, provider, model, latency_ms, status, is_stream, is_cache_hit, failovers, prompt_tokens, completion_tokens, total_tokens) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: [
+        crypto.randomUUID(),
+        customerKey || "demo",
+        Date.now(),
+        origin,
+        lastUserMsg.slice(0, 100),
+        failures.slice(0, 2).join("; ").slice(0, 100),
+        "gateway_failover",
+        body.model || "stream",
+        Date.now() - startTime,
+        502,
+        1,
+        0,
+        JSON.stringify(failures),
+        0,
+        0,
+        0
+      ]
+    }).catch(() => {});
+
     return NextResponse.json(
       { error: { message: "All configured AI cloud providers failed.", details: failures } },
       { status: 502, headers: corsHdrs }
@@ -509,8 +532,8 @@ export async function POST(request: Request) {
 
         responseCache.set(cacheKey, result);
 
-        // Record telemetry log
-        db.execute({
+        // Record telemetry log (awaited to guarantee edge persistence before response)
+        await db.execute({
           sql: `INSERT INTO request_logs (id, customer_key, timestamp, origin, prompt_preview, response_preview, provider, model, latency_ms, status, is_stream, is_cache_hit, failovers, prompt_tokens, completion_tokens, total_tokens) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           args: [
             result.id || crypto.randomUUID(),
@@ -549,6 +572,29 @@ export async function POST(request: Request) {
       state.lastError = lastErr;
     }
   }
+
+  // Log failure telemetry for non-streaming mode
+  await db.execute({
+    sql: `INSERT INTO request_logs (id, customer_key, timestamp, origin, prompt_preview, response_preview, provider, model, latency_ms, status, is_stream, is_cache_hit, failovers, prompt_tokens, completion_tokens, total_tokens) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    args: [
+      crypto.randomUUID(),
+      customerKey || "demo",
+      Date.now(),
+      origin,
+      lastUserMsg.slice(0, 100),
+      failures.slice(0, 2).join("; ").slice(0, 100),
+      "gateway_failover",
+      body.model || "direct",
+      Date.now() - startTime,
+      502,
+      0,
+      0,
+      JSON.stringify(failures),
+      0,
+      0,
+      0
+    ]
+  }).catch(() => {});
 
   return NextResponse.json(
     { error: { message: "All configured AI cloud providers failed.", details: failures } },
