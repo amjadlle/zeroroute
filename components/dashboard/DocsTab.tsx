@@ -131,7 +131,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="default",  # Automatically routes across 11 AI cloud providers with <8ms dynamic load balancing
+    model="default",  # Automatically routes across 12 AI cloud providers with <8ms dynamic load balancing
     messages=[{"role": "user", "content": "Hello ZeroRoute!"}]
 )
 

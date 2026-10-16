@@ -79,6 +79,11 @@ export const DEFAULT_PROVIDER_MODELS: Record<string, string[]> = {
   bazaarlink: [
     "qwen/qwen3.7-flash:free",
     "auto:free"
+  ],
+  ifm: [
+    "IFM/K2-Horizon-375B-A23B",
+    "IFM/Jais-3-MoVA-36B-A4B",
+    "IFM/Jais-ASR"
   ]
 };
 

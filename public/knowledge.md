@@ -18,7 +18,7 @@ ZeroRoute (https://zeroroute.mapki.in) is an open-source, multi-cloud AI Gateway
 
 ### 2. OpenAI-Compatible Multi-Cloud API Gateway
 - **Drop-in Replacement**: Fully compatible with `https://api.openai.com/v1/chat/completions` and official OpenAI SDKs (Python, TypeScript, Node.js, cURL, LangChain, Cursor, Claude Code).
-- **11 Pooled AI Clouds**: Groq, Cerebras, SambaNova, Mistral AI, Google Gemini, NVIDIA NIM, Cohere, OpenRouter, Cloudflare Workers AI, Hugging Face, and BazaarLink.
+- **12 Pooled AI Clouds**: Groq, Cerebras, SambaNova, Mistral AI, Google Gemini, NVIDIA NIM, Cohere, OpenRouter, Cloudflare Workers AI, Hugging Face, BazaarLink, and IFM AI (MBZUAI K2-Horizon & Jais).
 - **Sub-8ms Dynamic Routing**: Automatically detects rate limits (HTTP 429) or cloud downtime (HTTP 5xx) and dispatches requests to the next healthy provider in milliseconds.
 - **0ms RAM Caching**: Identical queries are served instantly with zero API credit consumption.
 

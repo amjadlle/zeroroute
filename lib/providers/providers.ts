@@ -12,7 +12,8 @@ const ENV_MAP: Record<string, string> = {
   bazaarlink: "BAZAARLINK_API_KEY",
   cloudflare: "CLOUDFLARE_API_TOKEN",
   cerebras: "CEREBRAS_API_KEY",
-  cohere: "COHERE_API_KEY"
+  cohere: "COHERE_API_KEY",
+  ifm: "IFM_API_KEY"
 };
 
 export function getProviderApiKey(providerId: string): string | undefined {
@@ -159,6 +160,7 @@ async function* openAIStyleStream(
     try {
       const data = JSON.parse(line);
       const content = data.choices?.[0]?.delta?.content ?? "";
+      const reasoning = data.choices?.[0]?.delta?.reasoning ?? data.choices?.[0]?.delta?.reasoning_content;
       const finish_reason = data.choices?.[0]?.finish_reason ?? null;
       yield {
         id: data.id ?? `${id}-${Date.now()}`,
@@ -169,7 +171,10 @@ async function* openAIStyleStream(
         choices: [
           {
             index: 0,
-            delta: { content },
+            delta: {
+              content,
+              ...(reasoning ? { reasoning } : {})
+            },
             finish_reason
           }
         ]
@@ -575,6 +580,22 @@ export const providers: Provider[] = [
       const targetModel = modelOverride || this.model;
       const key = getProviderApiKey("bazaarlink");
       return openAIStyleStream("bazaarlink", "https://api.bazaarlink.ai/v1/chat/completions", key, targetModel, r, s);
+    }
+  },
+  {
+    id: "ifm",
+    name: "IFM AI",
+    model: process.env.IFM_MODEL ?? "IFM/K2-Horizon-375B-A23B",
+    generate: async function (r, s, modelOverride) {
+      const targetModel = modelOverride || this.model;
+      const key = getProviderApiKey("ifm");
+      const res = await openAIStyle("ifm", "https://api.ifm.ai/v1/chat/completions", key, targetModel, r, s);
+      return normalize("ifm", targetModel, await parseJsonOrError(res, "ifm"), res);
+    },
+    generateStream: function (r, s, modelOverride) {
+      const targetModel = modelOverride || this.model;
+      const key = getProviderApiKey("ifm");
+      return openAIStyleStream("ifm", "https://api.ifm.ai/v1/chat/completions", key, targetModel, r, s);
     }
   }
 ];

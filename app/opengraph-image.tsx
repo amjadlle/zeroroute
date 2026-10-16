@@ -77,7 +77,7 @@ export default async function Image() {
               gap: "8px",
             }}
           >
-            11 Pooled AI Providers
+            12 Pooled AI Providers
           </div>
         </div>
 

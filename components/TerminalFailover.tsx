@@ -31,7 +31,7 @@ export function TerminalFailover() {
           </div>
 
           <div className="pt-2 text-slate-400 flex items-center gap-2">
-            <span className="text-amber-400">▶</span> Evaluating 11 AI cloud endpoints for optimal throughput...
+            <span className="text-amber-400">▶</span> Evaluating 12 AI cloud endpoints for optimal throughput...
           </div>
 
           <div className="text-emerald-400 flex items-center gap-2">

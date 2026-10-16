@@ -7,8 +7,8 @@ export const dynamic = "force-dynamic";
 
 function getNonChatModelDiagnostic(model: string): string | null {
   const m = model.toLowerCase();
-  if (m.includes("whisper")) {
-    return "Audio STT Model: Whisper requires audio files via /v1/audio/transcriptions (chat completions not supported)";
+  if (m.includes("whisper") || m.includes("asr")) {
+    return "Audio Speech/ASR Model: Audio recognition models require audio files via speech endpoints (chat completions not supported)";
   }
   if (m.includes("embed") || m.includes("bge") || m.includes("e5") || m.includes("minilm") || m.includes("sentence-transformers") || m.includes("gte-")) {
     return "Vector Embedding Model: Dedicated vector embedding model for semantic search & RAG (use /v1/embeddings endpoint)";

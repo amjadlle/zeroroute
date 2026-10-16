@@ -10,7 +10,7 @@
 [![Cloudflare D1](https://img.shields.io/badge/Database-Cloudflare_D1_%2B_SQLite-F38020.svg)](https://developers.cloudflare.com/d1/)
 [![Dodo Payments](https://img.shields.io/badge/Billing-Dodo_Payments-00E599.svg)](https://dodopayments.com/)
 
-**Zero Cost. Max Route. 100% Uptime Across 11 Pooled AI Cloud Providers.**
+**Zero Cost. Max Route. 100% Uptime Across 12 Pooled AI Cloud Providers.**
 
 [Live SaaS](https://zeroroute.mapki.in) • [Subscriber Console](https://zeroroute.mapki.in/app) • [Master Admin](https://zeroroute.mapki.in/admin) • [Buy Me a Coffee](https://buymeacoffee.com/amjadlle)
 
@@ -80,7 +80,7 @@ flowchart TD
     Cache -->|"Cache Hit (0ms)"| Immediate["Instant Cached Response"]
     Cache -->|"Cache Miss"| ProviderPool["Dynamic Multi-Cloud Pool"]
 
-    subgraph Matrix["11 Pooled AI Clouds"]
+    subgraph Matrix["12 Pooled AI Clouds"]
         P1["1. Groq — ~100ms (Llama 3.3 / GPT-OSS)"]
         P2["2. Cerebras — ~80ms (Wafer-Scale 70B)"]
         P3["3. SambaNova — ~360ms (Gemma 4 / MiniMax)"]
@@ -92,6 +92,7 @@ flowchart TD
         P9["9. Cloudflare AI — Edge Llama 3.1"]
         P10["10. Hugging Face — Serverless Router"]
         P11["11. BazaarLink AI — Qwen 2.5"]
+        P12["12. IFM AI — Cerebras 375B MoE & B200"]
     end
 
     ProviderPool --> P1
@@ -105,6 +106,7 @@ flowchart TD
     P8 -->|"Failover"| P9
     P9 -->|"Failover"| P10
     P10 -->|"Failover"| P11
+    P11 -->|"Failover"| P12
 ```
 
 ---

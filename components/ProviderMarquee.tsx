@@ -18,6 +18,7 @@ export function ProviderMarquee() {
     { emoji: "🤗", name: "Hugging Face", latency: "~450ms", color: "emerald", model: "meta-llama/Llama-3.1-8B", desc: "Serverless open-source router" },
     { emoji: "🔀", name: "OpenRouter", latency: "Free Pool", color: "slate", model: "nemotron-3.5-lightning:free", desc: "Community load-balanced endpoint" },
     { emoji: "⚡", name: "BazaarLink AI", latency: "~1.2s", color: "cyan", model: "auto:free-pool", desc: "Distributed backup inference" },
+    { emoji: "⚡", name: "IFM AI (375B)", latency: "~480ms", color: "emerald", model: "IFM/K2-Horizon-375B-A23B", desc: "Cerebras CS-3 375B MoE & NVIDIA B200" },
   ];
 
   const getLatencyBadge = (latency: string, color: string) => {
@@ -41,10 +42,10 @@ export function ProviderMarquee() {
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
             <Zap className="w-3.5 h-3.5" />
-            <span>11 Pooled AI Clouds</span>
+            <span>12 Pooled AI Clouds</span>
           </div>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
-            Backed by 11 Ultra-Fast AI Clouds
+            Backed by 12 Ultra-Fast AI Clouds
           </h2>
           <p className="text-xs sm:text-sm text-slate-400">
             Intelligent multi-cloud routing. ZeroRoute dynamically distributes requests across healthy clouds in &lt;8ms.
@@ -97,7 +98,7 @@ export function ProviderMarquee() {
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white border border-white/10 transition-all hover:-translate-y-0.5 active:translate-y-0 shadow-sm cursor-pointer min-h-[44px] touch-manipulation"
           >
             <BarChart2 className="w-3.5 h-3.5 text-red-400" />
-            <span>Inspect All 11 Cloud AI Providers</span>
+            <span>Inspect All 12 Cloud AI Providers</span>
           </button>
         </div>
       </section>
@@ -113,7 +114,7 @@ export function ProviderMarquee() {
                   <Cpu className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white">11 Multi-Cloud AI Benchmarks</h3>
+                  <h3 className="text-sm font-bold text-white">12 Multi-Cloud AI Benchmarks</h3>
                   <p className="text-[11px] text-slate-400">High availability • Intelligent multi-cloud routing mesh</p>
                 </div>
               </div>
@@ -150,7 +151,7 @@ export function ProviderMarquee() {
 
             {/* Modal Footer */}
             <div className="px-5 py-3 border-t border-dark-border flex items-center justify-between bg-dark-card/40 text-[11px] text-slate-400">
-              <span>All 11 providers auto-balanced in smart routing engine</span>
+              <span>All 12 providers auto-balanced in smart routing engine</span>
               <button
                 onClick={() => setModalOpen(false)}
                 className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors cursor-pointer"

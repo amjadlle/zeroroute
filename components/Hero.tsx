@@ -23,7 +23,7 @@ export function Hero({ onOpenCheckout }: HeroProps) {
           <span className="px-1.5 py-0.5 rounded bg-red-500/20 text-[10px] font-mono text-red-300 shrink-0">
             {APP_VERSION}
           </span>
-          <span className="truncate">⚡ NEW: 1-Line Embeddable AI Assistant • 11 Pooled AI Providers</span>
+          <span className="truncate">⚡ NEW: 1-Line Embeddable AI Assistant • 12 Pooled AI Providers</span>
           <ChevronRight className="w-3 h-3 opacity-70 shrink-0 hidden sm:inline-block" />
         </a>
       </div>

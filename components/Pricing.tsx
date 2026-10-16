@@ -219,7 +219,7 @@ export function Pricing({ onOpenCheckout }: PricingProps) {
                 <li className="flex items-center gap-2.5">
                   <Check className="w-4 h-4 text-red-400 shrink-0" />
                   <span>
-                    <strong>11 Clouds Pooled &amp; Managed</strong> for 99.9% uptime
+                    <strong>12 Clouds Pooled &amp; Managed</strong> for 99.9% uptime
                   </span>
                 </li>
                 <li className="flex items-center gap-2.5">

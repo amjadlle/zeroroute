@@ -120,7 +120,7 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-red-400 flex-shrink-0" />
                 <span>
-                  <strong>11 Pooled AI Clouds</strong> (Gemini, Groq, Cloudflare &amp; more)
+                  <strong>12 Pooled AI Clouds</strong> (Gemini, Groq, IFM, Cloudflare &amp; more)
                 </span>
               </li>
               <li className="flex items-center gap-2.5">

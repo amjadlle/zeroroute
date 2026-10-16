@@ -15,9 +15,9 @@ const FAQS: FAQItem[] = [
       "Major AI inference cloud providers like Groq, Cerebras, SambaNova, Mistral, Cloudflare, and Google provide generous developer tier quotas. ZeroRoute aggregates and dynamically load balances across all these free tiers into a single stable OpenAI-compatible gateway with intelligent multi-cloud routing.",
   },
   {
-    question: "How does ZeroRoute guarantee zero downtime with 11 pooled clouds?",
+    question: "How does ZeroRoute guarantee zero downtime with 12 pooled clouds?",
     answer:
-      "ZeroRoute's intelligent routing engine continuously monitors latency and availability across 11 AI cloud providers (Groq, Cerebras, SambaNova, Google Gemini, Mistral, Cloudflare, etc.). Every request is dynamically dispatched to the fastest available provider in under 8 milliseconds, ensuring your visitors enjoy instant, uninterrupted conversations.",
+      "ZeroRoute's intelligent routing engine continuously monitors latency and availability across 12 AI cloud providers (Groq, Cerebras, SambaNova, Google Gemini, Mistral, IFM AI, Cloudflare, etc.). Every request is dynamically dispatched to the fastest available provider in under 8 milliseconds, ensuring your visitors enjoy instant, uninterrupted conversations.",
   },
   {
     question: "Can I embed the chatbot on my website without coding?",
