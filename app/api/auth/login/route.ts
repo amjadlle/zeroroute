@@ -3,7 +3,7 @@ import crypto from "crypto";
 import { getDb, initDb } from "@/lib/db";
 import { verifyPassword, generateSessionToken } from "@/lib/auth/password";
 import { isRateLimited, getClientIp } from "@/lib/auth/rate-limit";
-import { SESSION_COOKIE_NAME, ROLE_COOKIE_NAME, ADMIN_EMAILS } from "@/lib/auth/session";
+import { SESSION_COOKIE_NAME, ADMIN_EMAILS } from "@/lib/auth/session";
 import { signAdminSession, ADMIN_SESSION_MAX_AGE } from "@/lib/auth/admin-session";
 
 function safeEqual(a: string, b: string): boolean {
@@ -66,16 +66,6 @@ export async function POST(req: NextRequest) {
         path: "/",
       });
 
-      response.cookies.set({
-        name: ROLE_COOKIE_NAME,
-        value: "admin",
-        httpOnly: false,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: ADMIN_SESSION_MAX_AGE,
-        path: "/",
-      });
-
       return response;
     }
 
@@ -87,28 +77,15 @@ export async function POST(req: NextRequest) {
       args: [email],
     });
 
-    if (result.rows.length === 0) {
-      return NextResponse.json(
-        { error: "No account found with this email address." },
-        { status: 401 }
-      );
-    }
-
+    // One message for every failure, so the response never says which emails have accounts.
+    // A missing account still runs one hash check to keep the timing similar.
     const customer = result.rows[0];
-    const passwordHash = customer.password_hash as string;
-    const passwordSalt = customer.password_salt as string;
-
-    if (!passwordHash || !passwordSalt) {
+    const passwordHash = (customer?.password_hash as string) || "";
+    const passwordSalt = (customer?.password_salt as string) || "";
+    const isValid = verifyPassword(password, passwordHash || "0".repeat(128), passwordSalt || "0".repeat(32));
+    if (!customer || !passwordHash || !passwordSalt || !isValid) {
       return NextResponse.json(
-        { error: "This account has no password set. Please use password reset or magic OTP." },
-        { status: 401 }
-      );
-    }
-
-    const isValid = verifyPassword(password, passwordHash, passwordSalt);
-    if (!isValid) {
-      return NextResponse.json(
-        { error: "Incorrect password. Please try again." },
+        { error: "Email or password is incorrect. Forgot it? Reset your password." },
         { status: 401 }
       );
     }
@@ -152,16 +129,6 @@ export async function POST(req: NextRequest) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 30 * 24 * 60 * 60, // 30 days
-      path: "/",
-    });
-
-    response.cookies.set({
-      name: ROLE_COOKIE_NAME,
-      value: targetRole,
-      httpOnly: false,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 30 * 24 * 60 * 60,
       path: "/",
     });
 

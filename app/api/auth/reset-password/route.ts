@@ -5,6 +5,7 @@ import {
   hashPassword,
   generateSessionToken,
 } from "@/lib/auth/password";
+import { MIN_PASSWORD_LENGTH } from "@/lib/constants";
 import { isRateLimited, getClientIp } from "@/lib/auth/rate-limit";
 import { SESSION_COOKIE_NAME } from "@/lib/auth/session";
 
@@ -30,9 +31,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (newPassword.length < 6) {
+    if (newPassword.length < MIN_PASSWORD_LENGTH) {
       return NextResponse.json(
-        { error: "Password must be at least 6 characters long." },
+        { error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters long.` },
         { status: 400 }
       );
     }

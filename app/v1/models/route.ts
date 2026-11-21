@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getRuntimeProviders } from "@/lib/providers/state";
+import { ensureProviderConfigs, getRuntimeProviders } from "@/lib/providers/state";
 import { isMasterAdminKey, getCustomerByTokenOrKey } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
@@ -22,6 +22,7 @@ export async function GET(request: Request) {
     }
   }
 
+  await ensureProviderConfigs();
   const modelList = getRuntimeProviders()
     .filter(p => p.enabled)
     .map(p => ({
