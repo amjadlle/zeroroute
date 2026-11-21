@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { PROVIDER_CATALOGS } from "@/lib/providers/catalog";
 import { UiProviders } from "@/components/ui/UiProviders";
 import { ProviderModelCatalogModal } from "./ProviderModelCatalogModal";
-import { keyEnvVar, plainLimit, recommendedChain } from "./providers/helpers";
+import { plainLimit, recommendedChain } from "./providers/helpers";
 
 const [fast, slow] = PROVIDER_CATALOGS.groq.categories.flatMap((c) => c.models).map((m) => m.id);
 const provider = {
@@ -79,9 +79,7 @@ it("cancels running tests when the dialog closes", async () => {
   expect(signals.every((s) => s.aborted)).toBe(true);
 });
 
-it("helpers: env var names, plain limits and the suggested order", () => {
-  expect(keyEnvVar("groq")).toBe("GROQ_API_KEY");
-  expect(keyEnvVar("cloudflare")).toBe("CLOUDFLARE_API_TOKEN");
+it("helpers: plain limits and the suggested order", () => {
   expect(plainLimit("30 RPM")).toBe("30 requests a minute");
   expect(plainLimit("14.4k RPD")).toBe("14.4k requests a day");
   expect(plainLimit("—")).toBeUndefined();

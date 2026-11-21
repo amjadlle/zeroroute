@@ -11,7 +11,7 @@ import { IconButton } from "@/components/ui/IconButton";
 import { Switch } from "@/components/ui/Switch";
 import { FallbackChainEditor } from "./FallbackChainEditor";
 import { TestResultBox } from "./TestResultBox";
-import { keyEnvVar, modelsOf, providerStatus, type ProviderItem, type TestResult } from "./helpers";
+import { modelsOf, providerStatus, type ProviderItem, type TestResult } from "./helpers";
 
 type Props = {
   provider: ProviderItem;
@@ -60,7 +60,7 @@ export function ProviderRow({ provider: p, position, isFirst, isLast, busy, test
           </p>
           {!p.configured && (
             <p className="text-meta text-text-muted">
-              To add a key, set <code className="font-ui-mono text-text">{keyEnvVar(p.id)}</code> in the server environment and restart.
+              To add a key, set <code className="font-ui-mono text-text">{p.keyEnvVar}</code> in the server environment and restart.
               {p.id === "cloudflare" && <> Cloudflare also needs <code className="font-ui-mono text-text">CLOUDFLARE_ACCOUNT_ID</code>.</>}
             </p>
           )}

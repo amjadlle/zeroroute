@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ChatRequest, ChatResponse, ChatStreamChunk, Provider, RateLimitTelemetry } from "./types";
 
-const ENV_MAP: Record<string, string> = {
+/** The server environment variable each provider's key is read from. Names only; never send values. */
+export const ENV_MAP: Record<string, string> = {
   groq: "GROQ_API_KEY",
   sambanova: "SAMBANOVA_API_KEY",
   mistral: "MISTRAL_API_KEY",
