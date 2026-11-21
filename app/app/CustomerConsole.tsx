@@ -6,7 +6,7 @@ import { ConsoleShell, type NavGroup } from "@/components/shell/ConsoleShell";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { PageLoader } from "@/components/ui/PageLoader";
-import type { KnowledgeDoc } from "@/components/dashboard/KnowledgeTab";
+import type { KnowledgeSource } from "@/components/shared/knowledge/KnowledgeList";
 import { apiFetch, ApiError } from "@/lib/client/api";
 import { PLAN_LABELS, PLAN_LIMITS, isPaidPlan } from "@/lib/constants";
 
@@ -42,7 +42,9 @@ type CustomerContextValue = {
   /** The plan's monthly request limit (profile value, else the Free plan's). */
   monthlyLimit: number;
   isPro: boolean;
-  docs: KnowledgeDoc[];
+  docs: KnowledgeSource[];
+  /** Set when the last knowledge load failed. */
+  docsError: string | null;
   setProfile: (p: CustomerProfile) => void;
   refreshProfile: () => Promise<void>;
   refreshDocs: () => Promise<void>;
@@ -63,7 +65,8 @@ export const failMsg = (e: unknown): string => (e instanceof Error ? e.message :
 
 export function CustomerConsole({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<CustomerProfile | null>(null);
-  const [docs, setDocs] = useState<KnowledgeDoc[]>([]);
+  const [docs, setDocs] = useState<KnowledgeSource[]>([]);
+  const [docsError, setDocsError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -81,10 +84,12 @@ export function CustomerConsole({ children }: { children: ReactNode }) {
 
   const refreshDocs = useCallback(async () => {
     try {
-      const data = await apiFetch<{ documents?: KnowledgeDoc[] }>("/api/knowledge");
+      const data = await apiFetch<{ documents?: KnowledgeSource[] }>("/api/knowledge");
       setDocs(data.documents ?? []);
-    } catch {
-      // The Knowledge page shows its own empty state; profile errors are the ones that block.
+      setDocsError(null);
+    } catch (e) {
+      // Only the Knowledge page shows this; profile errors are the ones that block.
+      setDocsError(failMsg(e));
     }
   }, []);
 
@@ -127,6 +132,7 @@ export function CustomerConsole({ children }: { children: ReactNode }) {
       monthlyLimit: profile.monthly_limit || PLAN_LIMITS.free.monthlyRequests,
       isPro,
       docs,
+      docsError,
       setProfile,
       refreshProfile,
       refreshDocs,
