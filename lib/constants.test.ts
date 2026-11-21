@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { PROVIDER_CATALOGS } from "@/lib/providers/catalog";
 import { providers } from "@/lib/providers/providers";
 import { isPaidPlan, knowledgeSourceLabel, PLAN_LIMITS, PROVIDER_COUNT, SITE_URL } from "./constants";
 
@@ -43,7 +44,8 @@ describe("knowledgeSourceLabel", () => {
 
 describe("product facts", () => {
   it("counts every provider the gateway can route to", () => {
-    expect(PROVIDER_COUNT).toBe(providers.length);
+    expect(Object.keys(PROVIDER_CATALOGS).length).toBe(PROVIDER_COUNT);
+    expect(providers.length).toBe(PROVIDER_COUNT);
   });
 
   it("has a site URL without a trailing slash", () => {

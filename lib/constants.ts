@@ -1,5 +1,4 @@
 // Product facts used in copy. Glossary terms live in GLOSSARY.md.
-import { PROVIDER_CATALOGS } from "@/lib/providers/catalog";
 
 // Production domain per DEPLOYMENT.md / README. `zeroroute.app` (OpenRouter referer, admin snippets) is not deployed.
 // NEXT_PUBLIC_APP_URL is readable in the browser; APP_URL only on the server.
@@ -16,7 +15,8 @@ export const PLAN_LIMITS = {
 } as const;
 export const UNLIMITED_MONTHLY_REQUESTS = 999999999;
 
-export const PROVIDER_COUNT = Object.keys(PROVIDER_CATALOGS).length;
+// Literal so client bundles skip the ~70 KB catalog; constants.test.ts fails if lib/providers drifts.
+export const PROVIDER_COUNT = 12;
 
 export type SubscriptionStatus = "active" | "paused" | "canceled";
 
