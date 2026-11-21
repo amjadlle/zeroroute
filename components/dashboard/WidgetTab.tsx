@@ -113,6 +113,9 @@ function renderInlineStyles(text: string) {
     if (linkMatch) {
       const label = linkMatch[1];
       const href = linkMatch[2];
+      // Model output is untrusted: only link http(s) and mailto, render anything else as text.
+      // Replaced by components/ui/Markdown + safeHref in the redesign (#18).
+      if (!/^(https?:\/\/|mailto:)/i.test(href.trim())) return <span key={i}>{label}</span>;
       return (
         <a
           key={i}
