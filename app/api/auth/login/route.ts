@@ -77,28 +77,15 @@ export async function POST(req: NextRequest) {
       args: [email],
     });
 
-    if (result.rows.length === 0) {
-      return NextResponse.json(
-        { error: "No account found with this email address." },
-        { status: 401 }
-      );
-    }
-
+    // One message for every failure, so the response never says which emails have accounts.
+    // A missing account still runs one hash check to keep the timing similar.
     const customer = result.rows[0];
-    const passwordHash = customer.password_hash as string;
-    const passwordSalt = customer.password_salt as string;
-
-    if (!passwordHash || !passwordSalt) {
+    const passwordHash = (customer?.password_hash as string) || "";
+    const passwordSalt = (customer?.password_salt as string) || "";
+    const isValid = verifyPassword(password, passwordHash || "0".repeat(128), passwordSalt || "0".repeat(32));
+    if (!customer || !passwordHash || !passwordSalt || !isValid) {
       return NextResponse.json(
-        { error: "This account has no password set. Please use password reset or magic OTP." },
-        { status: 401 }
-      );
-    }
-
-    const isValid = verifyPassword(password, passwordHash, passwordSalt);
-    if (!isValid) {
-      return NextResponse.json(
-        { error: "Incorrect password. Please try again." },
+        { error: "Email or password is incorrect. Forgot it? Reset your password." },
         { status: 401 }
       );
     }
