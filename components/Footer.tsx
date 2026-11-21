@@ -4,7 +4,7 @@ import { APP_VERSION } from "@/lib/version";
 
 export function Footer() {
   return (
-    <footer className="pt-10 pb-8 border-t border-dark-border space-y-4 text-xs text-slate-500">
+    <footer className="pt-10 pb-8 border-t border-landing-border space-y-4 text-xs text-slate-500">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2.5">
           <Image
@@ -15,11 +15,11 @@ export function Footer() {
             className="w-6 h-6 object-contain"
           />
           <span className="font-bold text-sm text-slate-200">ZeroRoute</span>
-          <span className="text-[10px] font-mono text-slate-400 font-normal">
+          <span className="text-landing-2xs font-mono text-slate-400 font-normal">
             {APP_VERSION} • MIT Licensed
           </span>
         </div>
-        <div className="flex flex-wrap items-center justify-center sm:justify-end gap-x-5 gap-y-2 text-[11px] text-slate-400">
+        <div className="flex flex-wrap items-center justify-center sm:justify-end gap-x-5 gap-y-2 text-landing-xs text-slate-400">
           <a href="#features" className="hover:text-white transition-colors">
             Features
           </a>
@@ -50,7 +50,7 @@ export function Footer() {
           </a>
         </div>
       </div>
-      <div className="text-[11px] text-center sm:text-left text-slate-500 pt-2 border-t border-dark-border/40">
+      <div className="text-landing-xs text-center sm:text-left text-slate-500 pt-2 border-t border-landing-border/40">
         © 2026 ZeroRoute by{" "}
         <a
           href="https://amjad.mapki.in"

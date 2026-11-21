@@ -50,6 +50,56 @@
   --color-brand-600: #dc2626;
 }
 
+/*
+ * Landing page tokens (#37). The landing page is dark-only and keeps its own red/gold look, so these are
+ * fixed values (they do not follow the theme). Use them only on the landing page (app/page.tsx and its
+ * sections); consoles use the semantic tokens below. landing-bg/card/card-hover/border equal the legacy
+ * dark-* aliases, which can go once the consoles stop using them.
+ */
+@theme {
+  --color-landing-bg: #050608;
+  --color-landing-card: #0c0e14;
+  --color-landing-card-hover: #131620;
+  --color-landing-border: #1a1f2c;
+  --color-landing-well: #080a0f;      /* code wells, navbar glass */
+  --color-landing-terminal: #07080c;  /* terminal body, creator card base */
+  --color-landing-panel: #0b0e14;     /* support banner, benchmarks modal */
+  --color-landing-checkout: #0d0708;  /* checkout modal */
+  --color-landing-pro-from: #1c080a;  /* Pro plan card gradient */
+  --color-landing-pro-via: #130507;
+  --color-landing-pro-to: #070203;
+  --color-landing-creator-from: #0e111a;
+  --color-landing-creator-via: #090b10;
+
+  /* Bevelled CTA gradients: base from/to, hover from/to. */
+  --color-landing-cta-from: #e5333b;
+  --color-landing-cta-to: #c71d25;
+  --color-landing-cta-hover-from: #f03e46;
+  --color-landing-cta-hover-to: #d6232b;
+  --color-landing-gold-from: #f59e0b;
+  --color-landing-gold-to: #d97706;
+  --color-landing-gold-hover-from: #fbbf24;
+  --color-landing-gold-hover-to: #b45309;
+  --color-landing-mint-from: #10b981;
+  --color-landing-mint-to: #047857;
+  --color-landing-mint-hover-from: #34d399;
+  --color-landing-mint-hover-to: #059669;
+  --color-landing-coffee: #ffdd00;    /* Buy Me a Coffee brand yellow */
+  --color-landing-coffee-hover: #ffea47;
+
+  /* Small landing labels; below the console minimum (text-meta) on purpose to keep the current look. */
+  --text-landing-tagline: 0.40625rem; /* 6.5px */
+  --text-landing-3xs: 0.5625rem;      /* 9px */
+  --text-landing-2xs: 0.625rem;       /* 10px */
+  --text-landing-xs: 0.6875rem;       /* 11px */
+
+  --shadow-landing-bevel-sm: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-landing-bevel: inset 0 1px 1px rgba(255, 255, 255, 0.4), 0 2px 6px rgba(0, 0, 0, 0.4);
+  --shadow-landing-bevel-strong: inset 0 1px 1px rgba(255, 255, 255, 0.6), 0 2px 6px rgba(0, 0, 0, 0.4);
+  --shadow-landing-nav: 0 8px 32px 0 rgba(0, 0, 0, 0.65);
+  --shadow-landing-nav-scrolled: 0 12px 40px rgba(0, 0, 0, 0.85);
+}
+
 /* `static` keeps every token on :root even when no utility uses it yet (inline styles, /design probes). */
 /* `static` keeps every token on :root even when no utility uses it yet (inline styles, /design probes). */
 @theme static {
