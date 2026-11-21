@@ -43,7 +43,20 @@ export function isSameOrigin(origin: string | null, host: string): boolean {
   return !origin || parseUrl(origin)?.host === host;
 }
 
-const contentLength = (content: unknown) => (typeof content === "string" ? content.length : JSON.stringify(content ?? "").length);
+const ROLES = ["system", "user", "assistant", "tool"];
+
+type Part = { type?: unknown; text?: unknown };
+const isValidContent = (c: unknown) =>
+  c == null ||
+  typeof c === "string" ||
+  (Array.isArray(c) && c.every((p: Part) => p && typeof p.type === "string" && (p.type !== "text" || typeof p.text === "string")));
+
+/** OpenAI-style content (string or [{type:"text",text}, ...]) as plain text; non-text parts are dropped. */
+export function contentText(content: unknown): string {
+  if (typeof content === "string") return content;
+  if (!Array.isArray(content)) return "";
+  return content.filter((p: Part) => p?.type === "text").map((p: Part) => p.text).join("\n");
+}
 
 /** Returns an HTTP error for an oversized or malformed body, or null when it is acceptable. */
 export function chatBodyError(body: { messages?: unknown; max_tokens?: unknown }): { status: number; message: string } | null {
@@ -55,7 +68,10 @@ export function chatBodyError(body: { messages?: unknown; max_tokens?: unknown }
   }
   let total = 0;
   for (const m of body.messages) {
-    const len = contentLength((m as { content?: unknown })?.content);
+    if (!m || !ROLES.includes(m.role) || !isValidContent(m.content)) {
+      return { status: 400, message: `Each message needs a role (${ROLES.join(", ")}) and string or text-part content.` };
+    }
+    const len = contentText(m.content).length;
     if (len > CHAT_LIMITS.maxMessageChars) {
       return { status: 413, message: `Message too long (max ${CHAT_LIMITS.maxMessageChars} characters).` };
     }
@@ -68,4 +84,14 @@ export function chatBodyError(body: { messages?: unknown; max_tokens?: unknown }
     return { status: 400, message: "max_tokens must be a positive integer" };
   }
   return null;
+}
+
+// Failover budget per request, so one bad request cannot fan out across every provider x model.
+export const MAX_ATTEMPTS = 6;
+export const MAX_WALL_MS = 30_000;
+
+/** Upstream 400/413/422 mean the request itself is bad: return it, don't fail over or cool down. */
+export function isFailoverError(err: unknown): boolean {
+  const status = (err as { status?: unknown })?.status;
+  return !(err instanceof Error && typeof status === "number" && [400, 413, 422].includes(status));
 }

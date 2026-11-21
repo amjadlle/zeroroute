@@ -7,7 +7,9 @@ import { isRateLimited, getClientIp } from "@/lib/auth/rate-limit";
 import { getEligibleProviders, TIMEOUT_MS, COOLDOWN_MS } from "@/lib/providers/state";
 import { responseCache } from "@/lib/providers/cache";
 import { buildDynamicSystemPrompt, retrieveKnowledgeContext, getDefaultLandingKnowledge } from "@/lib/providers/rag";
-import { CHAT_LIMITS, chatBodyError, isDemoOrigin, isHostAllowed, isSameOrigin } from "@/lib/providers/gateway";
+import {
+  CHAT_LIMITS, MAX_ATTEMPTS, MAX_WALL_MS, chatBodyError, contentText, isDemoOrigin, isFailoverError, isHostAllowed, isSameOrigin
+} from "@/lib/providers/gateway";
 import type { ChatRequest, ChatResponse } from "@/lib/providers/types";
 
 export const dynamic = "force-dynamic";
@@ -67,6 +69,8 @@ export async function POST(request: Request) {
     );
   }
   if (body.max_tokens !== undefined) body.max_tokens = Math.min(body.max_tokens, CHAT_LIMITS.maxTokens);
+  // Normalise array (multimodal) content to text before RAG, quota and providers see it.
+  body.messages = body.messages.map(m => ({ ...m, content: contentText(m.content) }));
 
   const rawBotId = xBotId || body.bot_id || (bearerToken.startsWith("bot_") ? bearerToken : undefined);
   let customerKey = bearerToken.startsWith("zr_live_") ? bearerToken : undefined;
@@ -206,8 +210,8 @@ export async function POST(request: Request) {
     );
   }
 
-  // 4. Domain Whitelisting Validation (for paying customer bots)
-  if (customer && customer.allowed_domains) {
+  // 4. Domain Whitelisting Validation (widget/bot_id calls only; bearer-key calls come from servers with no Origin)
+  if (isWidgetCall && customer && customer.allowed_domains) {
     try {
       const allowed = typeof customer.allowed_domains === "string" ? JSON.parse(customer.allowed_domains) : customer.allowed_domains;
       if (Array.isArray(allowed) && allowed.length > 0) {
@@ -402,6 +406,18 @@ export async function POST(request: Request) {
     return base;
   };
 
+  // Per-attempt timeout, or 0 once the request's attempt/wall-time budget is spent.
+  let attempts = 0;
+  const nextAttemptMs = () => {
+    const left = MAX_WALL_MS - (Date.now() - startTime);
+    return attempts < MAX_ATTEMPTS && left > 0 ? Math.min(TIMEOUT_MS, left) : 0;
+  };
+  const requestError = (error: any) =>
+    NextResponse.json(
+      { error: { message: error.message, type: "invalid_request_error" } },
+      { status: error.status, headers: corsHdrs }
+    );
+
   // ── Streaming Mode (SSE) ──
   if (body.stream) {
     for (const { state, provider } of candidates) {
@@ -410,22 +426,28 @@ export async function POST(request: Request) {
       let lastErr = "";
 
       for (const modelName of modelsToTry) {
+        const timeoutMs = nextAttemptMs();
+        if (!timeoutMs) break;
+        attempts++;
+        // The timeout covers time-to-first-chunk only; after that only a client cancel aborts upstream.
+        const upstream = new AbortController();
+        const ttfb = setTimeout(() => upstream.abort(new Error(`timed out after ${timeoutMs}ms`)), timeoutMs);
         try {
-          const streamIterable = await provider.generateStream(
-            body,
-            AbortSignal.timeout(TIMEOUT_MS),
-            modelName
-          );
+          const streamIterable = await provider.generateStream(body, upstream.signal, modelName);
           const iterator = streamIterable[Symbol.asyncIterator]();
           const first = await iterator.next();
 
           if (first.done) throw new Error(`${provider.id} returned an empty stream`);
+          clearTimeout(ttfb);
 
           state.consecutiveFailures = 0;
           state.cooldownUntil = 0;
           providerSuccess = true;
 
           const responseStream = new ReadableStream({
+            cancel() {
+              upstream.abort();
+            },
             async start(controller) {
               const encoder = new TextEncoder();
               controller.enqueue(encoder.encode(`data: ${JSON.stringify(first.value)}\n\n`));
@@ -474,7 +496,10 @@ export async function POST(request: Request) {
                 controller.enqueue(encoder.encode("data: [DONE]\n\n"));
                 controller.close();
               } catch (err) {
+                if (upstream.signal.aborted) return; // client went away
                 console.error("[Stream Pipe Error]:", err);
+                const error = { message: "The upstream provider stream was interrupted.", type: "stream_error" };
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error })}\n\n`));
                 controller.close();
               }
             }
@@ -490,13 +515,15 @@ export async function POST(request: Request) {
             }
           });
         } catch (error) {
+          clearTimeout(ttfb);
+          if (!isFailoverError(error)) return requestError(error);
           const errMsg = error instanceof Error ? error.message : "Streaming failed";
           lastErr = errMsg;
           failures.push(`${provider.id}/${modelName}: ${errMsg}`);
         }
       }
 
-      if (!providerSuccess) {
+      if (!providerSuccess && lastErr) {
         state.consecutiveFailures = (state.consecutiveFailures || 0) + 1;
         state.cooldownUntil = Date.now() + COOLDOWN_MS;
         state.lastError = lastErr;
@@ -539,9 +566,12 @@ export async function POST(request: Request) {
     let lastErr = "";
 
     for (const modelName of modelsToTry) {
+      const timeoutMs = nextAttemptMs();
+      if (!timeoutMs) break;
+      attempts++;
       const start = Date.now();
       try {
-        const result = await provider.generate(body, AbortSignal.timeout(TIMEOUT_MS), modelName);
+        const result = await provider.generate(body, AbortSignal.timeout(timeoutMs), modelName);
         const latencyMs = Date.now() - start;
 
         state.consecutiveFailures = 0;
@@ -578,13 +608,14 @@ export async function POST(request: Request) {
           headers: { "X-Cache": "MISS", ...corsHdrs }
         });
       } catch (error) {
+        if (!isFailoverError(error)) return requestError(error);
         const errMsg = error instanceof Error ? error.message : "Request failed";
         lastErr = errMsg;
         failures.push(`${provider.id}/${modelName}: ${errMsg}`);
       }
     }
 
-    if (!providerSuccess) {
+    if (!providerSuccess && lastErr) {
       state.consecutiveFailures = (state.consecutiveFailures || 0) + 1;
       state.cooldownUntil = Date.now() + COOLDOWN_MS;
       state.lastError = lastErr;

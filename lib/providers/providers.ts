@@ -41,10 +41,19 @@ export function isProviderConfigured(providerId: string): boolean {
   return Boolean(key && key.length > 5);
 }
 
+/** Non-2xx reply from a provider; `status` lets the gateway tell request errors from provider failures. */
+export class UpstreamError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
 const parseJsonOrError = async (response: Response, name: string) => {
   if (!response.ok) {
     const errorText = (await response.text()).slice(0, 500);
-    throw new Error(`${name} returned ${response.status}: ${errorText}`);
+    throw new UpstreamError(`${name} returned ${response.status}: ${errorText}`, response.status);
   }
   return response.json() as Promise<any>;
 };
@@ -152,7 +161,7 @@ async function* openAIStyleStream(
 
   if (!res.ok) {
     const errorText = (await res.text()).slice(0, 500);
-    throw new Error(`${id} returned ${res.status}: ${errorText}`);
+    throw new UpstreamError(`${id} returned ${res.status}: ${errorText}`, res.status);
   }
   if (!res.body) throw new Error(`${id} returned no response stream`);
 
@@ -481,7 +490,7 @@ export const providers: Provider[] = [
 
       if (!res.ok) {
         const errorText = (await res.text()).slice(0, 500);
-        throw new Error(`gemini returned ${res.status}: ${errorText}`);
+        throw new UpstreamError(`gemini returned ${res.status}: ${errorText}`, res.status);
       }
       if (!res.body) throw new Error("gemini returned no response stream");
 

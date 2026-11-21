@@ -2,7 +2,10 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { testDb } from "@/tests/db";
 import { runtimeStateMap } from "@/lib/providers/state";
 
-const session = vi.hoisted(() => ({ user: null as null | Record<string, unknown> }));
+const session = vi.hoisted(() => {
+  process.env.TIMEOUT_MS = "200"; // read by lib/providers/state at import
+  return { user: null as null | Record<string, unknown> };
+});
 vi.mock("@/lib/auth/session", async importOriginal => ({
   ...(await importOriginal<typeof import("@/lib/auth/session")>()),
   getCurrentUser: async () => session.user
@@ -128,5 +131,119 @@ describe("size caps", () => {
 
     expect((await chat(auth, { max_tokens: 1_000_000 })).status).toBe(200);
     expect(JSON.parse(fetchMock.mock.calls[0][1].body).max_tokens).toBe(4096);
+  });
+});
+
+/** Mock SSE upstream that honours the fetch abort signal. Steps: text chunk, delay in ms, or an Error. */
+function sse(signal: AbortSignal | undefined, steps: (string | number | Error)[]) {
+  const enc = new TextEncoder();
+  return new Response(new ReadableStream({
+    async start(c) {
+      signal?.addEventListener("abort", () => { try { c.error(signal.reason); } catch {} });
+      for (const s of steps) {
+        if (typeof s === "number") await new Promise(r => setTimeout(r, s));
+        if (signal?.aborted) return;
+        try {
+          if (s instanceof Error) return c.error(s);
+          if (typeof s === "string") c.enqueue(enc.encode(`data: ${JSON.stringify({ choices: [{ delta: { content: s } }] })}\n\n`));
+        } catch { return; }
+      }
+      try { c.close(); } catch {}
+    }
+  }), { headers: { "content-type": "text/event-stream" } });
+}
+
+describe("streaming (#39)", () => {
+  it("timeout covers time-to-first-chunk only, so slow streams finish", async () => {
+    fetchMock.mockImplementation(async (_url, init) => sse(init.signal, ["Hel", 400, "lo"]));
+    const c = await addCustomer();
+    const text = await (await chat({ authorization: `Bearer ${c.key}` }, { stream: true, messages: [{ role: "user", content: `slow ${++seq}` }] })).text();
+    expect(text).toContain('"Hel"');
+    expect(text).toContain('"lo"');
+    expect(text).toContain("data: [DONE]");
+  });
+
+  it("still fails over when the first chunk is late", async () => {
+    fetchMock.mockImplementation(async (_url, init) => sse(init.signal, [400, "late"]));
+    const c = await addCustomer();
+    expect((await chat({ authorization: `Bearer ${c.key}` }, { stream: true })).status).toBe(502);
+  });
+
+  it("emits an SSE error event when the upstream breaks mid-stream", async () => {
+    fetchMock.mockImplementation(async (_url, init) => sse(init.signal, ["Hel", 20, new Error("socket reset")]));
+    const c = await addCustomer();
+    const text = await (await chat({ authorization: `Bearer ${c.key}` }, { stream: true, messages: [{ role: "user", content: `broken ${++seq}` }] })).text();
+    expect(text).toContain('"stream_error"');
+    expect(text).not.toContain("[DONE]");
+  });
+
+  it("aborts the upstream request when the client cancels", async () => {
+    let upstreamSignal: AbortSignal | undefined;
+    fetchMock.mockImplementation(async (_url, init) => sse((upstreamSignal = init.signal), ["Hel", 1000, "lo"]));
+    const c = await addCustomer();
+    const res = await chat({ authorization: `Bearer ${c.key}` }, { stream: true, messages: [{ role: "user", content: `cancel ${++seq}` }] });
+    const reader = res.body!.getReader();
+    await reader.read();
+    await reader.cancel();
+    expect(upstreamSignal?.aborted).toBe(true);
+  });
+});
+
+describe("failover (#40)", () => {
+  it("returns upstream 400 without failing over or cooling down", async () => {
+    process.env.MISTRAL_API_KEY = "mistral_test_key";
+    runtimeStateMap.get("mistral")!.enabled = true;
+    runtimeStateMap.get("groq")!.models = ["m1", "m2", "m3"];
+    fetchMock.mockImplementation(async () => new Response("bad role", { status: 400 }));
+    const c = await addCustomer();
+    const res = await chat({ authorization: `Bearer ${c.key}` });
+    expect(res.status).toBe(400);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(runtimeStateMap.get("groq")!.cooldownUntil).toBe(0);
+    delete process.env.MISTRAL_API_KEY;
+  });
+
+  it("caps total attempts per request", async () => {
+    runtimeStateMap.get("groq")!.models = Array.from({ length: 10 }, (_, i) => `m${i}`);
+    fetchMock.mockImplementation(async () => new Response("down", { status: 500 }));
+    const c = await addCustomer();
+    expect((await chat({ authorization: `Bearer ${c.key}` })).status).toBe(502);
+    expect(fetchMock).toHaveBeenCalledTimes(6);
+  });
+
+  it("rejects invalid roles before calling any provider", async () => {
+    const c = await addCustomer();
+    expect((await chat({ authorization: `Bearer ${c.key}` }, { messages: [{ role: "root", content: "hi" }] })).status).toBe(400);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("array content (#43)", () => {
+  it("normalises text parts before RAG and the provider call", async () => {
+    const c = await addCustomer();
+    const content = [{ type: "text", text: "hello" }, { type: "image_url", image_url: { url: "x" } }, { type: "text", text: `there ${++seq}` }];
+    const tag = seq;
+    const res = await chat({ authorization: `Bearer ${c.key}` }, { messages: [{ role: "user", content }] });
+    expect(res.status).toBe(200);
+    const sent = JSON.parse(fetchMock.mock.calls[0][1].body).messages;
+    expect(sent.at(-1).content).toBe(`hello\nthere ${tag}`);
+  });
+
+  it("does not charge quota for a malformed array", async () => {
+    const c = await addCustomer();
+    const res = await chat({ authorization: `Bearer ${c.key}` }, { messages: [{ role: "user", content: [{ type: "text", text: 7 }] }] });
+    expect(res.status).toBe(400);
+    const { rows } = await db.execute({ sql: "SELECT monthly_requests FROM customers WHERE key = ?", args: [c.key] });
+    expect(Number(rows[0].monthly_requests)).toBe(0);
+  });
+});
+
+describe("domain allowlist scope (#44)", () => {
+  it("applies to bot_id calls only, not bearer API-key calls", async () => {
+    const c = await addCustomer({ allowed_domains: JSON.stringify(["shop.com"]) });
+    expect((await chat({ authorization: `Bearer ${c.key}` })).status).toBe(200);
+    expect((await chat({ "x-bot-id": c.bot_id })).status).toBe(403);
+    expect((await chat({ "x-bot-id": c.bot_id, origin: "https://evil.example" })).status).toBe(403);
+    expect((await chat({ "x-bot-id": c.bot_id, origin: "https://shop.com" })).status).toBe(200);
   });
 });
