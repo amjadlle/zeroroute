@@ -56,8 +56,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
       "Ministral 3B (750 RPM), Codestral (125 RPM), Pixtral (30 RPM), and Nemo (188 RPM) run in distinct speed buckets. $10 free credit resets every 30 days.",
     categories: [
       {
-        name: "💬 Chat & General Instruct",
-        description: "High quality multilingual European language models",
+        name: "Chat",
+        description: "General chat models that handle many European languages well",
         models: [
           {
             id: "open-mistral-nemo",
@@ -133,8 +133,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
         ],
       },
       {
-        name: "💻 Code & Developer Specialists",
-        description: "Dedicated code generation, SQL, JSON structure and FIM completion",
+        name: "Code",
+        description: "Models for writing and completing code, SQL and JSON",
         models: [
           {
             id: "codestral-latest",
@@ -181,8 +181,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
         ],
       },
       {
-        name: "👁️ Vision & Embeddings",
-        description: "Multimodal image analysis, vector embeddings and moderation",
+        name: "Images, search and safety",
+        description: "Models that read images, turn text into search vectors, or flag unsafe content",
         models: [
           {
             id: "pixtral-12b-2409",
@@ -253,8 +253,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
       "Every Groq model runs in an independent rate-limit bucket. Consuming quota on one model (e.g. 120B) does NOT drain or affect other models.",
     categories: [
       {
-        name: "💬 Chat & High-Intelligence",
-        description: "High-parameter reasoning & ultra-low latency conversational models",
+        name: "Chat",
+        description: "Capable chat models that reply very quickly",
         models: [
           {
             id: "openai/gpt-oss-120b",
@@ -335,8 +335,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
         ],
       },
       {
-        name: "📚 Large-Context & Compound AI",
-        description: "Massive 70,000 TPM limit + Unlimited Daily Tokens for large documents and RAG",
+        name: "Long documents",
+        description: "High limits (70,000 tokens a minute, no daily token cap) for long documents and knowledge lookups",
         models: [
           {
             id: "groq/compound-mini",
@@ -372,8 +372,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
         ],
       },
       {
-        name: "🛡️ Safety & Content Moderation",
-        description: "Prompt injection, jailbreak detection, and safety classification",
+        name: "Safety",
+        description: "Models that spot attempts to trick the chatbot and flag unsafe messages",
         models: [
           {
             id: "meta-llama/llama-prompt-guard-2-86m",
@@ -423,8 +423,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
         ],
       },
       {
-        name: "🎙️ Speech-to-Text Audio",
-        description: "8 Hours of free speech-to-text audio transcription every single day",
+        name: "Speech to text",
+        description: "Turns audio into text, up to 8 free hours a day",
         models: [
           {
             id: "whisper-large-v3-turbo",
@@ -471,8 +471,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
       "All Cloudflare Workers AI models share a single global account allowance of 10,000 Neurons/day. Lightweight models cost ~0.1-0.3 neurons/req, giving up to 100,000 free calls daily. Resets daily at 00:00 UTC.",
     categories: [
       {
-        name: "💬 Chat & Instruction",
-        description: "Ultra-fast global edge inference with sub-400ms latency",
+        name: "Chat",
+        description: "Fast chat models served close to the visitor, usually replying in under 400 ms",
         models: [
           {
             id: "@cf/meta/llama-3.1-8b-instruct",
@@ -590,8 +590,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
         ],
       },
       {
-        name: "💻 Code & Deep Reasoning",
-        description: "Specialized programming assistants and chain-of-thought reasoners",
+        name: "Code and reasoning",
+        description: "Models for writing code and working through problems step by step",
         models: [
           {
             id: "@cf/qwen/qwen2.5-coder-32b-instruct",
@@ -624,8 +624,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
         ],
       },
       {
-        name: "🌐 Vector Embeddings, Translation & Audio",
-        description: "Semantic dense vectors, language translation and Whisper transcription",
+        name: "Search, translation and speech",
+        description: "Models that turn text into search vectors, translate, or turn audio into text",
         models: [
           {
             id: "@cf/baai/bge-large-en-v1.5",
@@ -697,8 +697,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
       "All Cohere trial endpoints share a unified monthly allowance of 1,000 API calls and a 40 RPM speed throttle across chat, embed, vision, and rerank.",
     categories: [
       {
-        name: "💬 Chat & Large-Context Foundation",
-        description: "Enterprise grade instruction and massive context document reasoning",
+        name: "Chat and long documents",
+        description: "Chat models that follow instructions well and can read long documents",
         models: [
           {
             id: "command-r-plus-08-2024",
@@ -803,8 +803,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
         ],
       },
       {
-        name: "🧠 Multimodal, Code & Specialized Reasoning",
-        description: "Vision understanding, code generation and translation engines",
+        name: "Images, code and translation",
+        description: "Models that read images, write code or translate",
         models: [
           {
             id: "command-a-vision-07-2025",
@@ -865,8 +865,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
         ],
       },
       {
-        name: "🌐 Global Multilingual (Aya Series)",
-        description: "Flagship cross-lingual reasoning across 50+ world languages",
+        name: "Many languages",
+        description: "Aya models that chat in more than 50 languages",
         models: [
           {
             id: "c4ai-aya-expanse-32b",
@@ -900,8 +900,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
         ],
       },
       {
-        name: "🔍 Vector Embeddings",
-        description: "Dense semantic text embeddings for enterprise search and RAG",
+        name: "Search",
+        description: "Models that turn text into search vectors for finding matching knowledge",
         models: [
           {
             id: "embed-english-v3.0",
@@ -972,8 +972,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
       "MiniMax-M2.7 runs on dedicated hardware RDU compute with 100% pass rates (~500ms). High-demand models (70B, 120B, DeepSeek) share an open queue that can throttle during peak hours.",
     categories: [
       {
-        name: "🟢 Tier-1 Production Ready (Dedicated Queues)",
-        description: "High reliability dedicated hardware queues with ultra-low latency",
+        name: "Reliable",
+        description: "Models on their own hardware, so they reply quickly and fail rarely",
         models: [
           {
             id: "MiniMax-M2.7",
@@ -1007,8 +1007,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
         ],
       },
       {
-        name: "⚡ High-Demand Open Weights (Shared Queue)",
-        description: "Flagship open models on shared compute queues (auto-fallbacks to MiniMax on 429)",
+        name: "Popular open models",
+        description: "Large open models on shared hardware; when busy, requests move to MiniMax",
         models: [
           {
             id: "Meta-Llama-3.3-70B-Instruct",
@@ -1093,8 +1093,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
       "Every Gemini model runs in a separate, dedicated rate-limit bucket. Flash-Lite (500 RPD), Gemma (14,400 RPD), and Frontier Flash (20 RPD) are 100% isolated and never cross-deplete.",
     categories: [
       {
-        name: "⚡ Flash-Lite & High-Throughput Workhorses",
-        description: "Ultra-low latency default chat, structured extraction & 1M context analysis",
+        name: "Fast everyday",
+        description: "Quick default chat models that can also pull out data and read very long documents",
         models: [
           {
             id: "gemini-3.5-flash-lite",
@@ -1142,8 +1142,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
         ],
       },
       {
-        name: "🔥 Gemma High-Quota Open-Weights (14,400 RPD)",
-        description: "Massive 14,400 requests/day dedicated quota open-weights workhorses",
+        name: "Gemma (high daily limit)",
+        description: "Open Gemma models with their own limit of 14,400 requests a day",
         models: [
           {
             id: "gemma-4-31b-it",
@@ -1177,8 +1177,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
         ],
       },
       {
-        name: "🧠 Frontier & Reasoning Flash",
-        description: "Frontier multimodal intelligence, deep comprehension and agentic reasoning",
+        name: "Most capable",
+        description: "The strongest models, for hard questions, images and multi-step tasks",
         models: [
           {
             id: "gemini-3.7-flash",
@@ -1281,8 +1281,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
         ],
       },
       {
-        name: "🔍 Vector Embeddings & Audio",
-        description: "Dense 3,072-dim vector embeddings and audio speech processing",
+        name: "Search and speech",
+        description: "Models that turn text into search vectors or work with audio",
         models: [
           {
             id: "gemini-embedding-001",
@@ -1354,8 +1354,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
       "All OpenRouter :free models share an account-wide allowance of 200 requests/day and 20 RPM speed throttle. Native 3-model fallback arrays supported.",
     categories: [
       {
-        name: "💬 Chat, Reasoning & Code",
-        description: "Massive variety of free open-weights foundation models",
+        name: "Chat, reasoning and code",
+        description: "A wide range of free open models",
         models: [
           {
             id: "nvidia/nemotron-3-super-120b-a12b:free",
@@ -1530,8 +1530,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
         ],
       },
       {
-        name: "🛡️ Safety, Embeddings & Audio",
-        description: "Input/output guardrails, dense semantic embeddings and text-to-speech",
+        name: "Safety, search and speech",
+        description: "Models that check messages for safety, turn text into search vectors, or read text aloud",
         models: [
           {
             id: "nvidia/nemotron-3.5-content-safety:free",
@@ -1589,8 +1589,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
       "Enterprise containerized microservices running on NVIDIA DGX H100/H200 Tensor Core GPUs. 1,000 trial credits shared across all models.",
     categories: [
       {
-        name: "🚀 Accelerated Foundation Models",
-        description: "Optimized TensorRT-LLM engines on DGX Cloud infrastructure",
+        name: "Chat",
+        description: "Popular open models tuned to run fast on NVIDIA hardware",
         models: [
           {
             id: "nvidia/nemotron-3.5-lightning-30b-a3b",
@@ -1695,8 +1695,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
         ],
       },
       {
-        name: "🔍 Embeddings & Retrieval",
-        description: "Dense vector retrieval models on TensorRT infrastructure",
+        name: "Search",
+        description: "Models that turn text into search vectors for finding matching knowledge",
         models: [
           {
             id: "nvidia/embed-qa-4",
@@ -1753,8 +1753,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
       "Native serverless inference models share a rolling 200 RPM / 1,000 req per 5 min Hub limit. Extreme throughput for embeddings and classifiers.",
     categories: [
       {
-        name: "💬 Serverless Chat & Generation",
-        description: "Hosted open foundation models for conversational completions",
+        name: "Chat",
+        description: "Hosted open models for chat",
         models: [
           {
             id: "meta-llama/Llama-3.1-8B-Instruct",
@@ -1817,8 +1817,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
         ],
       },
       {
-        name: "🔍 Vector Embeddings & Similarity",
-        description: "Dense semantic text embeddings for knowledge bases and deduplication",
+        name: "Search",
+        description: "Models that turn text into search vectors for finding matching knowledge or duplicates",
         models: [
           {
             id: "BAAI/bge-large-en-v1.5",
@@ -1880,8 +1880,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
         ],
       },
       {
-        name: "🏷️ Text Classification & Intent",
-        description: "High-throughput sentiment analysis and intent detection routing",
+        name: "Sorting messages",
+        description: "Models that tell what a message is about and how the writer feels",
         models: [
           {
             id: "distilbert/distilbert-base-uncased-finetuned-sst-2-english",
@@ -1910,8 +1910,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
       "All BazaarLink free models share a single global account allowance of 3,700 points/day and 20 RPM limit. Supports built-in multi-model fallback arrays.",
     categories: [
       {
-        name: "💬 Reasoning & Auto-Routing",
-        description: "Large context reasoning and intelligent multi-cloud routing",
+        name: "Reasoning and automatic choice",
+        description: "Models for long, careful answers, plus an option that picks a model for you",
         models: [
           {
             id: "qwen/qwen3.7-flash:free",
@@ -1956,8 +1956,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
       "Cerebras does not provide a permanent free tier. Requires adding a verified payment method in cloud.cerebras.ai (returns HTTP 402 otherwise).",
     categories: [
       {
-        name: "⚡ Wafer-Scale Ultra-Fast Chat",
-        description: "World-record speed inference at >1,800 tokens per second",
+        name: "Very fast chat",
+        description: "Chat models that write more than 1,800 tokens a second",
         models: [
           {
             id: "gpt-oss-120b",
@@ -2001,8 +2001,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
       "MBZUAI frontier foundation models. Powered by Cerebras CS-3 wafer-scale engine (~760 tok/s with chain-of-thought) and AWS NVIDIA Blackwell B200 GPUs. 50M tokens/day free allocation with 3 req/sec burst limit.",
     categories: [
       {
-        name: "🧠 Frontier Reasoning & MoE",
-        description: "Ultra-fast 375B Mixture-of-Experts with native chain-of-thought reasoning on Cerebras hardware",
+        name: "Reasoning",
+        description: "A large, fast model that works through problems step by step",
         models: [
           {
             id: "IFM/K2-Horizon-375B-A23B",
@@ -2023,8 +2023,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
         ],
       },
       {
-        name: "🌍 Bilingual Arabic/English & Multimodal",
-        description: "World-leading bilingual Arabic/English foundation models running on NVIDIA Blackwell B200 superchips",
+        name: "Arabic and English",
+        description: "Models built for Arabic and English that can also read images",
         models: [
           {
             id: "IFM/Jais-3-MoVA-36B-A4B",
@@ -2044,8 +2044,8 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
         ],
       },
       {
-        name: "🎙️ Speech Recognition (ASR)",
-        description: "Specialized automatic speech recognition models for Arabic regional dialects and English",
+        name: "Speech to text",
+        description: "Turns English and regional Arabic audio into text",
         models: [
           {
             id: "IFM/Jais-ASR",

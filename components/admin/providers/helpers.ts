@@ -15,6 +15,8 @@ export interface ProviderItem {
   lastError?: string;
   rateLimits?: RateLimitTelemetry;
   lastUsedAt?: number;
+  /** Name of the server environment variable the key is read from. */
+  keyEnvVar?: string;
 }
 
 /** The only fields the PUT route reads. Runtime fields (latency, failures) are never sent back. */
@@ -42,12 +44,6 @@ export interface TestResult {
 }
 
 export const modelsOf = (p: { model: string; models?: string[] }) => (p.models?.length ? p.models : [p.model]);
-
-/**
- * The server environment variable a provider's key is read from. Mirrors the private ENV_MAP in
- * lib/providers/providers.ts; update both together if a provider is added.
- */
-export const keyEnvVar = (id: string) => (id === "cloudflare" ? "CLOUDFLARE_API_TOKEN" : `${id.toUpperCase()}_API_KEY`);
 
 export function move<T>(list: readonly T[], from: number, to: number): T[] {
   const next = [...list];

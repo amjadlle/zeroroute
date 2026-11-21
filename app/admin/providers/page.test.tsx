@@ -8,7 +8,7 @@ const groq = {
   id: "groq", name: "Groq", model: "a", models: ["a", "b"], enabled: true, order: 1, configured: true,
   consecutiveFailures: 0, cooldownUntil: 0, lastLatencyMs: 300, lastError: "old error",
 };
-const gemini = { ...groq, id: "gemini", name: "Gemini", model: "g", models: ["g"], order: 2, configured: false, lastError: undefined };
+const gemini = { ...groq, id: "gemini", name: "Gemini", model: "g", models: ["g"], order: 2, configured: false, lastError: undefined, keyEnvVar: "GEMINI_API_KEY" };
 
 type Call = { url: string; method: string; body?: unknown };
 

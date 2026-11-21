@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { resolveAuth } from "@/lib/auth/session";
 import { getRuntimeProviders, runtimeStateMap, loadSavedProviderConfigs, persistProviderConfigs } from "@/lib/providers/state";
-import { providers } from "@/lib/providers/providers";
+import { ENV_MAP, providers } from "@/lib/providers/providers";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +17,7 @@ export async function GET(request: Request) {
   const providersList = getRuntimeProviders();
   return NextResponse.json({
     success: true,
-    providers: providersList
+    providers: providersList.map(p => ({ ...p, keyEnvVar: ENV_MAP[p.id] }))
   });
 }
 
