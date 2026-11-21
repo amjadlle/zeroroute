@@ -59,3 +59,6 @@ export function knowledgeSourceLabel(type: string | null | undefined): string {
   if (type && KNOWLEDGE_SOURCE_LABELS[type]) return KNOWLEDGE_SOURCE_LABELS[type];
   return type?.startsWith("web_") ? "Website" : "Text";
 }
+
+// Enforced by the signup and reset-password routes; the auth pages check it before submitting.
+export const MIN_PASSWORD_LENGTH = 6;

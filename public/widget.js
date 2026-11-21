@@ -18,7 +18,8 @@
   var customTitle = scriptTag ? scriptTag.getAttribute("data-title") : null;
   var customGreeting = scriptTag ? scriptTag.getAttribute("data-greeting") : null;
   var customPromptsRaw = scriptTag ? scriptTag.getAttribute("data-prompts") : null;
-  var customColor = (scriptTag ? scriptTag.getAttribute("data-color") : null) || "#ef4444";
+  var attrColor = scriptTag ? scriptTag.getAttribute("data-color") : null;
+  var customColor = attrColor || "#ef4444";
   var customLinkColor = scriptTag ? scriptTag.getAttribute("data-link-color") : null;
   var customLogo = scriptTag ? scriptTag.getAttribute("data-logo") : null;
 
@@ -933,6 +934,10 @@
       }
 
       botTitleElem.textContent = title;
+      // Saved brand colour, unless the snippet sets data-color (older embeds).
+      if (!attrColor && /^#[0-9a-f]{6}$/i.test(bot.brandColor || "")) {
+        style.textContent = buildCss(bot.brandColor, customLinkColor);
+      }
       var logo = customLogo || bot.logo || null;
       if (avatarLogoElem) {
         if (logo) {

@@ -198,6 +198,9 @@ describe("failover (#40)", () => {
     const c = await addCustomer();
     const res = await chat({ authorization: `Bearer ${c.key}` });
     expect(res.status).toBe(400);
+    const body = JSON.stringify(await res.json());
+    expect(body).not.toContain("bad role"); // #46: upstream body is logged, not returned
+    expect(body).toContain("request_id");
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(runtimeStateMap.get("groq")!.cooldownUntil).toBe(0);
     delete process.env.MISTRAL_API_KEY;
@@ -205,10 +208,16 @@ describe("failover (#40)", () => {
 
   it("caps total attempts per request", async () => {
     runtimeStateMap.get("groq")!.models = Array.from({ length: 10 }, (_, i) => `m${i}`);
-    fetchMock.mockImplementation(async () => new Response("down", { status: 500 }));
+    fetchMock.mockImplementation(async () => new Response("upstream secret detail", { status: 500 }));
     const c = await addCustomer();
-    expect((await chat({ authorization: `Bearer ${c.key}` })).status).toBe(502);
+    const res = await chat({ authorization: `Bearer ${c.key}` });
+    expect(res.status).toBe(502);
     expect(fetchMock).toHaveBeenCalledTimes(6);
+    // #46: no upstream error text in the response or in the customer-visible log preview
+    const { error } = await res.json();
+    expect(JSON.stringify(error)).not.toContain("secret");
+    const { rows } = await db.execute({ sql: "SELECT response_preview FROM request_logs WHERE id = ?", args: [error.request_id] });
+    expect(String(rows[0].response_preview)).not.toContain("secret");
   });
 
   it("rejects invalid roles before calling any provider", async () => {

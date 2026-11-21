@@ -421,11 +421,7 @@ describe("cleanHtmlToMarkdown (more markup)", () => {
     expect(md).toContain("a\nb\nc *it*");
   });
 
-  // BUG: the `<b[^>]*>` / `<i[^>]*>` / `<p[^>]*>` patterns have no word boundary, so they also match
-  // <br>, <body>, <blockquote>, <img>, <iframe>, <pre> ... Today "a<br>b <b>x</b>" becomes "a**b x**",
-  // "<body><b>x</b></body>" becomes "** x**". Content mangling only, no security impact.
-  // Fix: add `\b` after each tag name in cleanHtmlToMarkdown, then un-skip.
-  it.skip("does not confuse <br>, <body> or <img> with <b> / <i>", () => {
+  it("does not confuse <br>, <body> or <img> with <b> / <i>", () => {
     expect(cleanHtmlToMarkdown("a<br>b <b>x</b>")).toBe("a\nb **x**");
     expect(cleanHtmlToMarkdown("<body><b>x</b></body>")).toBe("**x**");
     expect(cleanHtmlToMarkdown('<img src="a.png"> <i>y</i>')).toBe("*y*");
