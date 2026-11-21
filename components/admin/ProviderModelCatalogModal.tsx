@@ -1,5 +1,6 @@
 "use client";
 
+import { apiFetch } from "@/lib/client/api";
 import { useState, useEffect } from "react";
 import {
   X,
@@ -90,35 +91,12 @@ export function ProviderModelCatalogModal({
     setTimeout(() => setCopiedKey(null), 2000);
   };
 
-  const getAdminHeaders = () => {
-    const adminKey = typeof window !== "undefined" ? localStorage.getItem("admin_key") || "" : "";
-    return {
-      "Content-Type": "application/json",
-      "Authorization": adminKey ? `Bearer ${adminKey}` : "",
-    };
-  };
-
-  const safeFetchJson = async (url: string, options: RequestInit) => {
-    try {
-      const res = await fetch(url, options);
-      const text = await res.text();
-      try {
-        return JSON.parse(text);
-      } catch {
-        return { ok: false, error: `HTTP ${res.status}: ${text.slice(0, 120)}` };
-      }
-    } catch (e: any) {
-      return { ok: false, error: e.message || "Network request failed" };
-    }
-  };
-
   const handleTestModel = async (modelId: string) => {
     setTestingModels((prev) => ({ ...prev, [modelId]: true }));
     try {
-      const data = await safeFetchJson("/api/admin/providers/test", {
+      const data = await apiFetch<Partial<TestResult>>("/api/admin/providers/test", {
         method: "POST",
-        headers: getAdminHeaders(),
-        body: JSON.stringify({ providerId: provider.id, model: modelId }),
+        body: { providerId: provider.id, model: modelId },
       });
       setTestResults((prev) => ({
         ...prev,
@@ -161,10 +139,9 @@ export function ProviderModelCatalogModal({
         const currentModel = allCatalogModels[idx++];
         if (!currentModel) break;
         try {
-          const data = await safeFetchJson("/api/admin/providers/test", {
+          const data = await apiFetch<Partial<TestResult>>("/api/admin/providers/test", {
             method: "POST",
-            headers: getAdminHeaders(),
-            body: JSON.stringify({ providerId: provider.id, model: currentModel.id }),
+            body: { providerId: provider.id, model: currentModel.id },
           });
           setTestResults((prev) => ({
             ...prev,

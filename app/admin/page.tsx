@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { apiFetch } from "@/lib/client/api";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { AdminProvidersTab, ProviderItem } from "@/components/admin/AdminProvidersTab";
 import { AdminAnalyticsTab } from "@/components/admin/AdminAnalyticsTab";
@@ -21,7 +21,6 @@ import {
 } from "lucide-react";
 
 export default function AdminDashboardPage() {
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState<
     "providers" | "analytics" | "playground" | "logs" | "knowledge" | "customers"
   >("providers");
@@ -49,53 +48,39 @@ export default function AdminDashboardPage() {
   const [logsFilterKey, setLogsFilterKey] = useState("");
   const [loadedTabs, setLoadedTabs] = useState<Set<string>>(new Set());
 
-  const getAdminHeaders = useCallback(() => {
-    const adminKey = typeof window !== "undefined" ? localStorage.getItem("admin_key") || "" : "";
-    return {
-      "Content-Type": "application/json",
-      "Authorization": adminKey ? `Bearer ${adminKey}` : "",
-    };
-  }, []);
-
   // Fetch Providers Tab Data
   const fetchProviders = useCallback(async () => {
     try {
-      const res = await fetch("/api/admin/providers", { headers: getAdminHeaders() });
-      if (res.status === 401) { router.replace("/login"); return; }
-      const data = await res.json();
+      const data = await apiFetch<{ providers?: ProviderItem[] }>("/api/admin/providers");
       if (data.providers) setProvidersList(data.providers);
       setLoadedTabs((prev) => new Set(prev).add("providers"));
     } catch (e) {
       console.error("Failed to load providers:", e);
     }
-  }, [getAdminHeaders, router]);
+  }, []);
 
   // Fetch Logs & Aggregated Telemetry
   const fetchLogs = useCallback(async () => {
     try {
-      const res = await fetch("/api/admin/logs?limit=200", { headers: getAdminHeaders() });
-      if (res.status === 401) { router.replace("/login"); return; }
-      const data = await res.json();
+      const data = await apiFetch<{ logs?: GlobalLogItem[]; metrics?: typeof metrics }>("/api/admin/logs?limit=200");
       if (data.logs) setLogsList(data.logs);
       if (data.metrics) setMetrics(data.metrics);
       setLoadedTabs((prev) => new Set(prev).add("logs"));
     } catch (e) {
       console.error("Failed to load logs:", e);
     }
-  }, [getAdminHeaders, router]);
+  }, []);
 
   // Fetch Customers & Bots
   const fetchCustomers = useCallback(async () => {
     try {
-      const res = await fetch("/api/admin/customers", { headers: getAdminHeaders() });
-      if (res.status === 401) { router.replace("/login"); return; }
-      const data = await res.json();
+      const data = await apiFetch<{ customers?: CustomerAdminItem[] }>("/api/admin/customers");
       if (data.customers) setCustomersList(data.customers);
       setLoadedTabs((prev) => new Set(prev).add("customers"));
     } catch (e) {
       console.error("Failed to load customers:", e);
     }
-  }, [getAdminHeaders, router]);
+  }, []);
 
   // Initial Load: Load core providers + telemetry metrics in parallel
   useEffect(() => {
@@ -146,21 +131,20 @@ export default function AdminDashboardPage() {
 
   const handleUpdateProviders = async (updated: ProviderItem[]) => {
     try {
-      const res = await fetch("/api/admin/providers", {
+      const data = await apiFetch<{ providers?: ProviderItem[] }>("/api/admin/providers", {
         method: "PUT",
-        headers: getAdminHeaders(),
-        body: JSON.stringify({ providers: updated }),
+        body: { providers: updated },
       });
-      const data = await res.json();
       if (data.providers) setProvidersList(data.providers);
     } catch (e) {
       console.error("Failed to update providers:", e);
+      alert(`Failed to save providers: ${(e as Error).message}`);
     }
   };
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      await apiFetch("/api/auth/logout", { method: "POST" });
     } catch {}
     window.location.href = "/login";
   };

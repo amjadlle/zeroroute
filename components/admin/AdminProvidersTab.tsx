@@ -1,5 +1,6 @@
 "use client";
 
+import { apiFetch } from "@/lib/client/api";
 import { useState } from "react";
 import {
   Layers,
@@ -70,38 +71,15 @@ export function AdminProvidersTab({ providers, onUpdateProviders }: AdminProvide
   // Sort providers strictly by order
   const sortedProviders = [...providers].sort((a, b) => a.order - b.order);
 
-  const getAdminHeaders = () => {
-    const adminKey = typeof window !== "undefined" ? localStorage.getItem("admin_key") || "" : "";
-    return {
-      "Content-Type": "application/json",
-      "Authorization": adminKey ? `Bearer ${adminKey}` : "",
-    };
-  };
-
-  const safeFetchJson = async (url: string, options: RequestInit) => {
-    try {
-      const res = await fetch(url, options);
-      const text = await res.text();
-      try {
-        return JSON.parse(text);
-      } catch {
-        return { ok: false, error: `HTTP ${res.status}: ${text.slice(0, 120)}` };
-      }
-    } catch (e: any) {
-      return { ok: false, error: e.message || "Network request failed" };
-    }
-  };
-
   const handleTestPrimary = async (providerId: string) => {
     setTestingId(providerId);
     const provider = providers.find((p) => p.id === providerId);
     const targetModel = provider?.models?.[0] || provider?.model;
 
     try {
-      const data = await safeFetchJson("/api/admin/providers/test", {
+      const data = await apiFetch<{ ok?: boolean; latencyMs?: number; response?: string; error?: string }>("/api/admin/providers/test", {
         method: "POST",
-        headers: getAdminHeaders(),
-        body: JSON.stringify({ providerId, model: targetModel }),
+        body: { providerId, model: targetModel },
       });
       setTestResults((prev) => ({
         ...prev,
@@ -140,15 +118,15 @@ export function AdminProvidersTab({ providers, onUpdateProviders }: AdminProvide
     setBenchmarking(true);
     setBenchmarkResults(null);
     try {
-      const data = await safeFetchJson("/api/admin/providers/benchmark", {
+      const data = await apiFetch<{ results?: BenchmarkResult[] }>("/api/admin/providers/benchmark", {
         method: "POST",
-        headers: getAdminHeaders(),
       });
       if (data.results) {
         setBenchmarkResults(data.results);
       }
     } catch (err) {
       console.error("Benchmark error:", err);
+      alert(`Benchmark failed: ${(err as Error).message}`);
     } finally {
       setBenchmarking(false);
     }

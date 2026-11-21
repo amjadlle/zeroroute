@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { apiFetch } from "@/lib/client/api";
 import {
   Terminal,
   Sparkles,
@@ -70,34 +71,21 @@ export function AdminPlaygroundTab({ providers }: AdminPlaygroundTabProps) {
   const handleSavePersona = async () => {
     setSavingPersona(true);
     try {
-      const res = await fetch("/api/customer/persona", {
+      await apiFetch("/api/customer/persona", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        body: {
           company: companyName,
           bot_title: botRole,
           bot_role: botRole,
           persona: systemPersona,
-        }),
+        },
       });
-      if (res.ok) {
-        showToast("☁️ Persona saved to Cloud CRM & AI Widget!");
-      } else {
-        showToast("⚠️ Could not save persona to cloud.");
-      }
-    } catch {
-      showToast("⚠️ Network error while saving persona.");
+      showToast("☁️ Persona saved to Cloud CRM & AI Widget!");
+    } catch (e) {
+      showToast(`⚠️ Could not save persona to cloud: ${(e as Error).message}`);
     } finally {
       setSavingPersona(false);
     }
-  };
-
-  const getAdminHeaders = () => {
-    const adminKey = typeof window !== "undefined" ? localStorage.getItem("admin_key") || "" : "";
-    return {
-      "Content-Type": "application/json",
-      "Authorization": adminKey ? `Bearer ${adminKey}` : "",
-    };
   };
 
   const handleRunTest = async () => {
@@ -122,9 +110,10 @@ export function AdminPlaygroundTab({ providers }: AdminPlaygroundTabProps) {
     messages.push({ role: "user", content: prompt });
 
     try {
+      // Raw fetch: the streamed body is read below. Auth is the session cookie.
       const res = await fetch("/v1/chat/completions", {
         method: "POST",
-        headers: getAdminHeaders(),
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: targetModel || (targetProvider ? `${targetProvider}/default` : "auto"),
           messages,

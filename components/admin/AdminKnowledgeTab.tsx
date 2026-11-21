@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { apiFetch } from "@/lib/client/api";
 import {
   BookOpen,
   Sparkles,
@@ -64,24 +65,13 @@ export function AdminKnowledgeTab({ customers = [] }: AdminKnowledgeTabProps) {
     setTimeout(() => setToast(null), 3500);
   };
 
-  const getAdminHeaders = () => {
-    const adminKey = typeof window !== "undefined" ? localStorage.getItem("admin_key") || "" : "";
-    return {
-      "Content-Type": "application/json",
-      "Authorization": adminKey ? `Bearer ${adminKey}` : "",
-    };
-  };
-
   const fetchDocs = async () => {
     setLoading(true);
     try {
       const url = selectedKey 
         ? `/api/knowledge?target_key=${encodeURIComponent(selectedKey)}`
         : "/api/knowledge";
-      const res = await fetch(url, {
-        headers: getAdminHeaders(),
-      });
-      const data = await res.json();
+      const data = await apiFetch<{ documents?: KnowledgeDoc[] }>(url);
       if (data.documents) {
         setDocs(data.documents);
       }
@@ -103,17 +93,15 @@ export function AdminKnowledgeTab({ customers = [] }: AdminKnowledgeTabProps) {
     }
     setSavingSnippet(true);
     try {
-      const res = await fetch("/api/knowledge", {
+      const data = await apiFetch<{ success?: boolean; error?: string }>("/api/knowledge", {
         method: "POST",
-        headers: getAdminHeaders(),
-        body: JSON.stringify({
+        body: {
           title: rawTitle.trim() || "Knowledge Snippet",
           content: rawContent.trim(),
           type: "manual_text",
           target_key: selectedKey || undefined,
-        }),
+        },
       });
-      const data = await res.json();
       if (data.success) {
         setRawTitle("");
         setRawContent("");
@@ -137,15 +125,13 @@ export function AdminKnowledgeTab({ customers = [] }: AdminKnowledgeTabProps) {
     setCrawling(true);
     setCrawlStatus("Crawling & extracting clean markdown…");
     try {
-      const res = await fetch("/api/knowledge/crawl", {
+      const data = await apiFetch<{ success?: boolean; error?: string }>("/api/knowledge/crawl", {
         method: "POST",
-        headers: getAdminHeaders(),
-        body: JSON.stringify({ 
+        body: { 
           url: crawlUrl.trim(),
           target_key: selectedKey || undefined,
-        }),
+        },
       });
-      const data = await res.json();
       if (data.success) {
         setCrawlUrl("");
         setCrawlStatus("✅ Page crawled & indexed successfully!");
@@ -165,17 +151,15 @@ export function AdminKnowledgeTab({ customers = [] }: AdminKnowledgeTabProps) {
     setUploadStatus(`Processing ${file.name}…`);
     try {
       const text = await file.text();
-      const res = await fetch("/api/knowledge", {
+      const data = await apiFetch<{ success?: boolean; error?: string }>("/api/knowledge", {
         method: "POST",
-        headers: getAdminHeaders(),
-        body: JSON.stringify({
+        body: {
           title: file.name,
           content: text,
           type: "file_upload",
           target_key: selectedKey || undefined,
-        }),
+        },
       });
-      const data = await res.json();
       if (data.success) {
         setUploadStatus(`✅ Indexed ${file.name} (${text.length} chars)`);
         showToast(`✅ File ${file.name} uploaded and indexed!`);
@@ -194,15 +178,13 @@ export function AdminKnowledgeTab({ customers = [] }: AdminKnowledgeTabProps) {
     if (!doc.source_url) return;
     setSyncingDocId(doc.id);
     try {
-      const res = await fetch("/api/knowledge/crawl", {
+      const data = await apiFetch<{ success?: boolean; error?: string }>("/api/knowledge/crawl", {
         method: "POST",
-        headers: getAdminHeaders(),
-        body: JSON.stringify({ 
+        body: { 
           url: doc.source_url,
           target_key: selectedKey || undefined,
-        }),
+        },
       });
-      const data = await res.json();
       if (data.success) {
         showToast("🔄 Knowledge synced & updated!");
         await fetchDocs();
@@ -218,16 +200,13 @@ export function AdminKnowledgeTab({ customers = [] }: AdminKnowledgeTabProps) {
 
   const handleDeleteDoc = async (id: string) => {
     try {
-      const res = await fetch(`/api/knowledge?id=${id}&target_key=${encodeURIComponent(selectedKey)}`, {
+      await apiFetch(`/api/knowledge?id=${encodeURIComponent(id)}&target_key=${encodeURIComponent(selectedKey)}`, {
         method: "DELETE",
-        headers: getAdminHeaders(),
       });
-      if (res.ok) {
-        showToast("🗑️ Document deleted.");
-        setDocs((prev) => prev.filter((d) => d.id !== id));
-      }
-    } catch {
-      showToast("⚠️ Could not delete document.");
+      showToast("🗑️ Document deleted.");
+      setDocs((prev) => prev.filter((d) => d.id !== id));
+    } catch (e) {
+      showToast(`⚠️ Could not delete document: ${(e as Error).message}`);
     }
   };
 
