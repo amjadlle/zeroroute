@@ -4,7 +4,7 @@ import { useState } from "react";
 import { PageHeader } from "@/components/shell/PageHeader";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { useToast } from "@/components/ui/Toast";
-import { ChatbotSettingsForm, type ChatbotSettings } from "@/components/dashboard/ChatbotSettingsForm";
+import { appearanceErrors, ChatbotSettingsForm, type ChatbotSettings } from "@/components/dashboard/ChatbotSettingsForm";
 import { ChatPanel } from "@/components/shared/chat/ChatPanel";
 import { useChatStream } from "@/components/shared/chat/useChatStream";
 import { apiFetch } from "@/lib/client/api";
@@ -18,6 +18,8 @@ export default function ChatbotPage() {
     greeting: profile.greeting,
     persona: profile.persona,
     prompts: profile.prompts ?? [],
+    brand_color: profile.brand_color ?? "",
+    logo_url: profile.logo_url ?? "",
   };
   const [settings, setSettings] = useState(saved);
   const [saving, setSaving] = useState(false);
@@ -26,6 +28,10 @@ export default function ChatbotPage() {
 
   const prompts = settings.prompts.map((p) => p.trim()).filter(Boolean);
   const dirty = JSON.stringify({ ...settings, prompts }) !== JSON.stringify(saved);
+  // Preview only shows values that would save; the brand colour is user data, so it may style the preview.
+  const valid = appearanceErrors(settings);
+  const color = settings.brand_color && !valid.brand_color ? settings.brand_color.trim() : undefined;
+  const logo = settings.logo_url && !valid.logo_url ? settings.logo_url.trim() : undefined;
 
   const save = async () => {
     setSaving(true);
@@ -43,7 +49,7 @@ export default function ChatbotPage() {
 
   return (
     <>
-      <PageHeader title="Chatbot" description="Choose how your chatbot talks, then try it out." />
+      <PageHeader title="Chatbot" description="Choose how your chatbot looks and talks, then try it out." />
       <div className="grid items-start gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader title="Chatbot settings" description="Visitors see these on your website." />
@@ -53,12 +59,19 @@ export default function ChatbotPage() {
         </Card>
         <ChatPanel
           chat={chat}
-          title={settings.bot_title || "Your chatbot"}
+          title={
+            <span className="flex items-center gap-2">
+              {/* eslint-disable-next-line @next/next/no-img-element -- customer's own image host, not in next.config */}
+              {logo && <img src={logo} alt="" className="size-6 rounded-control object-contain" />}
+              {settings.bot_title || "Your chatbot"}
+            </span>
+          }
           description={dirty ? "Save your changes to test new instructions." : "Answers use your saved settings and knowledge."}
           greeting={settings.greeting}
           suggestions={prompts}
           placeholder="Ask what a visitor would ask"
-          className="lg:sticky lg:top-6"
+          className={color ? "border-t-4 lg:sticky lg:top-6" : "lg:sticky lg:top-6"}
+          style={color ? { borderTopColor: color } : undefined}
         />
       </div>
     </>

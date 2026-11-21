@@ -23,6 +23,9 @@ export interface CustomerProfile {
   greeting: string;
   prompts: string[];
   persona: string;
+  /** #rrggbb or "" for the widget default. */
+  brand_color?: string;
+  logo_url?: string;
   status: string;
   subscription_expires?: number;
   days_remaining: number;

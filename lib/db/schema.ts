@@ -21,6 +21,8 @@
   period_end?: number | null;
   bot_id?: string | null;
   allowed_domains?: string;
+  brand_color?: string | null;
+  logo_url?: string | null;
   session_token?: string | null;
   created_at: number;
   updated_at: number;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { RotateCcw, Send, Square } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { Alert } from "@/components/ui/Alert";
@@ -22,12 +22,14 @@ type ChatPanelProps = {
   suggestions?: string[];
   placeholder?: string;
   className?: string;
+  /** E.g. the brand colour as a border on the Chatbot page preview (user data, not console styling). */
+  style?: CSSProperties;
 };
 
 const bubble = "max-w-[85%] rounded-card px-3 py-2 text-body";
 
 /** Message list and composer for a useChatStream conversation. Answers render through the safe Markdown component. */
-export function ChatPanel({ chat, title, description, greeting, suggestions = [], placeholder = "Type a message", className }: ChatPanelProps) {
+export function ChatPanel({ chat, title, description, greeting, suggestions = [], placeholder = "Type a message", className, style }: ChatPanelProps) {
   const { messages, streaming, error, send, retry, stop, reset } = chat;
   const [input, setInput] = useState("");
   const logRef = useRef<HTMLDivElement>(null);
@@ -46,7 +48,7 @@ export function ChatPanel({ chat, title, description, greeting, suggestions = []
 
   return (
     // Fixed height so the composer stays in view; dvh keeps it inside small phone screens.
-    <Card className={cn("flex h-[36rem] max-h-[85dvh] min-h-80 flex-col overflow-hidden", className)}>
+    <Card style={style} className={cn("flex h-[36rem] max-h-[85dvh] min-h-80 flex-col overflow-hidden", className)}>
       <CardHeader
         title={title}
         description={description}

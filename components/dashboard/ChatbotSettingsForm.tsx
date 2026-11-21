@@ -7,11 +7,30 @@ import { Field } from "@/components/ui/Field";
 import { IconButton } from "@/components/ui/IconButton";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
+import { isBrandColor, parseAppearance } from "@/lib/brand";
 
-/** The chatbot settings the persona API stores. Brand colour and logo have no backend column yet. */
-export type ChatbotSettings = { bot_title: string; greeting: string; persona: string; prompts: string[] };
+/** The chatbot settings the persona API stores. Empty brand_color / logo_url mean the widget defaults. */
+export type ChatbotSettings = {
+  bot_title: string;
+  greeting: string;
+  persona: string;
+  prompts: string[];
+  brand_color: string;
+  logo_url: string;
+};
 
 export const MAX_SUGGESTED_QUESTIONS = 6;
+/** widget.js's own default colour, shown in the picker when no brand colour is saved. Data, not console styling. */
+const WIDGET_DEFAULT_COLOR = "#ef4444";
+
+/** Validation message per appearance field, or undefined when valid. */
+export function appearanceErrors(v: Pick<ChatbotSettings, "brand_color" | "logo_url">) {
+  const err = (f: "brand_color" | "logo_url") => {
+    const r = parseAppearance(f, v[f]);
+    return "error" in r ? r.error : undefined;
+  };
+  return { brand_color: err("brand_color"), logo_url: err("logo_url") };
+}
 
 type ChatbotSettingsFormProps = {
   value: ChatbotSettings;
@@ -27,13 +46,14 @@ type ChatbotSettingsFormProps = {
 export function ChatbotSettingsForm({ value, onChange, onSubmit, saving, submitLabel = "Save changes", actions }: ChatbotSettingsFormProps) {
   const set = (patch: Partial<ChatbotSettings>) => onChange({ ...value, ...patch });
   const setPrompt = (i: number, text: string) => set({ prompts: value.prompts.map((p, n) => (n === i ? text : p)) });
+  const errors = appearanceErrors(value);
 
   return (
     <form
       className="grid gap-4"
       onSubmit={(e: FormEvent) => {
         e.preventDefault();
-        onSubmit();
+        if (!errors.brand_color && !errors.logo_url) onSubmit();
       }}
     >
       <Field label="Name" hint="Shown in the chat header." required>
@@ -76,6 +96,22 @@ export function ChatbotSettingsForm({ value, onChange, onSubmit, saving, submitL
           </Button>
         )}
       </fieldset>
+      <div className="flex items-start gap-2">
+        <Field className="flex-1" label="Brand colour" hint="The colour of the chatbot button and header. Leave empty for the default." error={errors.brand_color}>
+          <Input value={value.brand_color} onChange={(e) => set({ brand_color: e.target.value })} maxLength={7} placeholder="#4f46e5" className="font-ui-mono" />
+        </Field>
+        <input
+          type="color"
+          aria-label="Pick brand colour"
+          value={isBrandColor(value.brand_color) ? value.brand_color.trim() : WIDGET_DEFAULT_COLOR}
+          onChange={(e) => set({ brand_color: e.target.value })}
+          /* mt-7 lines the swatch up with the text input under the label. */
+          className="mt-7 h-control-md w-12 shrink-0 cursor-pointer rounded-control border border-border-strong bg-surface-sunken p-0.5 focus-visible:outline-2 focus-visible:outline-focus-ring"
+        />
+      </div>
+      <Field label="Logo" hint="Web address of an image shown on the chatbot button and header." error={errors.logo_url}>
+        <Input type="url" value={value.logo_url} onChange={(e) => set({ logo_url: e.target.value })} maxLength={500} placeholder="https://example.com/logo.png" />
+      </Field>
       <div className="flex flex-wrap items-center gap-2 pt-2">
         <Button type="submit" loading={saving}>{submitLabel}</Button>
         {actions}

@@ -224,6 +224,14 @@ export const initDb = async (): Promise<void> => {
       db.execute(`CREATE INDEX IF NOT EXISTS idx_logs_status ON request_logs(status);`),
     ]);
 
+    // Additive columns for databases created before them. SQLite has no ADD COLUMN IF NOT EXISTS: a rerun
+    // fails with "duplicate column", which is ignored, so this stays idempotent.
+    for (const col of ["brand_color TEXT", "logo_url TEXT"]) {
+      try {
+        await db.execute(`ALTER TABLE customers ADD COLUMN ${col};`);
+      } catch {}
+    }
+
     // Auto-upgrade existing customers to 10,000 monthly limit
     try {
       await db.execute(`UPDATE customers SET monthly_limit = 10000 WHERE monthly_limit = 2000 OR monthly_limit IS NULL;`);

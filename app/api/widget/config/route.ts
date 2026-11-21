@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getDb } from "@/lib/db";
+import { getDb, initDb } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -12,9 +12,10 @@ export async function GET(request: Request) {
   }
 
   try {
+    await initDb(); // adds brand_color / logo_url on databases created before them
     const db = getDb();
     const res = await db.execute({
-      sql: `SELECT bot_title, bot_role, tone, greeting, prompts, company, name, status, monthly_limit FROM customers WHERE bot_id = ? LIMIT 1`,
+      sql: `SELECT bot_title, bot_role, tone, greeting, prompts, company, name, status, monthly_limit, brand_color, logo_url FROM customers WHERE bot_id = ? LIMIT 1`,
       args: [botId]
     });
 
@@ -58,6 +59,9 @@ export async function GET(request: Request) {
         greeting: row.greeting || "Hi there! How can I help you today?",
         prompts: prompts.length > 0 ? prompts : ["Tell me about your services", "How much does it cost?", "Can I talk to support?"],
         company: row.company || "ZeroRoute",
+        // Validated on save; omitted when unset so the widget keeps its default.
+        brandColor: row.brand_color || undefined,
+        logo: row.logo_url || undefined,
         status: row.status,
         isPaid,
         showBadge: !isPaid
