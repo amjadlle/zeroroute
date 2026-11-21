@@ -1,35 +1,39 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Plus_Jakarta_Sans, JetBrains_Mono, Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const jakarta = Plus_Jakarta_Sans({
+// Self-hosted variable fonts (latin subset, OFL) so builds never fetch from Google Fonts (#64).
+// To add a weight range or subset, download the matching woff2 from fonts.gstatic.com into app/fonts.
+const jakarta = localFont({
+  src: "./fonts/PlusJakartaSans-latin.woff2",
   variable: "--font-jakarta",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: "200 800",
   display: "swap",
 });
 
-const jetbrains = JetBrains_Mono({
+const jetbrains = localFont({
+  src: "./fonts/JetBrainsMono-latin.woff2",
   variable: "--font-mono",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: "100 800",
   display: "swap",
 });
 
 // Console fonts (Graphite+, issue #1). Exposed as CSS variables only; the font-ui / font-ui-mono
 // tokens in globals.css read them. The landing page keeps Plus Jakarta Sans.
-const geist = Geist({
+const geist = localFont({
+  src: "./fonts/Geist-latin.woff2",
   variable: "--font-geist",
+  weight: "100 900",
   preload: false, // unused on the landing page; loads when a console element uses font-ui
-  subsets: ["latin"],
   display: "swap",
 });
 
-const geistMono = Geist_Mono({
+const geistMono = localFont({
+  src: "./fonts/GeistMono-latin.woff2",
   variable: "--font-geist-mono",
+  weight: "100 900",
   preload: false,
-  subsets: ["latin"],
   display: "swap",
 });
 
