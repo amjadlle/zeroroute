@@ -94,7 +94,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`dark scroll-smooth ${jakarta.variable} ${jetbrains.variable}`}>
-      <body className="bg-[#050608] text-slate-100 min-h-screen font-sans antialiased selection:bg-red-500 selection:text-white">
+      <body className="bg-dark-bg text-slate-100 min-h-screen font-sans antialiased selection:bg-red-500 selection:text-white">
         <div className="fixed inset-0 grid-pattern pointer-events-none z-0" />
         <div className="relative z-10 flex flex-col min-h-screen">
           {children}

@@ -235,7 +235,7 @@ export function AdminKnowledgeTab({ customers = [] }: AdminKnowledgeTabProps) {
     <div className="space-y-6">
       {/* Toast Alert */}
       {toast && (
-        <div className="fixed top-6 right-6 z-50 px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 text-white text-xs font-bold shadow-xl flex items-center gap-2 animate-in fade-in">
+        <div className="fixed top-6 right-6 z-50 px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 text-white text-xs font-bold shadow-xl flex items-center gap-2">
           <Sparkles className="w-4 h-4" />
           <span>{toast}</span>
         </div>

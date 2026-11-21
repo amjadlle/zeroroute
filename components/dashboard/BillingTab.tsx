@@ -38,11 +38,11 @@ export function BillingModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md duration-200"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-md bg-[#0a0d14] border border-dark-border rounded-2xl p-6 shadow-2xl space-y-5 glow-effect animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-md bg-[#0a0d14] border border-dark-border rounded-2xl p-6 shadow-2xl space-y-5 glow-effect duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

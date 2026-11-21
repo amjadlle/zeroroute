@@ -173,7 +173,7 @@ export function OverviewTab({
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-200">
+    <div className="space-y-6 duration-200">
       {/* Primary Credentials Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* 1. Master Gateway Key Card */}
@@ -310,7 +310,7 @@ export function OverviewTab({
         </div>
 
         {domainError && (
-          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-center justify-between gap-2 animate-in fade-in duration-200">
+          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-center justify-between gap-2 duration-200">
             <span>{domainError}</span>
             {!isPro && isLimitReached && onOpenBilling && (
               <button

@@ -134,7 +134,7 @@ export function Navbar() {
 
       {/* Mobile Dropdown Drawer */}
       {mobileMenuOpen && (
-        <div className="pointer-events-auto md:hidden mt-2 bg-[#080a0f]/95 backdrop-blur-2xl border border-white/10 rounded-2xl p-4 shadow-2xl space-y-1 font-semibold text-sm text-slate-200 ring-1 ring-white/5 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="pointer-events-auto md:hidden mt-2 bg-[#080a0f]/95 backdrop-blur-2xl border border-white/10 rounded-2xl p-4 shadow-2xl space-y-1 font-semibold text-sm text-slate-200 ring-1 ring-white/5 duration-200">
           <a
             href="#widget"
             onClick={() => setMobileMenuOpen(false)}

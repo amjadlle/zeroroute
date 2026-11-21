@@ -376,7 +376,7 @@ function OnboardingContent() {
 
           {/* ──────────────── STEP 1: BRAND IDENTITY ──────────────── */}
           {currentStep === 1 && (
-            <div className="space-y-5 animate-in fade-in duration-200">
+            <div className="space-y-5 duration-200">
               <div className="space-y-1">
                 <h2 className="text-xl font-bold text-white">Brand &amp; Assistant Identity</h2>
                 <p className="text-xs text-slate-400">
@@ -456,7 +456,7 @@ function OnboardingContent() {
 
           {/* ──────────────── STEP 2: PERSONA & TONE ──────────────── */}
           {currentStep === 2 && (
-            <div className="space-y-5 animate-in fade-in duration-200">
+            <div className="space-y-5 duration-200">
               <div className="space-y-1">
                 <h2 className="text-xl font-bold text-white">AI Persona &amp; Tone</h2>
                 <p className="text-xs text-slate-400">
@@ -549,7 +549,7 @@ function OnboardingContent() {
 
           {/* ──────────────── STEP 3: KNOWLEDGE BASE ──────────────── */}
           {currentStep === 3 && (
-            <div className="space-y-5 animate-in fade-in duration-200">
+            <div className="space-y-5 duration-200">
               <div className="space-y-1">
                 <h2 className="text-xl font-bold text-white">Knowledge Base &amp; Semantic RAG</h2>
                 <p className="text-xs text-slate-400">
@@ -609,7 +609,7 @@ function OnboardingContent() {
                   </div>
 
                   {crawledSuccess && (
-                    <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs flex items-center gap-2 animate-in fade-in">
+                    <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 shrink-0" />
                       <span>Successfully crawled and indexed content into your RAG knowledge corpus!</span>
                     </div>
@@ -654,7 +654,7 @@ function OnboardingContent() {
 
           {/* ──────────────── STEP 4: PASSWORD & DEPLOY ──────────────── */}
           {currentStep === 4 && (
-            <div className="space-y-5 animate-in fade-in duration-200">
+            <div className="space-y-5 duration-200">
               <div className="space-y-1">
                 <h2 className="text-xl font-bold text-white">Access Credentials &amp; Live Widget</h2>
                 <p className="text-xs text-slate-400">

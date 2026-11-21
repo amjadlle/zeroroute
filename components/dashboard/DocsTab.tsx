@@ -155,7 +155,7 @@ curl ${hostUrl}/v1/chat/completions \\
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-200">
+    <div className="space-y-6 duration-200">
       {/* Main Glass Card */}
       <div className="bg-dark-card border border-dark-border rounded-2xl p-6 sm:p-7 space-y-6 shadow-xl">
         {/* Header Banner */}
@@ -422,11 +422,11 @@ curl ${hostUrl}/v1/chat/completions \\
       {/* Step-by-Step Integration Guide Modal */}
       {guideModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md duration-200"
           onClick={() => setGuideModalOpen(false)}
         >
           <div
-            className="relative w-full max-w-2xl bg-[#0a0d14] border border-dark-border rounded-2xl p-6 sm:p-7 shadow-2xl space-y-5 glow-effect animate-in zoom-in-95 duration-200"
+            className="relative w-full max-w-2xl bg-[#0a0d14] border border-dark-border rounded-2xl p-6 sm:p-7 shadow-2xl space-y-5 glow-effect duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -452,7 +452,7 @@ curl ${hostUrl}/v1/chat/completions \\
             </div>
 
             {/* Platform Selector Tabs */}
-            <div className="flex flex-wrap gap-2 overflow-x-auto pb-1 scrollbar-none touch-pan-x">
+            <div className="flex flex-wrap gap-2 overflow-x-auto pb-1 touch-pan-x">
               {[
                 { id: "agent", label: "🤖 AI Agent" },
                 { id: "html", label: "🌐 HTML / Webflow" },

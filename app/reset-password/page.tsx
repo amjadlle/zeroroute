@@ -66,7 +66,7 @@ function ResetPasswordForm() {
 
   if (success) {
     return (
-      <div className="space-y-4 text-center py-4 animate-in fade-in duration-300">
+      <div className="space-y-4 text-center py-4 duration-300">
         <div className="w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center mx-auto text-emerald-400">
           <CheckCircle2 className="w-6 h-6" />
         </div>
@@ -91,7 +91,7 @@ function ResetPasswordForm() {
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Error Alert */}
       {error && (
-        <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-start gap-2 animate-in fade-in duration-200">
+        <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-start gap-2 duration-200">
           <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
           <span>{error}</span>
         </div>

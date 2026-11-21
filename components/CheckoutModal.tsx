@@ -52,7 +52,7 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-[999999] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
+      className="fixed inset-0 z-[999999] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md duration-200"
     >
       <div className="relative w-full max-w-[440px] bg-[#0d0708] border border-red-500/30 rounded-2xl shadow-2xl shadow-red-950/80 overflow-hidden flex flex-col max-h-[95vh] overflow-y-auto">
         {/* Close Button */}

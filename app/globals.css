@@ -1,9 +1,42 @@
 @import "tailwindcss";
 
+/*
+ * ZeroRoute design tokens (issue #1). Components use these, never raw hex.
+ *
+ * Colour (semantic, utilities: bg-*, text-*, border-*, ring-*):
+ *   bg                    page background
+ *   surface               cards and panels
+ *   surface-raised        popovers, menus, hovered rows
+ *   surface-sunken        inputs, code blocks, wells
+ *   border / border-strong  dividers / control outlines (border-strong is >= 3:1 on surfaces)
+ *   text / text-muted / text-subtle   primary / secondary / meta text (all >= 4.5:1 on every surface)
+ *   accent, accent-hover, accent-fg   the one brand colour; accent-fg is text on an accent fill
+ *   success | warning | danger | info  solid (icons, dots, fills), -soft (tinted bg), -fg (text on -soft or surface)
+ *   focus-ring            :focus-visible outline
+ *   Red is danger only. Use text-white on a bg-danger fill (destructive button).
+ *
+ * Themes: every colour is light-dark(LIGHT, DARK). The used `color-scheme` picks the value:
+ *   dark by default, light when the OS prefers light, and data-theme="dark" | "light" forces one.
+ * Accents: A (indigo) is the default; data-accent="b" (teal) is a comparison option until the owner picks.
+ *   Put data-theme / data-accent on <html>: Lightning CSS compiles light-dark() to --lightningcss-*
+ *   fallbacks that resolve where the token is declared (:root), so a nested wrapper will not re-theme.
+ *
+ * Type:    text-meta 12px (minimum), text-body 14px (default UI text), text-body-lg 16px,
+ *          text-title 18px, text-heading 24px, text-display 32px.
+ * Space:   Tailwind's 4px scale (p-1 = 4px, p-2 = 8px, ...). Control heights: h-control-sm 32px,
+ *          h-control-md 36px, h-control-lg 40px.
+ * Radius:  rounded-control 8px (buttons, inputs), rounded-card 12px (cards, dialogs), rounded-full (pills).
+ * Shadow:  shadow-raised (menus, popovers), shadow-overlay (dialogs).
+ * Motion:  infinite pulses/pings/bounces and the marquee stop under prefers-reduced-motion (see bottom).
+ *
+ * Legacy: dark-* and brand-* below are frozen aliases for the landing page and the current consoles.
+ * Do not use them in new code; they go away when the landing page migrates (M5).
+ */
 @theme {
   --font-sans: var(--font-jakarta), "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: var(--font-mono), "JetBrains Mono", monospace;
 
+  /* Legacy aliases: fixed values, do not follow the theme. */
   --color-dark-bg: #050608;
   --color-dark-card: #0c0e14;
   --color-dark-cardHover: #131620;
@@ -13,6 +46,76 @@
   --color-brand-500: #ef4444;
   --color-brand-600: #dc2626;
 }
+
+/* `static` keeps every token on :root even when no utility uses it yet (inline styles, /design probes). */
+@theme static {
+  /*                          light      dark    */
+  --color-bg:             light-dark(#fafafa, #09090b);
+  --color-surface:        light-dark(#ffffff, #111113);
+  --color-surface-raised: light-dark(#ffffff, #1b1b1f);
+  --color-surface-sunken: light-dark(#f2f2f4, #060607);
+  --color-border:         light-dark(#e4e4e7, #27272a);
+  --color-border-strong:  light-dark(#8a8a93, #686871);
+  --color-text:           light-dark(#18181b, #f4f4f5);
+  --color-text-muted:     light-dark(#4f4f57, #b4b4bc);
+  --color-text-subtle:    light-dark(#65656e, #8f8f98);
+
+  --color-accent:       light-dark(#4f46e5, #818cf8);
+  --color-accent-hover: light-dark(#4338ca, #a5b4fc);
+  --color-accent-fg:    light-dark(#ffffff, #0c0c1d);
+  --color-focus-ring:   light-dark(#4f46e5, #818cf8);
+
+  --color-success:      light-dark(#16a34a, #22c55e);
+  --color-success-soft: light-dark(#dcfce7, #0b2616);
+  --color-success-fg:   light-dark(#166534, #4ade80);
+  --color-warning:      light-dark(#d97706, #f59e0b);
+  --color-warning-soft: light-dark(#fef3c7, #2a1c05);
+  --color-warning-fg:   light-dark(#92400e, #fbbf24);
+  --color-danger:       light-dark(#dc2626, #dc2626);
+  --color-danger-soft:  light-dark(#fee2e2, #2d0f10);
+  --color-danger-fg:    light-dark(#b91c1c, #f87171);
+  --color-info:         light-dark(#0284c7, #0ea5e9);
+  --color-info-soft:    light-dark(#e0f2fe, #072235);
+  --color-info-fg:      light-dark(#075985, #38bdf8);
+
+  --text-meta: 0.75rem;
+  --text-meta--line-height: 1rem;
+  --text-body: 0.875rem;
+  --text-body--line-height: 1.375rem;
+  --text-body-lg: 1rem;
+  --text-body-lg--line-height: 1.5rem;
+  --text-title: 1.125rem;
+  --text-title--line-height: 1.625rem;
+  --text-heading: 1.5rem;
+  --text-heading--line-height: 2rem;
+  --text-display: 2rem;
+  --text-display--line-height: 2.5rem;
+
+  --spacing-control-sm: 2rem;
+  --spacing-control-md: 2.25rem;
+  --spacing-control-lg: 2.5rem;
+
+  --radius-control: 0.5rem;
+  --radius-card: 0.75rem;
+
+  --shadow-raised: 0 4px 12px -2px rgb(0 0 0 / 0.25), 0 2px 4px -2px rgb(0 0 0 / 0.15);
+  --shadow-overlay: 0 24px 48px -12px rgb(0 0 0 / 0.45);
+}
+
+/* Accent option B (teal), for the owner to compare against A. */
+[data-accent="b"] {
+  --color-accent:       light-dark(#0f766e, #2dd4bf);
+  --color-accent-hover: light-dark(#115e59, #5eead4);
+  --color-accent-fg:    light-dark(#ffffff, #04211f);
+  --color-focus-ring:   light-dark(#0f766e, #2dd4bf);
+}
+
+:root { color-scheme: dark; }
+@media (prefers-color-scheme: light) {
+  :root { color-scheme: light; }
+}
+[data-theme="dark"] { color-scheme: dark; }
+[data-theme="light"] { color-scheme: light; }
 
 @layer base {
   html {
@@ -27,8 +130,8 @@
   body {
     overflow-x: hidden;
     width: 100%;
-    background-color: #050608;
-    background-image: 
+    background-color: var(--color-dark-bg);
+    background-image:
       radial-gradient(ellipse 80% 40% at 50% -20%, rgba(239, 68, 68, 0.06), transparent),
       radial-gradient(ellipse 50% 50% at 80% 80%, rgba(255, 255, 255, 0.02), transparent);
     touch-action: manipulation;
@@ -48,6 +151,8 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* Stops iOS zoom-on-focus. Kept for now: removing it shrinks every mobile input that uses
+     text-xs/text-sm. Drop it once the Input component (#4) ships 16px mobile inputs. */
   @media screen and (max-width: 768px) {
     input, textarea, select {
       font-size: 16px !important;
@@ -96,13 +201,24 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #050608;
+  background: var(--color-dark-bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: #1a1f2c;
+  background: var(--color-dark-border);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #ef4444;
+  background: var(--color-brand-500);
 }
 
+/* Infinite attention animations stop for people who ask for less motion (WCAG 2.2.2 / 2.3.3).
+   One rule here instead of motion-safe: on every call site; it also covers future usages. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse,
+  .animate-ping,
+  .animate-bounce,
+  .animate-marquee,
+  .terminal-cursor::after {
+    animation: none;
+  }
+}
