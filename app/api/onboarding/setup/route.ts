@@ -10,8 +10,10 @@ export async function POST(req: NextRequest) {
     await initDb();
     const db = getDb();
 
-    // 1. Identify user via authenticated session or verified customer key/token
-    let customer = await getCurrentUser();
+    // 1. Identify user via authenticated session or customer API key.
+    // Only a cookie session may set a password or receive a session token.
+    const sessionCustomer = await getCurrentUser();
+    let customer = sessionCustomer;
     const authHeader = req.headers.get("authorization") || "";
     const bearerToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
     const token = body.key || body.token || bearerToken;
@@ -27,7 +29,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const activeCust: any = customer;
+    if (!sessionCustomer && body.password) {
+      return NextResponse.json(
+        { error: "Please log in to set a password." },
+        { status: 401 }
+      );
+    }
+
+    const activeCust = customer;
 
     const name = (body.name || body.company || body.botTitle || body.bot_title ? String(body.name || body.company || body.botTitle || body.bot_title).trim() : activeCust.name || "Subscriber").slice(0, 100);
     const company = (body.company ? String(body.company).trim() : activeCust.company || "").slice(0, 100);
@@ -120,7 +129,7 @@ export async function POST(req: NextRequest) {
     const response = NextResponse.json({
       success: true,
       message: "Onboarding completed successfully!",
-      token: sessionToken,
+      token: sessionCustomer ? sessionToken : undefined,
       customer: {
         id: activeCust.id,
         key: activeCust.key,
@@ -132,6 +141,8 @@ export async function POST(req: NextRequest) {
         status: activeCust.status,
       },
     });
+
+    if (!sessionCustomer) return response;
 
     // Set authenticated session cookie
     response.cookies.set({

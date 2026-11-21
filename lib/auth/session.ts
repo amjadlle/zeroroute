@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { getDb, initDb } from "@/lib/db";
 import { Customer } from "@/lib/db/schema";
+import { verifyAdminSession } from "@/lib/auth/admin-session";
 
 export const SESSION_COOKIE_NAME = "zr_session";
 export const ROLE_COOKIE_NAME = "zr_role";
@@ -17,11 +18,6 @@ export function isMasterAdminKey(token: string): boolean {
 
   if (adminKey && clean === adminKey.trim()) return true;
   if (routerKey && clean === routerKey.trim()) return true;
-
-  // Fallback for default local development if no key configured
-  if (!adminKey && !routerKey && process.env.NODE_ENV !== "production") {
-    return clean === "zr_admin_master_dev";
-  }
 
   return false;
 }
@@ -44,13 +40,13 @@ export function invalidateSessionCache(tokenOrKey?: string) {
 }
 
 interface CustomerLookupEntry {
-  customer: any;
+  customer: Customer;
   expiresAt: number;
 }
 const customerLookupCache = globalForAuth.zrCustomerLookupCache || new Map<string, CustomerLookupEntry>();
 if (!globalForAuth.zrCustomerLookupCache) globalForAuth.zrCustomerLookupCache = customerLookupCache;
 
-export function getCachedCustomer(id: string): any | null {
+export function getCachedCustomer(id: string): Customer | null {
   const cached = customerLookupCache.get(id);
   if (cached && Date.now() < cached.expiresAt) {
     return cached.customer;
@@ -58,7 +54,7 @@ export function getCachedCustomer(id: string): any | null {
   return null;
 }
 
-export function setCachedCustomer(id: string, customer: any, ttlMs = 30_000) {
+export function setCachedCustomer(id: string, customer: Customer, ttlMs = 30_000) {
   customerLookupCache.set(id, { customer, expiresAt: Date.now() + ttlMs });
   if (customer.key) customerLookupCache.set(customer.key, { customer, expiresAt: Date.now() + ttlMs });
   if (customer.bot_id) customerLookupCache.set(customer.bot_id, { customer, expiresAt: Date.now() + ttlMs });
@@ -80,8 +76,8 @@ export async function getCurrentUser(): Promise<Customer | null> {
     return null;
   }
 
-  // Check admin session
-  if (sessionToken.startsWith("zr_admin_")) {
+  // Check admin session (signed JWT issued by the admin login)
+  if (await verifyAdminSession(sessionToken)) {
     return {
       id: "admin_master",
       key: process.env.ROUTER_API_KEY || process.env.ADMIN_KEY || "zr_admin_master",
@@ -125,39 +121,16 @@ export async function getSessionFromCookie(): Promise<Customer | null> {
   return getCurrentUser();
 }
 
-export async function resolveAuth(headerOrToken?: string): Promise<{
+// Admin requires the verified admin session cookie. The header argument is kept for
+// call-site compatibility; bearer keys never grant admin.
+export async function resolveAuth(_headerOrToken?: string): Promise<{
   isAdmin: boolean;
   role: "admin" | "customer";
   customer: Customer | null;
 }> {
-  if (headerOrToken) {
-    const clean = headerOrToken.replace(/^Bearer\s+/i, "").trim();
-    if (isMasterAdminKey(clean)) {
-      return {
-        isAdmin: true,
-        role: "admin",
-        customer: {
-          id: "admin_master",
-          key: clean,
-          email: process.env.ADMIN_EMAIL || "mapkisolutions@gmail.com",
-          name: "ZeroRoute Admin",
-          company: "ZeroRoute Master",
-          status: "active",
-          monthly_requests: 0,
-          monthly_limit: 999999999,
-          created_at: 1700000000000,
-          updated_at: Date.now(),
-        } as Customer,
-      };
-    }
-  }
-
   const user = await getCurrentUser();
   if (user) {
-    const isAdmin =
-      ADMIN_EMAILS.includes(user.email.toLowerCase()) ||
-      Boolean(user.id === "admin_master") ||
-      Boolean(user.key && isMasterAdminKey(user.key));
+    const isAdmin = user.id === "admin_master";
 
     return {
       isAdmin,
@@ -173,27 +146,13 @@ export async function resolveAuth(headerOrToken?: string): Promise<{
   };
 }
 
+// Bearer lookup: matches customer API keys only.
 export async function getCustomerByTokenOrKey(token: string): Promise<Customer | null> {
   if (!token) return null;
 
-  if (isMasterAdminKey(token)) {
-    return {
-      id: "admin_master",
-      key: token,
-      email: process.env.ADMIN_EMAIL || "mapkisolutions@gmail.com",
-      name: "ZeroRoute Admin",
-      company: "ZeroRoute Master",
-      bot_title: "Master Admin AI",
-      bot_role: "Superadmin",
-      status: "active",
-      monthly_requests: 0,
-      monthly_limit: 999999999,
-      created_at: 1700000000000,
-      updated_at: Date.now(),
-    } as Customer;
-  }
-
-  const cached = sessionCache.get(token);
+  // Prefixed so a cached cookie-session entry can never satisfy a bearer lookup.
+  const cacheKey = `key:${token}`;
+  const cached = sessionCache.get(cacheKey);
   if (cached && Date.now() < cached.expiresAt) {
     return cached.customer;
   }
@@ -202,13 +161,13 @@ export async function getCustomerByTokenOrKey(token: string): Promise<Customer |
   const db = getDb();
 
   const result = await db.execute({
-    sql: "SELECT * FROM customers WHERE key = ? OR session_token = ? OR id = ? LIMIT 1",
-    args: [token, token, token],
+    sql: "SELECT * FROM customers WHERE key = ? LIMIT 1",
+    args: [token],
   });
 
   if (result.rows.length > 0) {
     const customer = result.rows[0] as unknown as Customer;
-    sessionCache.set(token, { customer, expiresAt: Date.now() + 30_000 });
+    sessionCache.set(cacheKey, { customer, expiresAt: Date.now() + 30_000 });
     return customer;
   }
 

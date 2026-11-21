@@ -8,7 +8,7 @@ import {
   generateBotId,
 } from "@/lib/auth/password";
 import { isRateLimited, getClientIp } from "@/lib/auth/rate-limit";
-import { SESSION_COOKIE_NAME } from "@/lib/auth/session";
+import { SESSION_COOKIE_NAME, ADMIN_EMAILS } from "@/lib/auth/session";
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req.headers);
@@ -28,6 +28,10 @@ export async function POST(req: NextRequest) {
 
     if (!email || !email.includes("@")) {
       return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
+    }
+
+    if (ADMIN_EMAILS.includes(email)) {
+      return NextResponse.json({ error: "This email address cannot be registered." }, { status: 403 });
     }
 
     if (!password || password.length < 6) {
