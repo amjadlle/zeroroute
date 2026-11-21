@@ -110,7 +110,7 @@ export async function GET(request: Request) {
       logs,
       metrics: {
         totalRequests,
-        avgLatencyMs: avgLatency || 450,
+        avgLatencyMs: avgLatency,
         successRate,
         cacheHits,
         cacheSavings: `$${(cacheHits * 0.0002).toFixed(4)}`,

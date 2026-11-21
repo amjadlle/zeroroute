@@ -38,6 +38,9 @@ export interface GlobalLogItem {
   total_tokens: number;
 }
 
+/** sessionStorage key the customers page uses to open this log filtered to one customer. */
+export const LOG_FILTER_KEY = "zr_admin_log_filter";
+
 interface AdminLogsTabProps {
   logs: GlobalLogItem[];
   onRefresh: () => Promise<void>;
@@ -149,14 +152,14 @@ export function AdminLogsTab({ logs, onRefresh, loading, initialSearch = "" }: A
             <div className="flex items-center gap-2">
               <Radio className="w-5 h-5 text-emerald-400 animate-pulse" />
               <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                Live Gateway Telemetry & Failover Stream
+                Requests
               </h2>
               <span className="text-[11px] font-mono text-slate-400 bg-white/5 border border-white/10 px-2 py-0.5 rounded-md">
                 Showing {filteredLogs.length} of {logs.length}
               </span>
             </div>
             <p className="text-xs text-slate-400">
-              Zero-latency multi-cloud audit log with payload inspection, failover traces, and origin security analysis.
+              Click a row to see the full request and response.
             </p>
           </div>
 
