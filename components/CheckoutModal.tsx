@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { X, Sparkles, Check, ArrowRight, ShieldCheck, CreditCard, Loader2 } from "lucide-react";
+import { PLAN_LIMITS, PROVIDER_COUNT } from "@/lib/constants";
+import { PRO_DAILY_REQUESTS, PRO_PRICE, PRO_REQUESTS } from "@/components/landing-facts";
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -54,7 +56,7 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       }}
       className="fixed inset-0 z-[999999] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md duration-200"
     >
-      <div className="relative w-full max-w-[440px] bg-[#0d0708] border border-red-500/30 rounded-2xl shadow-2xl shadow-red-950/80 overflow-hidden flex flex-col max-h-[95vh] overflow-y-auto">
+      <div className="relative w-full max-w-110 bg-landing-checkout border border-red-500/30 rounded-2xl shadow-2xl shadow-red-950/80 overflow-hidden flex flex-col max-h-[95vh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -67,7 +69,7 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
         <div className="p-5 sm:p-7 space-y-5">
           {/* Header & Value Prop */}
           <div className="space-y-2 pr-6">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold tracking-wide bg-red-500/20 text-red-300 border border-red-400/30">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-landing-xs font-bold tracking-wide bg-red-500/20 text-red-300 border border-red-400/30">
               <Sparkles className="w-3.5 h-3.5 text-red-300" />
               <span>ZeroRoute Pro Plan</span>
             </div>
@@ -75,7 +77,7 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
               Unlock ZeroRoute Pro
             </h3>
             <p className="text-xs text-slate-300 leading-relaxed">
-              10,000 monthly requests, 100% white-label (removes badge), multi-domain whitelist, and 11-cloud pooled reliability.
+              {`${PRO_REQUESTS} monthly requests, 100% white-label (removes badge), multi-domain whitelist, and ${PROVIDER_COUNT}-cloud pooled reliability.`}
             </p>
           </div>
 
@@ -84,14 +86,14 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
             <div className="flex items-baseline justify-between gap-2">
               <div>
                 <span className="text-sm font-bold text-white block">ZeroRoute Pro</span>
-                <span className="text-[11px] text-rose-300/70">All-in-one Managed Suite</span>
+                <span className="text-landing-xs text-rose-300/70">All-in-one Managed Suite</span>
               </div>
               <div className="text-right flex-shrink-0">
                 <div className="flex items-baseline gap-1 justify-end">
-                  <span className="text-2xl font-black text-white font-mono">$2.00</span>
+                  <span className="text-2xl font-black text-white font-mono">{PRO_PRICE}</span>
                   <span className="text-xs text-rose-300/70">/mo</span>
                 </div>
-                <span className="text-[10px] font-semibold text-emerald-400 block">
+                <span className="text-landing-2xs font-semibold text-emerald-400 block">
                   Cancel Anytime • Instant Activation
                 </span>
               </div>
@@ -102,7 +104,7 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                 <span>
-                  <strong>10,000 Monthly AI Requests</strong> (~330 chats/day included)
+                  <strong>{`${PRO_REQUESTS} Monthly AI Requests`}</strong>{` (~${PRO_DAILY_REQUESTS} chats/day included)`}
                 </span>
               </li>
               <li className="flex items-center gap-2.5">
@@ -114,13 +116,13 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-red-400 flex-shrink-0" />
                 <span>
-                  <strong>Up to 3 Whitelisted Domains</strong>
+                  <strong>{`Up to ${PLAN_LIMITS.pro.allowedDomains} Whitelisted Domains`}</strong>
                 </span>
               </li>
               <li className="flex items-center gap-2.5">
                 <Check className="w-4 h-4 text-red-400 flex-shrink-0" />
                 <span>
-                  <strong>12 Pooled AI Clouds</strong> (Gemini, Groq, IFM, Cloudflare &amp; more)
+                  <strong>{`${PROVIDER_COUNT} Pooled AI Clouds`}</strong> (Gemini, Groq, IFM, Cloudflare &amp; more)
                 </span>
               </li>
               <li className="flex items-center gap-2.5">
@@ -144,7 +146,7 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
               type="button"
               onClick={handleStartCheckout}
               disabled={loading}
-              className="group w-full flex items-center justify-center gap-2 py-3.5 px-5 rounded-xl text-sm font-bold bg-gradient-to-b from-[#e5333b] to-[#c71d25] hover:from-[#f03e46] hover:to-[#d6232b] text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_6px_rgba(0,0,0,0.4)] transition-all active:scale-95 cursor-pointer disabled:brightness-95 disabled:cursor-wait touch-manipulation min-h-[46px]"
+              className="group w-full flex items-center justify-center gap-2 py-3.5 px-5 rounded-xl text-sm font-bold bg-gradient-to-b from-landing-cta-from to-landing-cta-to hover:from-landing-cta-hover-from hover:to-landing-cta-hover-to text-white border border-white/30 shadow-landing-bevel transition-all active:scale-95 cursor-pointer disabled:brightness-95 disabled:cursor-wait touch-manipulation min-h-11.5"
             >
               {loading ? (
                 <>
@@ -153,14 +155,14 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                 </>
               ) : (
                 <>
-                  <span className="text-white font-bold">Upgrade to Pro • $2.00 / month</span>
+                  <span className="text-white font-bold">{`Upgrade to Pro • ${PRO_PRICE} / month`}</span>
                   <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
                 </>
               )}
             </button>
 
             {/* Trust Badges & Guarantees */}
-            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px] text-slate-400 text-center">
+            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-landing-xs text-slate-400 text-center">
               <span className="inline-flex items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400/80" />
                 <span>Encrypted Checkout</span>

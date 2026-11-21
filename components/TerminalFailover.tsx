@@ -1,11 +1,13 @@
 "use client";
 
+import { PROVIDER_COUNT, SITE_URL } from "@/lib/constants";
+
 export function TerminalFailover() {
   return (
     <section className="max-w-4xl mx-auto">
-      <div className="rounded-2xl border border-dark-border bg-dark-card shadow-2xl overflow-hidden glow-effect">
+      <div className="rounded-2xl border border-landing-border bg-landing-card shadow-2xl overflow-hidden glow-effect">
         {/* Terminal Header */}
-        <div className="px-4 py-3 bg-[#080a0f] border-b border-dark-border flex items-center justify-between">
+        <div className="px-4 py-3 bg-landing-well border-b border-landing-border flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-rose-500/80 inline-block" />
             <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block" />
@@ -14,24 +16,24 @@ export function TerminalFailover() {
               zeroroute — smart multi-cloud router
             </span>
           </div>
-          <div className="text-[11px] font-mono text-emerald-400 flex items-center gap-1.5">
+          <div className="text-landing-xs font-mono text-emerald-400 flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             <span>smart routing active</span>
           </div>
         </div>
 
         {/* Terminal Body */}
-        <div className="p-6 font-mono text-xs sm:text-sm space-y-3 bg-[#07080c] leading-relaxed text-slate-300 overflow-x-auto">
+        <div className="p-6 font-mono text-xs sm:text-sm space-y-3 bg-landing-terminal leading-relaxed text-slate-300 overflow-x-auto">
           <div className="text-slate-500">
             # Sending prompt: &quot;Summarize user feedback and answer inquiry&quot;
           </div>
           <div>
             <span className="text-red-400 font-bold">$ </span>
-            <span>curl -N https://zeroroute.mapki.in/v1/chat/completions</span>
+            <span>{`curl -N ${SITE_URL}/v1/chat/completions`}</span>
           </div>
 
           <div className="pt-2 text-slate-400 flex items-center gap-2">
-            <span className="text-amber-400">▶</span> Evaluating 12 AI cloud endpoints for optimal throughput...
+            <span className="text-amber-400">▶</span>{` Evaluating ${PROVIDER_COUNT} AI cloud endpoints for optimal throughput...`}
           </div>
 
           <div className="text-emerald-400 flex items-center gap-2">
@@ -43,13 +45,13 @@ export function TerminalFailover() {
             ✓
           </div>
 
-          <div className="p-3 bg-dark-card border border-dark-border rounded-lg text-slate-200">
-            <div className="text-[11px] text-slate-500 mb-1">Incoming Stream:</div>
+          <div className="p-3 bg-landing-card border border-landing-border rounded-lg text-slate-200">
+            <div className="text-landing-xs text-slate-500 mb-1">Incoming Stream:</div>
             &quot;Here is the summarized breakdown: 1. User loved the 1-line chatbot setup. 2. Performance was rated 10/10 with sub-100ms response time...&quot;{" "}
             <span className="text-red-400 terminal-cursor" />
           </div>
 
-          <div className="pt-2 border-t border-white/5 flex flex-wrap items-center justify-between text-[11px] text-slate-500">
+          <div className="pt-2 border-t border-white/5 flex flex-wrap items-center justify-between text-landing-xs text-slate-500">
             <span>
               Latency: <strong className="text-slate-300">98ms</strong>
             </span>

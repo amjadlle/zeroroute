@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { PLAN_LIMITS, PROVIDER_COUNT } from "@/lib/constants";
+import { FREE_PRICE, FREE_REQUESTS, PRO_PRICE, PRO_REQUESTS } from "@/components/landing-facts";
+import { SUPPORT_EMAIL } from "@/components/shared/SupportBanner";
 
 interface FAQItem {
   question: string;
@@ -15,9 +18,9 @@ const FAQS: FAQItem[] = [
       "Major AI inference cloud providers like Groq, Cerebras, SambaNova, Mistral, Cloudflare, and Google provide generous developer tier quotas. ZeroRoute aggregates and dynamically load balances across all these free tiers into a single stable OpenAI-compatible gateway with intelligent multi-cloud routing.",
   },
   {
-    question: "How does ZeroRoute guarantee zero downtime with 12 pooled clouds?",
+    question: `How does ZeroRoute guarantee zero downtime with ${PROVIDER_COUNT} pooled clouds?`,
     answer:
-      "ZeroRoute's intelligent routing engine continuously monitors latency and availability across 12 AI cloud providers (Groq, Cerebras, SambaNova, Google Gemini, Mistral, IFM AI, Cloudflare, etc.). Every request is dynamically dispatched to the fastest available provider in under 8 milliseconds, ensuring your visitors enjoy instant, uninterrupted conversations.",
+      `ZeroRoute's intelligent routing engine continuously monitors latency and availability across ${PROVIDER_COUNT} AI cloud providers (Groq, Cerebras, SambaNova, Google Gemini, Mistral, IFM AI, Cloudflare, etc.). Every request is dynamically dispatched to the fastest available provider in under 8 milliseconds, ensuring your visitors enjoy instant, uninterrupted conversations.`,
   },
   {
     question: "Can I embed the chatbot on my website without coding?",
@@ -37,12 +40,12 @@ const FAQS: FAQItem[] = [
   {
     question: "What if I need help setting up or embedding the chatbot on my site?",
     answer:
-      "We provide 100% free personal setup! If you're not sure how to add the script tag or configure documents for your website (WordPress, Shopify, Webflow, Next.js, or HTML), you can book a free 15-minute 1-on-1 call with our team or email us (mapkisolutions@gmail.com), and we will set up and test your chatbot for you for free.",
+      `We provide 100% free personal setup! If you're not sure how to add the script tag or configure documents for your website (WordPress, Shopify, Webflow, Next.js, or HTML), you can book a free 15-minute 1-on-1 call with our team or email us (${SUPPORT_EMAIL}), and we will set up and test your chatbot for you for free.`,
   },
   {
     question: "How does the Free Plan and Pro Plan work?",
     answer:
-      "You can start immediately on our $0 Free Forever tier (500 requests/month, 1 website domain, with subtle ZeroRoute badge) without entering any credit card. If you want 100% white-label branding, 10,000 monthly requests, and multi-domain support, you can upgrade to ZeroRoute Pro anytime for just $2.00 / month.",
+      `You can start immediately on our ${FREE_PRICE} Free Forever tier (${FREE_REQUESTS} requests/month, ${PLAN_LIMITS.free.allowedDomains} website domain, with subtle ZeroRoute badge) without entering any credit card. If you want 100% white-label branding, ${PRO_REQUESTS} monthly requests, and multi-domain support, you can upgrade to ZeroRoute Pro anytime for just ${PRO_PRICE} / month.`,
   },
 ];
 
@@ -74,7 +77,7 @@ export function FAQSection() {
               <button
                 type="button"
                 onClick={() => setOpenIdx(isOpen ? null : idx)}
-                className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 text-sm font-bold text-white hover:text-red-400 transition-colors cursor-pointer min-h-[44px] touch-manipulation"
+                className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 text-sm font-bold text-white hover:text-red-400 transition-colors cursor-pointer min-h-11 touch-manipulation"
               >
                 <span>{faq.question}</span>
                 <ChevronDown
