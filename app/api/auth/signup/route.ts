@@ -148,17 +148,6 @@ export async function POST(req: NextRequest) {
       path: "/",
     });
 
-    // Set client role cookie
-    response.cookies.set({
-      name: "zr_role",
-      value: "customer",
-      httpOnly: false,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 30 * 24 * 60 * 60,
-      path: "/",
-    });
-
     return response;
   } catch (err: unknown) {
     console.error("Signup error:", err);

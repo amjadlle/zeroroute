@@ -137,13 +137,15 @@ describe("non-streaming failover", () => {
     expect(calls()).toEqual(["cerebras:c1"]);
   });
 
-  it("returns 502 with every failure listed once all providers fail", async () => {
+  it("returns a generic 502 with a request id once all providers fail", async () => {
     behaviour = { groq: [500, 500], mistral: [429], cerebras: [503] };
     const res = await chat();
     expect(res.status).toBe(502);
     const { error } = await res.json();
-    expect(error.details).toHaveLength(4);
-    expect(error.details[0]).toMatch(/^groq\/g1: groq returned 500/);
+    // Upstream details stay in server logs (#46); clients get a request id to look up.
+    expect(error.details).toBeUndefined();
+    expect(JSON.stringify(error)).not.toMatch(/groq returned/);
+    expect(error.request_id).toBeTruthy();
     expect(calls()).toEqual(["groq:g1", "groq:g2", "mistral:m1", "cerebras:c1"]);
   });
 });

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { resolveAuth } from "@/lib/auth/session";
 import { providers } from "@/lib/providers/providers";
-import { runtimeStateMap, TIMEOUT_MS } from "@/lib/providers/state";
+import { ensureProviderConfigs, runtimeStateMap, TIMEOUT_MS } from "@/lib/providers/state";
 
 export const dynamic = "force-dynamic";
 
@@ -41,6 +41,7 @@ export async function POST(request: Request) {
     const providerId = body.providerId || body.id;
     const modelToUse = body.model;
 
+    await ensureProviderConfigs();
     const provider = providers.find(p => p.id === providerId);
     const state = runtimeStateMap.get(providerId);
 
