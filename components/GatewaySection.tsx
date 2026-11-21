@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { TerminalFailover } from "@/components/TerminalFailover";
 import { Zap, Code2, ArrowRight, ShieldCheck, Cpu } from "lucide-react";
+import { PROVIDER_COUNT, SITE_URL } from "@/lib/constants";
 
 export function GatewaySection() {
   return (
@@ -22,14 +23,14 @@ export function GatewaySection() {
         </h2>
 
         <p className="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed text-balance">
-          Drop in our single OpenAI-compatible base URL into your <strong className="text-slate-200">Cursor</strong>, <strong className="text-slate-200">Claude Code</strong>, <strong className="text-slate-200">Python</strong>, or <strong className="text-slate-200">TypeScript</strong> apps. Automatically load balances across 11 pooled AI providers with sub-8ms dynamic failover.
+          Drop in our single OpenAI-compatible base URL into your <strong className="text-slate-200">Cursor</strong>, <strong className="text-slate-200">Claude Code</strong>, <strong className="text-slate-200">Python</strong>, or <strong className="text-slate-200">TypeScript</strong>{` apps. Automatically load balances across ${PROVIDER_COUNT} pooled AI providers with sub-8ms dynamic failover.`}
         </p>
 
         {/* Feature Pills */}
         <div className="flex flex-wrap items-center justify-center gap-2 pt-2 text-xs">
-          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-dark-card border border-dark-border text-slate-300 font-mono">
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-landing-card border border-landing-border text-slate-300 font-mono">
             <Cpu className="w-3 h-3 text-red-400" />
-            <span>baseURL: &quot;https://zeroroute.mapki.in/v1&quot;</span>
+            <span>{`baseURL: "${SITE_URL}/v1"`}</span>
           </span>
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-semibold font-mono">
             <ShieldCheck className="w-3 h-3" />
