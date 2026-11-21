@@ -1,3 +1,6 @@
+import { lookup } from "node:dns/promises";
+import { BlockList, isIP } from "node:net";
+
 export type LiveSourceType = "google_docs" | "github_raw" | "notion" | "website" | "raw_text";
 
 export interface CrawlResult {
@@ -9,42 +12,93 @@ export interface CrawlResult {
   charCount: number;
 }
 
+const BLOCKED_MESSAGE = "Access to private, loopback, or internal addresses is prohibited.";
+const MAX_REDIRECTS = 5;
+const MAX_BODY_BYTES = 2 * 1024 * 1024;
+
+// Non-public ranges. IPv4 rules also match IPv4-mapped IPv6 (::ffff:a.b.c.d).
+const blockedRanges = new BlockList();
+for (const [net, prefix] of [
+  ["0.0.0.0", 8], // "this network" / unspecified
+  ["10.0.0.0", 8], // RFC 1918
+  ["100.64.0.0", 10], // CGNAT
+  ["127.0.0.0", 8], // loopback
+  ["169.254.0.0", 16], // link-local / cloud metadata
+  ["172.16.0.0", 12], // RFC 1918
+  ["192.0.0.0", 24], // IETF protocol assignments
+  ["192.168.0.0", 16], // RFC 1918
+  ["198.18.0.0", 15], // benchmarking
+  ["224.0.0.0", 4], // multicast
+  ["240.0.0.0", 4], // reserved + broadcast
+] as const) blockedRanges.addSubnet(net, prefix, "ipv4");
+for (const [net, prefix] of [
+  ["::", 96], // unspecified, loopback, IPv4-compatible
+  ["64:ff9b::", 96], // NAT64
+  ["fc00::", 7], // unique local
+  ["fe80::", 10], // link-local
+  ["ff00::", 8], // multicast
+] as const) blockedRanges.addSubnet(net, prefix, "ipv6");
+
+function isPrivateIp(ip: string): boolean {
+  const family = isIP(ip);
+  if (family === 0) return true;
+  return blockedRanges.check(ip, family === 4 ? "ipv4" : "ipv6");
+}
+
 /**
  * Checks for private / loopback / cloud metadata IP addresses to prevent SSRF.
+ * Synchronous URL-only check; crawlSourceUrl also checks the resolved addresses.
  */
 export function isSsrfSafeUrl(rawUrl: string): boolean {
   try {
     if (!rawUrl || typeof rawUrl !== "string" || rawUrl.length > 2048) return false;
     const parsed = new URL(rawUrl);
     if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return false;
+    if (parsed.username || parsed.password) return false;
 
-    const host = parsed.hostname.toLowerCase();
+    // WHATWG URL already turns decimal/hex/octal IPv4 into dotted form; strip IPv6 brackets and a trailing dot.
+    const host = parsed.hostname.toLowerCase().replace(/^\[|\]$/g, "").replace(/\.$/, "");
+    if (isIP(host)) return !isPrivateIp(host);
 
-    if (
+    return !(
       host === "localhost" ||
-      host === "0.0.0.0" ||
-      host.startsWith("127.") ||
-      host === "::1" ||
-      host.startsWith("fe80:") || // IPv6 link-local
-      host.startsWith("fd00:") || // IPv6 unique local
-      host.startsWith("::ffff:127.") ||
-      host.startsWith("169.254.") || // Cloud metadata
-      host.startsWith("10.") || // RFC 1918 Class A
-      host.startsWith("192.168.") || // RFC 1918 Class C
-      /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(host) || // RFC 1918 Class B
       host.endsWith(".internal") ||
       host.endsWith(".local") ||
-      host.endsWith(".localhost") ||
-      /^\d+$/.test(host) || // Decimal IP
-      /^0x[0-9a-f]+$/i.test(host) // Hex IP
-    ) {
-      return false;
-    }
-
-    return true;
+      host.endsWith(".localhost")
+    );
   } catch {
     return false;
   }
+}
+
+/**
+ * Throws unless the URL passes isSsrfSafeUrl and every address its host resolves to is public.
+ * Ceiling: DNS-rebinding TOCTOU. fetch resolves the name again and the checked IP isn't pinned
+ * for the connection. Upgrade path: a custom undici dispatcher whose connect `lookup` runs this check.
+ */
+async function assertPublicUrl(url: string): Promise<void> {
+  if (isSsrfSafeUrl(url)) {
+    const host = new URL(url).hostname.replace(/^\[|\]$/g, "");
+    const addresses = await lookup(host, { all: true });
+    if (addresses.length > 0 && addresses.every((a) => !isPrivateIp(a.address))) return;
+  }
+  throw new Error(BLOCKED_MESSAGE);
+}
+
+/** Reads at most maxBytes of the body, then cancels the stream. */
+async function readCappedText(res: Response, maxBytes: number): Promise<string> {
+  if (!res.body) return "";
+  const reader = res.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  while (total < maxBytes) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    total += value.byteLength;
+  }
+  await reader.cancel();
+  return new TextDecoder().decode(Buffer.concat(chunks).subarray(0, maxBytes));
 }
 
 /**
@@ -219,24 +273,33 @@ export function extractHtmlMetadata(html: string): ExtractedMeta {
 export async function crawlSourceUrl(rawUrl: string, customTitle?: string): Promise<CrawlResult> {
   const { normalizedUrl, sourceType, suggestedTitle } = normalizeSourceUrl(rawUrl);
 
-  if (!isSsrfSafeUrl(normalizedUrl)) {
-    throw new Error("Access to private, loopback, or internal addresses is prohibited.");
+  // Follow redirects by hand so every hop is re-validated. One timeout covers all hops and the body.
+  const signal = AbortSignal.timeout(12000);
+  let url = normalizedUrl;
+  let fetchRes: Response;
+  for (let hop = 0; ; hop++) {
+    await assertPublicUrl(url);
+    fetchRes = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) ZeroRoute-Knowledge-Crawler/2.0",
+        Accept: "text/html,text/markdown,text/plain,application/json,*/*",
+      },
+      redirect: "manual",
+      signal,
+    });
+    const location = fetchRes.headers.get("location");
+    if (fetchRes.status < 300 || fetchRes.status > 399 || !location) break;
+    await fetchRes.body?.cancel();
+    if (hop >= MAX_REDIRECTS) throw new Error("Failed to fetch URL: too many redirects.");
+    url = new URL(location, url).toString();
   }
-
-  const fetchRes = await fetch(normalizedUrl, {
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) ZeroRoute-Knowledge-Crawler/2.0",
-      Accept: "text/html,text/markdown,text/plain,application/json,*/*",
-    },
-    signal: AbortSignal.timeout(12000),
-  });
 
   if (!fetchRes.ok) {
     throw new Error(`Failed to fetch URL: HTTP ${fetchRes.status} (${fetchRes.statusText})`);
   }
 
   const contentType = fetchRes.headers.get("content-type") || "";
-  const rawBody = await fetchRes.text();
+  const rawBody = await readCappedText(fetchRes, MAX_BODY_BYTES);
 
   let cleanedContent = "";
   let extractedTitle = customTitle || suggestedTitle || "";
