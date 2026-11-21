@@ -1,280 +1,96 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { apiFetch } from "@/lib/client/api";
-import { AdminHeader } from "@/components/admin/AdminHeader";
-import { AdminProvidersTab, ProviderItem } from "@/components/admin/AdminProvidersTab";
+import { Activity, Gauge, Layers, RefreshCw, Users, Zap } from "lucide-react";
+import { PageHeader } from "@/components/shell/PageHeader";
+import { Button } from "@/components/ui/Button";
+import { PageLoader } from "@/components/ui/PageLoader";
+import { StatTile } from "@/components/ui/StatTile";
 import { AdminAnalyticsTab } from "@/components/admin/AdminAnalyticsTab";
-import { AdminPlaygroundTab } from "@/components/admin/AdminPlaygroundTab";
-import { AdminLogsTab, GlobalLogItem } from "@/components/admin/AdminLogsTab";
-import { AdminKnowledgeTab } from "@/components/admin/AdminKnowledgeTab";
-import { AdminCustomersTab, CustomerAdminItem } from "@/components/admin/AdminCustomersTab";
-import { AdminApiKeysModal } from "@/components/admin/AdminApiKeysModal";
-import {
-  SlidersHorizontal,
-  BarChart3,
-  Terminal,
-  Activity,
-  BookOpen,
-  Users,
-  Loader2
-} from "lucide-react";
+import type { ProviderItem } from "@/components/admin/AdminProvidersTab";
+import type { GlobalLogItem } from "@/components/admin/AdminLogsTab";
+import type { CustomerAdminItem } from "@/components/admin/AdminCustomersTab";
+import { LoadError, useAdminData } from "@/components/admin/useAdminData";
 
-export default function AdminDashboardPage() {
-  const [activeTab, setActiveTab] = useState<
-    "providers" | "analytics" | "playground" | "logs" | "knowledge" | "customers"
-  >("providers");
+// Shape of `metrics` from GET /api/admin/logs (all requests, not just the returned page).
+type Metrics = {
+  totalRequests: number;
+  avgLatencyMs: number;
+  successRate: number;
+  cacheHits: number;
+  cacheSavings: string;
+  cacheHitRatio: number;
+};
 
-  const [loading, setLoading] = useState(true);
-  const [tabLoading, setTabLoading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-  const [showKeysModal, setShowKeysModal] = useState(false);
+export default function AdminOverviewPage() {
+  const providers = useAdminData<{ providers?: ProviderItem[] }>("/api/admin/providers");
+  const logs = useAdminData<{ logs?: GlobalLogItem[]; metrics?: Metrics }>("/api/admin/logs?limit=200");
+  const customers = useAdminData<{ customers?: CustomerAdminItem[] }>("/api/admin/customers");
 
-  // Tab Data Cache
-  const [providersList, setProvidersList] = useState<ProviderItem[]>([]);
-  const [customersList, setCustomersList] = useState<CustomerAdminItem[]>([]);
-  const [logsList, setLogsList] = useState<GlobalLogItem[]>([]);
-
-  // Telemetry Aggregations
-  const [metrics, setMetrics] = useState({
-    totalRequests: 0,
-    avgLatencyMs: 450,
-    successRate: 100,
-    cacheHits: 0,
-    cacheSavings: "$0.0000",
-    cacheHitRatio: 0
-  });
-
-  const [logsFilterKey, setLogsFilterKey] = useState("");
-  const [loadedTabs, setLoadedTabs] = useState<Set<string>>(new Set());
-
-  // Fetch Providers Tab Data
-  const fetchProviders = useCallback(async () => {
-    try {
-      const data = await apiFetch<{ providers?: ProviderItem[] }>("/api/admin/providers");
-      if (data.providers) setProvidersList(data.providers);
-      setLoadedTabs((prev) => new Set(prev).add("providers"));
-    } catch (e) {
-      console.error("Failed to load providers:", e);
-    }
-  }, []);
-
-  // Fetch Logs & Aggregated Telemetry
-  const fetchLogs = useCallback(async () => {
-    try {
-      const data = await apiFetch<{ logs?: GlobalLogItem[]; metrics?: typeof metrics }>("/api/admin/logs?limit=200");
-      if (data.logs) setLogsList(data.logs);
-      if (data.metrics) setMetrics(data.metrics);
-      setLoadedTabs((prev) => new Set(prev).add("logs"));
-    } catch (e) {
-      console.error("Failed to load logs:", e);
-    }
-  }, []);
-
-  // Fetch Customers & Bots
-  const fetchCustomers = useCallback(async () => {
-    try {
-      const data = await apiFetch<{ customers?: CustomerAdminItem[] }>("/api/admin/customers");
-      if (data.customers) setCustomersList(data.customers);
-      setLoadedTabs((prev) => new Set(prev).add("customers"));
-    } catch (e) {
-      console.error("Failed to load customers:", e);
-    }
-  }, []);
-
-  // Initial Load: Load core providers + telemetry metrics in parallel
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        await Promise.all([fetchProviders(), fetchLogs()]);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    })();
-    return () => { mounted = false; };
-  }, [fetchProviders, fetchLogs]);
-
-  // Lazy load tab data when switching
-  const handleTabChange = async (tab: typeof activeTab) => {
-    setActiveTab(tab);
-
-    if (tab === "customers" && !loadedTabs.has("customers")) {
-      setTabLoading(true);
-      await fetchCustomers();
-      setTabLoading(false);
-    } else if (tab === "logs" && !loadedTabs.has("logs")) {
-      setTabLoading(true);
-      await fetchLogs();
-      setTabLoading(false);
-    } else if (tab === "knowledge" && !loadedTabs.has("customers")) {
-      setTabLoading(true);
-      await fetchCustomers();
-      setTabLoading(false);
-    }
+  const all = [providers, logs, customers];
+  const refreshing = all.some((r) => r.loading);
+  const refresh = async () => {
+    await Promise.all(all.map((r) => r.reload()));
   };
 
-  const handleRefreshData = async () => {
-    setRefreshing(true);
-    try {
-      if (activeTab === "logs" || activeTab === "analytics") {
-        await fetchLogs();
-      } else if (activeTab === "customers" || activeTab === "knowledge") {
-        await fetchCustomers();
-      } else {
-        await fetchProviders();
-      }
-    } finally {
-      setRefreshing(false);
-    }
-  };
-
-  const handleUpdateProviders = async (updated: ProviderItem[]) => {
-    try {
-      const data = await apiFetch<{ providers?: ProviderItem[] }>("/api/admin/providers", {
-        method: "PUT",
-        body: { providers: updated },
-      });
-      if (data.providers) setProvidersList(data.providers);
-    } catch (e) {
-      console.error("Failed to update providers:", e);
-      alert(`Failed to save providers: ${(e as Error).message}`);
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await apiFetch("/api/auth/logout", { method: "POST" });
-    } catch {}
-    window.location.href = "/login";
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#050608] flex items-center justify-center text-slate-400 text-xs gap-2">
-        <Loader2 className="w-5 h-5 animate-spin text-red-500" />
-        <span>Loading ZeroRoute Master Admin Console…</span>
-      </div>
-    );
-  }
-
-  const activeProvidersCount = providersList.filter((p) => p.enabled && p.configured).length;
-  const totalVolume = Math.max(metrics.totalRequests, logsList.length);
-
-  const tabs = [
-    { id: "providers", label: "Provider Routing", icon: SlidersHorizontal },
-    { id: "analytics", label: "Analytics & Quotas", icon: BarChart3 },
-    { id: "playground", label: "Playground", icon: Terminal },
-    { id: "logs", label: `Logs & Failovers (${logsList.length})`, icon: Activity },
-    { id: "knowledge", label: "Knowledge Base", icon: BookOpen },
-    { id: "customers", label: `Subscribers & Bots (${customersList.length})`, icon: Users },
-  ];
+  const providerList = providers.data?.providers ?? [];
+  const m = logs.data?.metrics;
+  const hasRequests = !!m && m.totalRequests > 0;
+  const activeProviders = providerList.filter((p) => p.enabled && p.configured).length;
 
   return (
-    <div className="min-h-screen bg-[#050608] text-slate-100 flex flex-col font-sans selection:bg-red-500/30 selection:text-white pb-12">
-      <AdminHeader
-        totalCustomers={customersList.length}
-        activeProviders={activeProvidersCount}
-        totalProvidersCount={providersList.length}
-        totalRequests={totalVolume}
-        avgLatencyMs={metrics.avgLatencyMs}
-        cacheSavings={metrics.cacheSavings}
-        cacheHitRatio={metrics.cacheHitRatio}
-        onLogout={handleLogout}
-        onOpenKeysModal={() => setShowKeysModal(true)}
+    <>
+      <PageHeader
+        title="Overview"
+        description="How the gateway is doing across all providers and customers."
+        actions={
+          <Button variant="secondary" size="sm" onClick={refresh} loading={refreshing} leftIcon={<RefreshCw className="size-3.5" />}>
+            Refresh
+          </Button>
+        }
       />
 
-      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-6 space-y-6">
-        
-        {/* Navigation Tabs Bar */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-white/10 text-xs font-semibold -mx-4 px-4 sm:mx-0 sm:px-0 touch-pan-x">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isSelected = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => handleTabChange(tab.id as any)}
-                className={`flex items-center gap-2 px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all whitespace-nowrap cursor-pointer touch-manipulation shrink-0 ${
-                  isSelected
-                    ? "bg-gradient-to-b from-[#e5333b] to-[#c71d25] text-white font-bold border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_4px_rgba(0,0,0,0.4)]"
-                    : "text-slate-400 hover:text-white hover:bg-white/5 border border-transparent"
-                }`}
-              >
-                <Icon className="w-4 h-4 shrink-0" />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
+      {providers.error && <LoadError what="providers" error={providers.error} onRetry={providers.reload} />}
+      {logs.error && <LoadError what="request stats" error={logs.error} onRetry={logs.reload} />}
+      {customers.error && <LoadError what="customers" error={customers.error} onRetry={customers.reload} />}
 
-        {tabLoading && (
-          <div className="py-12 flex items-center justify-center gap-2 text-slate-400 text-xs">
-            <Loader2 className="w-4 h-4 animate-spin text-red-500" />
-            <span>Loading {activeTab} data…</span>
-          </div>
-        )}
-
-        {!tabLoading && (
-          <>
-            {/* Tab 1: Provider Routing */}
-            {activeTab === "providers" && (
-              <AdminProvidersTab providers={providersList} onUpdateProviders={handleUpdateProviders} />
-            )}
-
-            {/* Tab 2: Analytics & Multi-Tenant Quotas */}
-            {activeTab === "analytics" && (
-              <AdminAnalyticsTab
-                providers={providersList}
-                logs={logsList}
-                onRefresh={handleRefreshData}
-                loading={refreshing}
-              />
-            )}
-
-            {/* Tab 3: Live Playground */}
-            {activeTab === "playground" && (
-              <AdminPlaygroundTab providers={providersList} />
-            )}
-
-            {/* Tab 4: Logs & Failovers */}
-            {activeTab === "logs" && (
-              <AdminLogsTab
-                logs={logsList}
-                onRefresh={handleRefreshData}
-                loading={refreshing}
-                initialSearch={logsFilterKey}
-              />
-            )}
-
-            {/* Tab 5: Knowledge Base */}
-            {activeTab === "knowledge" && (
-              <AdminKnowledgeTab customers={customersList} />
-            )}
-
-            {/* Tab 6: Subscribers & Bots Directory */}
-            {activeTab === "customers" && (
-              <AdminCustomersTab
-                customers={customersList}
-                onRefresh={handleRefreshData}
-                onViewCustomerLogs={(key) => {
-                  setLogsFilterKey(key);
-                  handleTabChange("logs");
-                }}
-              />
-            )}
-          </>
-        )}
+      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
+        <StatTile
+          icon={Activity}
+          label="Requests"
+          value={m ? m.totalRequests.toLocaleString() : "—"}
+          hint={hasRequests ? `${m.successRate}% succeeded` : "No requests yet"}
+        />
+        <StatTile
+          icon={Gauge}
+          label="Average response time"
+          value={hasRequests ? `${m.avgLatencyMs.toLocaleString()} ms` : "—"}
+          hint="Across all requests"
+        />
+        <StatTile
+          icon={Zap}
+          label="Cache hits"
+          value={m ? m.cacheHits.toLocaleString() : "—"}
+          hint={m ? `${m.cacheHitRatio}% of requests, about ${m.cacheSavings} saved` : undefined}
+        />
+        <StatTile
+          icon={Layers}
+          label="Providers on"
+          value={providers.data ? `${activeProviders} / ${providerList.length}` : "—"}
+          hint="Turned on and have a key"
+        />
+        <StatTile
+          icon={Users}
+          label="Customers"
+          value={customers.data ? (customers.data.customers?.length ?? 0).toLocaleString() : "—"}
+          hint="Accounts and admin bots"
+        />
       </div>
 
-      {/* API Keys Credentials Modal */}
-      <AdminApiKeysModal
-        isOpen={showKeysModal}
-        onClose={() => setShowKeysModal(false)}
-        providers={providersList}
-      />
-    </div>
+      {providers.data && logs.data ? (
+        <AdminAnalyticsTab providers={providerList} logs={logs.data.logs ?? []} onRefresh={refresh} loading={refreshing} />
+      ) : (
+        !providers.error && !logs.error && <PageLoader label="Loading activity" />
+      )}
+    </>
   );
 }
-

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/client/api";
+import { LoadError } from "./useAdminData";
 import {
   BookOpen,
   Sparkles,
@@ -38,6 +39,7 @@ export function AdminKnowledgeTab({ customers = [] }: AdminKnowledgeTabProps) {
   const [selectedKey, setSelectedKey] = useState<string>("");
   const [docs, setDocs] = useState<KnowledgeDoc[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   // Set initial selected key if customers exist
   useEffect(() => {
@@ -75,8 +77,9 @@ export function AdminKnowledgeTab({ customers = [] }: AdminKnowledgeTabProps) {
       if (data.documents) {
         setDocs(data.documents);
       }
-    } catch {
-      showToast("⚠️ Could not load knowledge documents.");
+      setLoadError(null);
+    } catch (e) {
+      setLoadError((e as Error).message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
@@ -220,6 +223,8 @@ export function AdminKnowledgeTab({ customers = [] }: AdminKnowledgeTabProps) {
         </div>
       )}
 
+      {loadError && <LoadError what="documents" error={loadError} onRetry={fetchDocs} />}
+
       {/* Main Glass Container */}
       <div className="bg-[#090d16] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-6">
         
@@ -228,14 +233,14 @@ export function AdminKnowledgeTab({ customers = [] }: AdminKnowledgeTabProps) {
           <div className="space-y-1">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-[10.5px] font-semibold">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Smart BM25 Semantic RAG</span>
+              <span>Search-based answers</span>
             </div>
             <h2 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-red-500" />
-              <span>Knowledge Base & Document Training</span>
+              <span>Sources</span>
             </h2>
             <p className="text-xs text-slate-400">
-              Upload company documents or crawl website URLs. ZeroRoute automatically chunks and indexes content to deliver 0-hallucination answers.
+              Add files or web pages. The bot answers from what you add here.
             </p>
           </div>
 
@@ -246,7 +251,7 @@ export function AdminKnowledgeTab({ customers = [] }: AdminKnowledgeTabProps) {
             className="inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[44px] text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white border border-white/10 rounded-xl transition-all cursor-pointer shrink-0 disabled:opacity-50 touch-manipulation w-full sm:w-auto"
           >
             <RotateCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-red-400" : ""}`} />
-            <span>Refresh Docs</span>
+            <span>Refresh</span>
           </button>
         </div>
 
@@ -361,9 +366,9 @@ export function AdminKnowledgeTab({ customers = [] }: AdminKnowledgeTabProps) {
             <div className="space-y-1">
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
                 <Globe className="w-3.5 h-3.5 text-blue-400" />
-                <span>1-Click URL Crawler</span>
+                <span>Add a web page</span>
               </h3>
-              <p className="text-[11px] text-slate-400">Scrape live documentation or pricing pages into clean markdown knowledge.</p>
+              <p className="text-[11px] text-slate-400">Copies the page's text into the bot's knowledge.</p>
             </div>
 
             <div className="p-4 bg-black/40 border border-white/10 rounded-2xl space-y-3">

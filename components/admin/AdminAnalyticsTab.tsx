@@ -65,14 +65,14 @@ export function AdminAnalyticsTab({ providers, logs, onRefresh, loading }: Admin
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
               <Globe className="w-4 h-4 text-blue-400" />
-              <span>Connected Websites & Traffic Origins</span>
+              <span>Websites</span>
             </h3>
             <span className="text-xs font-mono text-slate-400">
               {originsList.length} origin{originsList.length === 1 ? "" : "s"} active
             </span>
           </div>
           <p className="text-xs text-slate-400">
-            Real-time breakdown of chatbot requests, token consumption, and cache hits per website domain.
+            Requests, tokens and cache hits for each website.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
@@ -112,15 +112,15 @@ export function AdminAnalyticsTab({ providers, logs, onRefresh, loading }: Admin
           </div>
         </div>
 
-        {/* Model Traffic Distribution Card */}
+        {/* Models used Card */}
         <div className="bg-[#090d16] border border-white/10 rounded-2xl p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
               <PieChart className="w-4 h-4 text-red-400" />
-              <span>Model Traffic Distribution</span>
+              <span>Models used</span>
             </h3>
           </div>
-          <p className="text-xs text-slate-400">Which models and speed buckets are fulfilling user requests.</p>
+          <p className="text-xs text-slate-400">Which models answered requests.</p>
 
           <div className="space-y-3 pt-1">
             {modelsList.length > 0 ? (
@@ -158,10 +158,10 @@ export function AdminAnalyticsTab({ providers, logs, onRefresh, loading }: Admin
           <div>
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
               <ShieldAlert className="w-4 h-4 text-emerald-400" />
-              <span>AI Provider Quotas & Health Status</span>
+              <span>Provider health</span>
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              Live monitoring of 429 rate limit events, consecutive errors, and automated failover cooldowns.
+              Rate limits, errors and pauses for each provider.
             </p>
           </div>
 
@@ -172,7 +172,7 @@ export function AdminAnalyticsTab({ providers, logs, onRefresh, loading }: Admin
             className="inline-flex items-center justify-center gap-1.5 px-4 py-2 min-h-[44px] text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 rounded-xl transition-all cursor-pointer disabled:opacity-50 touch-manipulation w-full sm:w-auto"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-red-400" : ""}`} />
-            <span>Refresh Quotas</span>
+            <span>Refresh</span>
           </button>
         </div>
 
