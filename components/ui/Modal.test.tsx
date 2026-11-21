@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { StrictMode, useState } from "react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { Modal } from "./Modal";
@@ -76,5 +76,28 @@ describe("Modal", () => {
     await userEvent.click(screen.getByRole("button", { name: "Close" }));
     expect(onClose).toHaveBeenCalledOnce();
     expect(screen.getByRole("button", { name: "Open" })).toHaveFocus();
+  });
+  it("stays open when mounted open under Strict Mode, and still syncs a browser-initiated close", async () => {
+    // Browsers queue the `close` event as a task; the setup stub fires it synchronously, which hides the bug.
+    const close = vi.spyOn(HTMLDialogElement.prototype, "close").mockImplementation(function (this: HTMLDialogElement) {
+      if (!this.open) return;
+      this.removeAttribute("open");
+      setTimeout(() => this.dispatchEvent(new Event("close")));
+    });
+    const tick = () => act(() => new Promise((r) => setTimeout(r)));
+    try {
+      const onClose = vi.fn();
+      render(<StrictMode><Modal open onClose={onClose} title="Rename bot" /></StrictMode>);
+      await tick();
+      expect(onClose).not.toHaveBeenCalled();
+      const dialog = screen.getByRole("dialog") as HTMLDialogElement;
+      expect(dialog.open).toBe(true);
+
+      dialog.close(); // e.g. Chrome closing on repeated Esc without a cancelable cancel
+      await tick();
+      expect(onClose).toHaveBeenCalledOnce();
+    } finally {
+      close.mockRestore();
+    }
   });
 });
