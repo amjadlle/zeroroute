@@ -39,14 +39,16 @@ class CloudflareD1Adapter implements DatabaseAdapter {
       body: JSON.stringify({ sql, params }),
     });
 
+    // Raw D1 error bodies are logged here only; the thrown message stays generic in case a caller echoes it.
     if (!res.ok) {
-      const errText = await res.text();
-      throw new Error(`Cloudflare D1 Query Failed (${res.status}): ${errText}`);
+      console.error(`[ZeroRoute DB] D1 query failed (${res.status}):`, await res.text());
+      throw new Error(`Database query failed (${res.status})`);
     }
 
     const data = await res.json();
     if (!data.success) {
-      throw new Error(`Cloudflare D1 Error: ${JSON.stringify(data.errors || data)}`);
+      console.error("[ZeroRoute DB] D1 error:", JSON.stringify(data.errors || data));
+      throw new Error("Database query failed");
     }
 
     const firstResult = data.result?.[0] || {};

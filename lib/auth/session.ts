@@ -4,7 +4,6 @@ import { Customer } from "@/lib/db/schema";
 import { verifyAdminSession } from "@/lib/auth/admin-session";
 
 export const SESSION_COOKIE_NAME = "zr_session";
-export const ROLE_COOKIE_NAME = "zr_role";
 
 export const ADMIN_EMAILS = [
   (process.env.ADMIN_EMAIL || "mapkisolutions@gmail.com").toLowerCase(),
@@ -118,10 +117,6 @@ export async function getCurrentUser(): Promise<Customer | null> {
   const customer = result.rows[0] as unknown as Customer;
   sessionCache.set(sessionToken, { customer, expiresAt: Date.now() + 30_000 });
   return customer;
-}
-
-export async function getSessionFromCookie(): Promise<Customer | null> {
-  return getCurrentUser();
 }
 
 // Admin requires the verified admin session cookie. The header argument is kept for
