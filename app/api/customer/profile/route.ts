@@ -51,6 +51,8 @@ export async function GET(req: NextRequest) {
         greeting: customer.greeting || "Hi there! How can I help you today?",
         prompts: customer.prompts ? JSON.parse(customer.prompts) : [],
         persona: customer.persona || "",
+        brand_color: customer.brand_color || "",
+        logo_url: customer.logo_url || "",
         status: customer.status || "active",
         subscription_expires: customer.subscription_expires,
         days_remaining: daysRemaining,
