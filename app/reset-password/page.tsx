@@ -1,39 +1,36 @@
 "use client";
 
-import { useState, Suspense } from "react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRef, useState, Suspense, type FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
 import { AuthCard } from "@/components/AuthCard";
-import { Mail, Lock, KeyRound, Eye, EyeOff, Loader2, AlertCircle, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Alert } from "@/components/ui/Alert";
+import { Button } from "@/components/ui/Button";
+import { Field } from "@/components/ui/Field";
+import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
+import { MIN_PASSWORD_LENGTH } from "@/lib/constants";
 
 function ResetPasswordForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const initialEmail = searchParams.get("email") || "";
-
-  const [email, setEmail] = useState(initialEmail);
+  const [email, setEmail] = useState(searchParams.get("email") || "");
   const [code, setCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [mismatch, setMismatch] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const confirmRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
-
-    if (newPassword.length < 6) {
-      setError("New password must be at least 6 characters.");
-      return;
-    }
-
+    // Length is checked natively by minLength on the new password field.
     if (newPassword !== confirmPassword) {
-      setError("Passwords do not match.");
+      setMismatch(true);
+      confirmRef.current?.focus();
       return;
     }
-
     setLoading(true);
 
     try {
@@ -42,163 +39,71 @@ function ResetPasswordForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, code, newPassword }),
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Failed to reset password. Please check your code.");
-        setLoading(false);
-        return;
-      }
-
-      setSuccess(true);
+      const data = await res.json().catch(() => ({}));
       setLoading(false);
 
-      // Auto redirect to /app
-      setTimeout(() => {
-        router.push("/app");
-      }, 2000);
+      if (!res.ok) {
+        setError(data.error || "Could not reset your password. Check the code and try again.");
+        return;
+      }
+      setSuccess(true);
     } catch {
-      setError("An unexpected network error occurred. Please try again.");
+      setError("Network error. Check your connection and try again.");
       setLoading(false);
     }
   };
 
   if (success) {
     return (
-      <div className="space-y-4 text-center py-4 duration-300">
-        <div className="w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center mx-auto text-emerald-400">
-          <CheckCircle2 className="w-6 h-6" />
-        </div>
-        <div className="space-y-1">
-          <h3 className="text-base font-bold text-white">Password Updated!</h3>
-          <p className="text-xs text-slate-400">
-            You are now logged in. Redirecting to your console…
-          </p>
-        </div>
-        <Link
-          href="/app"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-500 text-white shadow-lg"
-        >
-          <span>Go to Console</span>
-          <ArrowRight className="w-3.5 h-3.5" />
-        </Link>
+      <div className="grid gap-4">
+        <Alert tone="success" title="Password updated">You are signed in.</Alert>
+        <Button href="/app" size="lg" className="w-full">Go to console</Button>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Error Alert */}
-      {error && (
-        <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-start gap-2 duration-200">
-          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-          <span>{error}</span>
-        </div>
-      )}
+    <form onSubmit={handleSubmit} className="grid gap-4">
+      {error && <Alert tone="danger">{error}</Alert>}
 
-      {/* Email Field */}
-      <div className="space-y-1.5">
-        <label className="text-xs font-semibold text-slate-300 block">Account Email</label>
-        <div className="relative">
-          <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@company.com"
-            className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 focus:ring-1 focus:ring-red-500/50 rounded-xl px-10 py-2.5 text-base sm:text-sm text-white placeholder-slate-500 outline-none transition-all touch-manipulation"
-          />
-        </div>
-      </div>
+      <Field label="Email" required>
+        <Input type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+      </Field>
 
-      {/* 6-Digit OTP Field */}
-      <div className="space-y-1.5">
-        <label className="text-xs font-semibold text-slate-300 block">6-Digit Reset Code</label>
-        <div className="relative">
-          <KeyRound className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            type="text"
-            required
-            maxLength={6}
-            value={code}
-            onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-            placeholder="123456"
-            className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 focus:ring-1 focus:ring-red-500/50 rounded-xl px-10 py-2.5 text-base sm:text-sm text-white font-mono tracking-widest placeholder-slate-500 outline-none transition-all touch-manipulation"
-          />
-        </div>
-      </div>
+      <Field label="Code" required hint="The 6-digit code from the email.">
+        <Input
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          pattern="\d{6}"
+          maxLength={6}
+          className="font-ui-mono tracking-widest"
+          value={code}
+          onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+        />
+      </Field>
 
-      {/* New Password */}
-      <div className="space-y-1.5">
-        <label className="text-xs font-semibold text-slate-300 block">New Password</label>
-        <div className="relative">
-          <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            type={showPassword ? "text" : "password"}
-            required
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            placeholder="At least 6 characters"
-            className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 focus:ring-1 focus:ring-red-500/50 rounded-xl pl-10 pr-12 py-2.5 text-base sm:text-sm text-white placeholder-slate-500 outline-none transition-all touch-manipulation"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-1 top-1/2 -translate-y-1/2 p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-500 hover:text-slate-300 transition-colors touch-manipulation"
-            aria-label="Toggle password visibility"
-          >
-            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-          </button>
-        </div>
-      </div>
+      <Field label="New password" required hint={`At least ${MIN_PASSWORD_LENGTH} characters.`}>
+        <PasswordInput
+          autoComplete="new-password"
+          minLength={MIN_PASSWORD_LENGTH}
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+        />
+      </Field>
 
-      {/* Confirm New Password */}
-      <div className="space-y-1.5">
-        <label className="text-xs font-semibold text-slate-300 block">Confirm New Password</label>
-        <div className="relative">
-          <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            type={showPassword ? "text" : "password"}
-            required
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Repeat password"
-            className="w-full bg-[#080a0f] border border-dark-border focus:border-red-500/50 focus:ring-1 focus:ring-red-500/50 rounded-xl px-10 py-2.5 text-base sm:text-sm text-white placeholder-slate-500 outline-none transition-all touch-manipulation"
-          />
-        </div>
-      </div>
+      <Field label="Confirm new password" required error={mismatch ? "Passwords do not match." : undefined}>
+        <PasswordInput
+          ref={confirmRef}
+          autoComplete="new-password"
+          value={confirmPassword}
+          onChange={(e) => {
+            setConfirmPassword(e.target.value);
+            setMismatch(false);
+          }}
+        />
+      </Field>
 
-      {/* Submit Button */}
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full flex items-center justify-center gap-2 py-3 px-4 min-h-[44px] rounded-xl text-sm font-extrabold bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-xl shadow-red-500/20 active:scale-95 transition-all cursor-pointer disabled:brightness-95 disabled:cursor-wait touch-manipulation drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
-      >
-        {loading ? (
-          <>
-            <Loader2 className="w-4 h-4 animate-spin text-white" />
-            <span className="text-white font-bold">Updating password…</span>
-          </>
-        ) : (
-          <>
-            <span className="text-white font-bold">Set New Password &amp; Sign In</span>
-            <ArrowRight className="w-4 h-4 text-white" />
-          </>
-        )}
-      </button>
-
-      {/* Resend code */}
-      <div className="pt-2 text-center text-xs text-slate-400">
-        Didn&apos;t receive a code?{" "}
-        <Link
-          href="/forgot-password"
-          className="text-red-400 hover:text-red-300 font-semibold transition-colors min-h-[44px] inline-flex items-center touch-manipulation"
-        >
-          Request new code
-        </Link>
-      </div>
+      <Button type="submit" size="lg" loading={loading} className="w-full">Set password and sign in</Button>
     </form>
   );
 }
@@ -207,9 +112,10 @@ export default function ResetPasswordPage() {
   return (
     <AuthCard
       title="Set a new password"
-      subtitle="Enter the 6-digit code sent to your email to verify your identity"
+      subtitle="Enter the code we emailed you."
+      footer={<>No code? <Button variant="link" href="/forgot-password">Send a new one</Button></>}
     >
-      <Suspense fallback={<div className="p-8 text-center text-xs text-slate-500">Loading…</div>}>
+      <Suspense>
         <ResetPasswordForm />
       </Suspense>
     </AuthCard>
