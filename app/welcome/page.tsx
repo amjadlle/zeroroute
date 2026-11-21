@@ -87,7 +87,12 @@ function WelcomeContent() {
       const queryString = searchParams.toString();
       if (sessionId || subscriptionId || paymentId || emailParam || statusParam) {
         try {
-          const res = await fetch(`/api/checkout/session?${queryString}`);
+          let res = await fetch(`/api/checkout/session?${queryString}`);
+          // 202 = paid, but the payment webhook hasn't created the account yet
+          for (let i = 0; res.status === 202 && i < 10; i++) {
+            await new Promise((r) => setTimeout(r, 2000));
+            res = await fetch(`/api/checkout/session?${queryString}`);
+          }
           if (res.ok) {
             const data = await res.json();
             if (data.success) {
@@ -351,7 +356,7 @@ function WelcomeContent() {
               <div className="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
                 <Headphones className="w-4 h-4" />
               </div>
-              <span className="text-sm sm:text-base font-bold text-white">Need Help Setting Up? We'll Do It For Free!</span>
+              <span className="text-sm sm:text-base font-bold text-white">Need Help Setting Up? We&apos;ll Do It For Free!</span>
               <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
                 <Sparkles className="w-3 h-3" />
                 100% Free Setup &amp; Help
