@@ -102,7 +102,7 @@ export function Modal({ size = "md", className, ...props }: ModalProps) {
     <Overlay
       {...props}
       className={cn(
-        "inset-x-4 m-auto w-auto rounded-cardmotion-safe:starting:open:translate-y-1.5 motion-safe:starting:open:opacity-0",
+        "inset-x-4 m-auto w-auto rounded-card motion-safe:starting:open:translate-y-1.5 motion-safe:starting:open:opacity-0",
         SIZES[size],
         className,
       )}

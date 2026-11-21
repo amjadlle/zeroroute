@@ -5,6 +5,7 @@ import SurfacesSection from "./surfaces";
 import NavigationSection from "./navigation";
 import OverlaysSection from "./overlays";
 import DataDisplaySection from "./data";
+import ShellSection from "./shell";
 
 export const SECTIONS = [
   { id: "buttons", title: "Buttons", Component: ButtonsSection },
@@ -13,4 +14,5 @@ export const SECTIONS = [
   { id: "navigation", title: "Tabs and segmented controls", Component: NavigationSection },
   { id: "overlays", title: "Modal, drawer and toast", Component: OverlaysSection },
   { id: "data", title: "Code, copy, secrets, tables and markdown", Component: DataDisplaySection },
+  { id: "shell", title: "Console shell, page header and command palette", Component: ShellSection },
 ] as const;
