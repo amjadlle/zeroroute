@@ -2,10 +2,9 @@ import type { HTMLAttributes } from "react";
 import { cn } from "@/lib/cn";
 import { StatusDot, type Tone } from "./StatusDot";
 
-// No accent-soft token yet, so the accent badge tints with bg-accent/15.
 const TONE: Record<Tone, string> = {
   neutral: "bg-surface-sunken text-text-muted",
-  accent: "bg-accent/15 text-accent",
+  accent: "bg-accent-soft text-accent",
   success: "bg-success-soft text-success-fg",
   warning: "bg-warning-soft text-warning-fg",
   danger: "bg-danger-soft text-danger-fg",

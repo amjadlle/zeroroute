@@ -30,7 +30,7 @@ export function Sparkline({ values, label, className }: SparklineProps) {
       aria-hidden={label ? undefined : true}
       className={cn("block h-9 w-full overflow-visible", className)}
     >
-      <path d={`${line} L${W} ${H} L0 ${H}Z`} className="fill-accent/15" />
+      <path d={`${line} L${W} ${H} L0 ${H}Z`} className="fill-accent-soft" />
       <path d={line} className="fill-none stroke-accent" strokeWidth={1.8} vectorEffect="non-scaling-stroke" />
     </svg>
   );
