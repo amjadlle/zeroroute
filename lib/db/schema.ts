@@ -143,6 +143,14 @@ export const SCHEMA_TABLES = [
     models TEXT NOT NULL,
     updated_at INTEGER NOT NULL
   )`,
+  // Payment webhook ids already handled (dedupes provider retries) and each event's own time,
+  // so an older event that arrives late can't undo a newer one.
+  `CREATE TABLE IF NOT EXISTS webhook_events (
+    id TEXT PRIMARY KEY,
+    email TEXT,
+    event_at INTEGER NOT NULL,
+    received_at INTEGER NOT NULL
+  )`,
 ];
 
 export const SCHEMA_INDEXES = [
@@ -159,4 +167,5 @@ export const SCHEMA_INDEXES = [
   `CREATE INDEX IF NOT EXISTS idx_logs_origin ON request_logs(origin)`,
   `CREATE INDEX IF NOT EXISTS idx_logs_provider ON request_logs(provider)`,
   `CREATE INDEX IF NOT EXISTS idx_logs_status ON request_logs(status)`,
+  `CREATE INDEX IF NOT EXISTS idx_webhook_events_email ON webhook_events(email, event_at)`,
 ];
