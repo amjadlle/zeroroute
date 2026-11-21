@@ -4,7 +4,7 @@ import crypto from "crypto";
 import { isMasterAdminKey, getCachedCustomer, setCachedCustomer } from "@/lib/auth/session";
 import { getDb } from "@/lib/db";
 import { isRateLimited, getClientIp } from "@/lib/auth/rate-limit";
-import { getEligibleProviders, TIMEOUT_MS, COOLDOWN_MS } from "@/lib/providers/state";
+import { ensureProviderConfigs, getEligibleProviders, TIMEOUT_MS, COOLDOWN_MS } from "@/lib/providers/state";
 import { responseCache } from "@/lib/providers/cache";
 import { buildDynamicSystemPrompt, retrieveKnowledgeContext, getDefaultLandingKnowledge } from "@/lib/providers/rag";
 import {
@@ -384,6 +384,7 @@ export async function POST(request: Request) {
   }
 
   // 6. Multi-Cloud Provider Pool Failover Routing
+  await ensureProviderConfigs();
   const candidates = getEligibleProviders(body.model);
   if (candidates.length === 0) {
     return NextResponse.json(
@@ -392,6 +393,8 @@ export async function POST(request: Request) {
     );
   }
 
+  // Upstream error bodies stay server-side (logs + admin request log); callers get this id instead.
+  const requestId = crypto.randomUUID();
   const failures: string[] = [];
 
   const getModelChain = (stateModels: string[] | undefined, defaultModel: string, targetModel?: string): string[] => {
@@ -412,11 +415,20 @@ export async function POST(request: Request) {
     const left = MAX_WALL_MS - (Date.now() - startTime);
     return attempts < MAX_ATTEMPTS && left > 0 ? Math.min(TIMEOUT_MS, left) : 0;
   };
-  const requestError = (error: any) =>
-    NextResponse.json(
-      { error: { message: error.message, type: "invalid_request_error" } },
+  const requestError = (error: any) => {
+    console.error(`[Gateway ${requestId}] Upstream rejected the request:`, error.message);
+    return NextResponse.json(
+      { error: { message: "The AI provider rejected this request as invalid. Check the messages and parameters.", type: "invalid_request_error", request_id: requestId } },
       { status: error.status, headers: corsHdrs }
     );
+  };
+  const allFailed = () => {
+    console.error(`[Gateway ${requestId}] All providers failed:`, failures);
+    return NextResponse.json(
+      { error: { message: "All configured AI cloud providers failed.", request_id: requestId } },
+      { status: 502, headers: corsHdrs }
+    );
+  };
 
   // ── Streaming Mode (SSE) ──
   if (body.stream) {
@@ -534,12 +546,12 @@ export async function POST(request: Request) {
     await db.execute({
       sql: `INSERT INTO request_logs (id, customer_key, timestamp, origin, prompt_preview, response_preview, provider, model, latency_ms, status, is_stream, is_cache_hit, failovers, prompt_tokens, completion_tokens, total_tokens) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
-        crypto.randomUUID(),
+        requestId,
         customerKey || "demo",
         Date.now(),
         origin,
         lastUserMsg.slice(0, 100),
-        failures.slice(0, 2).join("; ").slice(0, 100),
+        `All providers failed (request ${requestId})`,
         "gateway_failover",
         body.model || "stream",
         Date.now() - startTime,
@@ -553,10 +565,7 @@ export async function POST(request: Request) {
       ]
     }).catch(() => {});
 
-    return NextResponse.json(
-      { error: { message: "All configured AI cloud providers failed.", details: failures } },
-      { status: 502, headers: corsHdrs }
-    );
+    return allFailed();
   }
 
   // ── Non-Streaming Mode (JSON) ──
@@ -626,12 +635,12 @@ export async function POST(request: Request) {
   await db.execute({
     sql: `INSERT INTO request_logs (id, customer_key, timestamp, origin, prompt_preview, response_preview, provider, model, latency_ms, status, is_stream, is_cache_hit, failovers, prompt_tokens, completion_tokens, total_tokens) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     args: [
-      crypto.randomUUID(),
+      requestId,
       customerKey || "demo",
       Date.now(),
       origin,
       lastUserMsg.slice(0, 100),
-      failures.slice(0, 2).join("; ").slice(0, 100),
+      `All providers failed (request ${requestId})`,
       "gateway_failover",
       body.model || "direct",
       Date.now() - startTime,
@@ -645,8 +654,5 @@ export async function POST(request: Request) {
     ]
   }).catch(() => {});
 
-  return NextResponse.json(
-    { error: { message: "All configured AI cloud providers failed.", details: failures } },
-    { status: 502, headers: corsHdrs }
-  );
+  return allFailed();
 }

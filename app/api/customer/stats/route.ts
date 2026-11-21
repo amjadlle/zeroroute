@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { getSessionFromCookie } from "@/lib/auth/session";
+import { getCurrentUser } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const session = await getSessionFromCookie();
+  const session = await getCurrentUser();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -13,7 +13,7 @@ export async function GET() {
   try {
     const db = getDb();
     const logsRes = await db.execute({
-      sql: `SELECT * FROM request_logs WHERE customer_key = ? ORDER BY timestamp DESC LIMIT 50`,
+      sql: `SELECT id, timestamp, origin, prompt_preview, response_preview, provider, model, latency_ms, status, is_stream, is_cache_hit FROM request_logs WHERE customer_key = ? ORDER BY timestamp DESC LIMIT 50`,
       args: [session.key]
     });
 

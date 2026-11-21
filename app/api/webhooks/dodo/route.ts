@@ -5,6 +5,7 @@ import { getDb } from "@/lib/db";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
+  let claimedId: string | null = null;
   try {
     const rawBody = await request.text();
     const webhookSecret = process.env.DODO_WEBHOOK_SECRET;
@@ -63,10 +64,32 @@ export async function POST(request: Request) {
     const customerName = data.customer?.name || data.name || "Subscriber";
     const customerCompany = data.customer_business_name || data.customer?.business_name || data.metadata?.company || customerName;
 
+    // Providers retry until they get a 2xx, so each webhook id is handled once.
+    const db = getDb();
+    const eventAt = Date.parse(event.timestamp) || ts * 1000;
+    const claim = await db.execute({
+      sql: `INSERT INTO webhook_events (id, email, event_at, received_at) VALUES (?, ?, ?, ?) ON CONFLICT(id) DO NOTHING`,
+      args: [webhookId, customerEmail || null, eventAt, Date.now()],
+    });
+    if (!claim.rowsAffected) {
+      console.log(`[DodoWebhook] Skipping already processed webhook: ${webhookId}`);
+      return NextResponse.json({ received: true, duplicate: true });
+    }
+    claimedId = webhookId;
+
     if (customerEmail) {
-      const { initDb } = await import("@/lib/db");
-      await initDb();
-      const db = getDb();
+      // Ceiling: two different events for one customer handled at the same moment can still race,
+      // since this check and the update below are separate statements. Upgrade path: a per-customer
+      // last_event_at column set with a conditional UPDATE.
+      const newer = await db.execute({
+        sql: `SELECT 1 FROM webhook_events WHERE email = ? AND event_at > ? LIMIT 1`,
+        args: [customerEmail, eventAt],
+      });
+      if (newer.rows.length > 0) {
+        console.log(`[DodoWebhook] Ignoring out-of-order ${eventType} for ${customerEmail}`);
+        return NextResponse.json({ received: true, stale: true });
+      }
+
       const existingRes = await db.execute({
         sql: `SELECT * FROM customers WHERE email = ? LIMIT 1`,
         args: [customerEmail]
@@ -193,6 +216,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ received: true });
   } catch (err) {
     console.error("[DodoWebhook Error]:", err);
+    // Release the id so the provider's retry processes the event again.
+    if (claimedId) {
+      await getDb().execute({ sql: `DELETE FROM webhook_events WHERE id = ?`, args: [claimedId] }).catch(() => {});
+    }
     return NextResponse.json({ error: "Webhook error" }, { status: 400 });
   }
 }
