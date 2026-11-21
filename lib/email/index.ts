@@ -3,6 +3,9 @@
  * Supports Resend API, Cloudflare Email Workers, Webhooks, and Dev Console Logging
  */
 
+const esc = (v: string) =>
+  String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+
 export interface EmailOptions {
   to: string;
   subject: string;
@@ -42,7 +45,7 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
         const errText = await res.text();
         console.warn(`[Email:Resend] Failed to send to ${to}:`, errText);
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error(`[Email:Resend] Error sending to ${to}:`, err);
     }
   }
@@ -68,7 +71,7 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
         console.log(`[Email:Webhook] Dispatched email to ${to}`);
         return { success: true };
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error(`[Email:Webhook] Error dispatching to ${to}:`, err);
     }
   }
@@ -116,11 +119,11 @@ export async function sendPasswordResetOtpEmail(params: {
     <div class="logo">⚡ ZeroRoute</div>
     <div class="badge">SECURITY VERIFICATION</div>
     <h2 style="color: #ffffff; margin-top: 0;">Password Reset Code</h2>
-    <p>${greeting}</p>
+    <p>${esc(greeting)}</p>
     <p>You requested a verification code to reset your ZeroRoute account password. Use the single-use code below to complete the reset:</p>
     
     <div class="otp-box">
-      <div class="otp-code">${otp}</div>
+      <div class="otp-code">${esc(otp)}</div>
       <div style="color: #94a3b8; font-size: 11px; margin-top: 8px;">Expires in 15 minutes • Single-use only</div>
     </div>
 
@@ -178,16 +181,16 @@ export async function sendWelcomeCredentialsEmail(params: {
   <div class="container">
     <div class="logo">⚡ ZeroRoute Pro</div>
     <div class="badge">ACTIVE SUBSCRIPTION</div>
-    <h2 style="color: #ffffff; margin-top: 0;">Welcome to ZeroRoute Cloud, ${name}!</h2>
+    <h2 style="color: #ffffff; margin-top: 0;">Welcome to ZeroRoute Cloud, ${esc(name)}!</h2>
     <p>Your subscription is now active with high-availability 11-cloud smart routing and your custom embeddable AI chatbot widget (10,000 monthly requests included).</p>
     
     <h4 style="color: #cbd5e1; margin-bottom: 4px;">Your Master Router API Key:</h4>
-    <div class="key-box">${key}</div>
+    <div class="key-box">${esc(key)}</div>
 
     <h4 style="color: #cbd5e1; margin-bottom: 4px;">Your Live Bot ID:</h4>
-    <div class="key-box">${botId}</div>
+    <div class="key-box">${esc(botId)}</div>
 
-    <p><a href="${targetLoginUrl}" class="btn">Open Subscriber Console</a></p>
+    <p><a href="${esc(targetLoginUrl)}" class="btn">Open Subscriber Console</a></p>
 
     <!-- Free Concierge Setup Box -->
     <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 20px; margin: 24px 0;">
@@ -273,7 +276,7 @@ export async function sendSubscriptionCancelledEmail(params: {
     <div class="logo">⚡ ZeroRoute</div>
     <div class="badge">SUBSCRIPTION UPDATE</div>
     <h2 style="color: #ffffff; margin-top: 0;">Subscription Cancelled</h2>
-    <p>${greeting}</p>
+    <p>${esc(greeting)}</p>
     <p>Your ZeroRoute Pro subscription has been cancelled. You will not be charged for any future billing cycles.</p>
     
     <div class="info-box">
@@ -283,7 +286,7 @@ export async function sendSubscriptionCancelledEmail(params: {
       • You can reactivate Pro anytime in 1 click from your console.
     </div>
 
-    <p><a href="${targetLoginUrl}" class="btn">Open Subscriber Console</a></p>
+    <p><a href="${esc(targetLoginUrl)}" class="btn">Open Subscriber Console</a></p>
 
     <p style="font-size: 12px; color: #94a3b8; margin-top: 20px;">
       If you cancelled by mistake or have feedback on how we can improve, please reply directly to this email or contact us at <a href="mailto:mapkisolutions@gmail.com" style="color: #cbd5e1;">mapkisolutions@gmail.com</a>. We'd love to hear from you!

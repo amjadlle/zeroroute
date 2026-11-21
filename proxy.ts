@@ -1,19 +1,13 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { verifyAdminSession } from "@/lib/auth/admin-session";
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
   const sessionToken = request.cookies.get("zr_session")?.value;
   const queryKey = searchParams.get("key") || searchParams.get("token");
 
-  const isAdmin = Boolean(
-    (sessionToken && sessionToken.startsWith("zr_admin_")) ||
-    (queryKey && (
-      queryKey.startsWith("zr_admin_") ||
-      (Boolean(process.env.ROUTER_API_KEY) && queryKey === process.env.ROUTER_API_KEY) ||
-      (Boolean(process.env.ADMIN_KEY) && queryKey === process.env.ADMIN_KEY)
-    ))
-  );
+  const isAdmin = await verifyAdminSession(sessionToken);
 
   const isAuthenticated = Boolean(sessionToken || queryKey);
 

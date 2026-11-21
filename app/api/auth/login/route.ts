@@ -4,6 +4,13 @@ import { getDb, initDb } from "@/lib/db";
 import { verifyPassword, generateSessionToken } from "@/lib/auth/password";
 import { isRateLimited, getClientIp } from "@/lib/auth/rate-limit";
 import { SESSION_COOKIE_NAME, ROLE_COOKIE_NAME, ADMIN_EMAILS } from "@/lib/auth/session";
+import { signAdminSession, ADMIN_SESSION_MAX_AGE } from "@/lib/auth/admin-session";
+
+function safeEqual(a: string, b: string): boolean {
+  const ha = crypto.createHash("sha256").update(a).digest();
+  const hb = crypto.createHash("sha256").update(b).digest();
+  return crypto.timingSafeEqual(ha, hb);
+}
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req.headers);
@@ -26,12 +33,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const adminPassword = (process.env.ADMIN_PASSWORD || process.env.ADMIN_KEY || process.env.ROUTER_API_KEY || "").trim();
+    const adminPassword = (process.env.ADMIN_PASSWORD || "").trim();
     const isAdminEmail = ADMIN_EMAILS.includes(email);
 
-    // 1. Direct Admin Master Key / Password Check (strictly requires configured environment key)
-    if (isAdminEmail && adminPassword && (password === adminPassword || password === process.env.ADMIN_KEY || password === process.env.ROUTER_API_KEY)) {
-      const adminSessionToken = `zr_admin_${crypto.randomBytes(24).toString("hex")}`;
+    // 1. Admin login: dedicated ADMIN_PASSWORD, session is a signed JWT (null if ADMIN_SESSION_SECRET is unset)
+    const adminSessionToken = isAdminEmail && adminPassword && safeEqual(password, adminPassword)
+      ? await signAdminSession()
+      : null;
+    if (adminSessionToken) {
       const response = NextResponse.json({
         success: true,
         message: "Admin authentication successful!",
@@ -53,7 +62,7 @@ export async function POST(req: NextRequest) {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        maxAge: 30 * 24 * 60 * 60,
+        maxAge: ADMIN_SESSION_MAX_AGE,
         path: "/",
       });
 
@@ -63,7 +72,7 @@ export async function POST(req: NextRequest) {
         httpOnly: false,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        maxAge: 30 * 24 * 60 * 60,
+        maxAge: ADMIN_SESSION_MAX_AGE,
         path: "/",
       });
 
@@ -104,9 +113,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Determine role (customer or admin if registered with admin email)
-    const isUserAdmin = ADMIN_EMAILS.includes(email);
-    const sessionToken = isUserAdmin ? `zr_admin_${crypto.randomBytes(24).toString("hex")}` : generateSessionToken();
+    // Customer accounts are always customers; admin comes only from the admin login above
+    const sessionToken = generateSessionToken();
     const now = Date.now();
 
     await db.execute({
@@ -114,8 +122,8 @@ export async function POST(req: NextRequest) {
       args: [sessionToken, now, customer.id as string],
     });
 
-    const targetRole = isUserAdmin ? "admin" : "customer";
-    const targetRedirect = isUserAdmin ? "/admin" : "/app";
+    const targetRole = "customer";
+    const targetRedirect = "/app";
 
     const response = NextResponse.json({
       success: true,
