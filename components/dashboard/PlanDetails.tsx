@@ -8,11 +8,11 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardBody, CardFooter, CardHeader } from "@/components/ui/Card";
 import { useToast } from "@/components/ui/Toast";
 import { apiFetch } from "@/lib/client/api";
-import { PLAN_LABELS, PLAN_LIMITS, SUBSCRIPTION_STATUS_LABELS, type SubscriptionStatus } from "@/lib/constants";
+import { PLAN_LABELS, PLAN_LIMITS, SUBSCRIPTION_STATUS_LABELS, UNLIMITED_MONTHLY_REQUESTS, type SubscriptionStatus } from "@/lib/constants";
 
 const SUPPORT_EMAIL = "mapkisolutions@gmail.com";
 
-type PlanCardProps = {
+type PlanDetailsProps = {
   email: string;
   name: string;
   status: string;
@@ -25,12 +25,12 @@ type PlanCardProps = {
 const mailto = (subject: string, email: string) =>
   `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`Account email: ${email}\n\n`)}`;
 
-function Includes({ plan }: { plan: keyof typeof PLAN_LIMITS }) {
+function Includes({ plan, unlimited }: { plan: keyof typeof PLAN_LIMITS; unlimited?: boolean }) {
   const { monthlyRequests, allowedDomains } = PLAN_LIMITS[plan];
   return (
     <ul className="grid gap-1.5 text-body text-text-muted">
       {[
-        `${monthlyRequests.toLocaleString()} requests a month`,
+        unlimited ? "No monthly request limit" : `${monthlyRequests.toLocaleString()} requests a month`,
         `${allowedDomains} allowed ${allowedDomains === 1 ? "domain" : "domains"}`,
       ].map((line) => (
         <li key={line} className="flex items-center gap-2">
@@ -47,7 +47,7 @@ function Includes({ plan }: { plan: keyof typeof PLAN_LIMITS }) {
  * payment webhook confirms it, never from this page. There is no cancel or invoice API yet,
  * so those go to support by email.
  */
-export function PlanCard({ email, name, status, monthlyLimit, subscriptionExpires, isPro }: PlanCardProps) {
+export function PlanDetails({ email, name, status, monthlyLimit, subscriptionExpires, isPro }: PlanDetailsProps) {
   const toast = useToast();
   const [opening, setOpening] = useState(false);
   // Paused and canceled customers keep the Pro limit but are not paid (see isPaidPlan).
@@ -96,7 +96,7 @@ export function PlanCard({ email, name, status, monthlyLimit, subscriptionExpire
             <span className="font-semibold text-text tabular-nums">${PLAN_LIMITS[showsPro ? "pro" : "free"].priceUsd}</span> / month
           </p>
         </div>
-        <Includes plan={showsPro ? "pro" : "free"} />
+        <Includes plan={showsPro ? "pro" : "free"} unlimited={monthlyLimit >= UNLIMITED_MONTHLY_REQUESTS} />
         {isPro && subscriptionExpires ? (
           <p className="text-meta text-text-muted">Paid through {new Date(subscriptionExpires).toLocaleDateString(undefined, { dateStyle: "long" })}.</p>
         ) : null}

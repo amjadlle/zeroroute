@@ -1,8 +1,8 @@
 "use client";
 
 import { PageHeader } from "@/components/shell/PageHeader";
-import { PlanCard } from "@/components/dashboard/PlanCard";
-import { UsageCard } from "@/components/dashboard/UsageCard";
+import { PlanDetails } from "@/components/dashboard/PlanDetails";
+import { UsageCard } from "@/components/home/UsageCard";
 import { useCustomer } from "../CustomerConsole";
 
 export default function BillingPage() {
@@ -11,7 +11,7 @@ export default function BillingPage() {
     <>
       <PageHeader title="Billing" description="Your plan, what it includes and how much of it you have used." />
       <div className="grid items-start gap-4 lg:grid-cols-2">
-        <PlanCard
+        <PlanDetails
           email={profile.email}
           name={profile.name}
           status={profile.status}

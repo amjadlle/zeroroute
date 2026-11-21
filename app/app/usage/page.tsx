@@ -1,7 +1,7 @@
 "use client";
 
 import { PageHeader } from "@/components/shell/PageHeader";
-import { UsageCard } from "@/components/dashboard/UsageCard";
+import { UsageCard } from "@/components/home/UsageCard";
 import { VisitorConversations } from "@/components/dashboard/VisitorConversations";
 import { useCustomer } from "../CustomerConsole";
 

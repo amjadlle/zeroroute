@@ -2,11 +2,12 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, it, vi } from "vitest";
 import { UiProviders } from "@/components/ui/UiProviders";
-import { PlanCard } from "./PlanCard";
+import { PlanDetails } from "./PlanDetails";
+import { UNLIMITED_MONTHLY_REQUESTS } from "@/lib/constants";
 
 const BASE = { email: "hi@example.com", name: "Brightpath", status: "active", monthlyLimit: 500, isPro: false };
-const setup = (props: Partial<Parameters<typeof PlanCard>[0]> = {}) =>
-  render(<UiProviders><PlanCard {...BASE} {...props} /></UiProviders>);
+const setup = (props: Partial<Parameters<typeof PlanDetails>[0]> = {}) =>
+  render(<UiProviders><PlanDetails {...BASE} {...props} /></UiProviders>);
 
 function stubCheckout(url: string) {
   const fetch = vi.fn(async (...[]: [string, RequestInit?]) => Response.json({ checkout_url: url }));
@@ -60,4 +61,9 @@ it("lets a canceled customer restart Pro", () => {
   setup({ status: "canceled", monthlyLimit: 10000 });
   expect(screen.getByText("Canceled")).toBeInTheDocument();
   expect(screen.getByRole("button", { name: /Restart Pro/ })).toBeInTheDocument();
+});
+
+it("does not claim a 10,000 limit for an unlimited account", () => {
+  setup({ isPro: true, monthlyLimit: UNLIMITED_MONTHLY_REQUESTS });
+  expect(screen.getByText("No monthly request limit")).toBeInTheDocument();
 });
