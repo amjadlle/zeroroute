@@ -1,4 +1,6 @@
 import { Layers, ShieldCheck, Zap, Gauge, Key, Server, MessageSquareText, FileText } from "lucide-react";
+import { PROVIDER_COUNT } from "@/lib/constants";
+import { PRO_REQUESTS } from "@/components/landing-facts";
 
 export function Features() {
   const features = [
@@ -13,8 +15,8 @@ export function Features() {
       icon: Layers,
       color: "blue",
       iconBg: "bg-blue-500/10 border-blue-500/20 text-blue-400",
-      title: "10,000 Requests/Mo Pool",
-      description: "Includes 10,000 monthly requests routed across Groq, Cloudflare, Gemini, Mistral, SambaNova & 6 more clouds with zero token overage fees.",
+      title: `${PRO_REQUESTS} Requests/Mo Pool`,
+      description: `Includes ${PRO_REQUESTS} monthly requests routed across Groq, Cloudflare, Gemini, Mistral, SambaNova & ${PROVIDER_COUNT - 5} more clouds with zero token overage fees.`,
     },
     {
       icon: ShieldCheck,
@@ -42,7 +44,7 @@ export function Features() {
       color: "rose",
       iconBg: "bg-rose-500/10 border-rose-500/20 text-rose-400",
       title: "Parallel Benchmark Suite",
-      description: "Race all 11 multi-cloud providers concurrently in real-time. Detect the fastest model and optimize your routing chain in 1-click.",
+      description: `Race all ${PROVIDER_COUNT} multi-cloud providers concurrently in real-time. Detect the fastest model and optimize your routing chain in 1-click.`,
     },
   ];
 
@@ -66,7 +68,7 @@ export function Features() {
           return (
             <div
               key={i}
-              className="p-6 bg-dark-card border border-dark-border rounded-2xl space-y-3 hover:border-slate-700 transition-all"
+              className="p-6 bg-landing-card border border-landing-border rounded-2xl space-y-3 hover:border-slate-700 transition-all"
             >
               <div className={`w-10 h-10 rounded-xl border flex items-center justify-center ${f.iconBg}`}>
                 <Icon className="w-5 h-5" />
