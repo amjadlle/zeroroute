@@ -145,7 +145,7 @@ export function AdminHeader({
 
         {/* Mobile Dropdown Drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-white/10 bg-[#080b12] px-4 py-3 space-y-2 animate-in slide-in-from-top-2 duration-200 shadow-2xl">
+          <div className="md:hidden border-t border-white/10 bg-[#080b12] px-4 py-3 space-y-2 duration-200 shadow-2xl">
             <div className="flex items-center justify-between pb-2 border-b border-white/5 text-xs">
               <span className="text-slate-400 font-medium">Role:</span>
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-bold uppercase tracking-wider">

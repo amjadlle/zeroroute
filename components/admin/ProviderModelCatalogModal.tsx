@@ -310,12 +310,12 @@ export function ProviderModelCatalogModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md duration-200">
       <div className="relative w-full max-w-5xl max-h-[90vh] bg-[#090d16] border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100">
         
         {/* Toast Alert */}
         {toastMessage && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 text-white text-xs font-bold shadow-xl flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 text-white text-xs font-bold shadow-xl flex items-center gap-2">
             <Sparkles className="w-4 h-4" />
             <span>{toastMessage}</span>
           </div>
@@ -477,7 +477,7 @@ export function ProviderModelCatalogModal({
 
           {/* Smart Fallback Recommendation (if benchmarked / tested) */}
           {healthyTestedModels.length > 1 && (
-            <div className="p-4 bg-gradient-to-r from-emerald-950/40 via-[#0a1518] to-black/60 border border-emerald-500/30 rounded-2xl space-y-3 animate-in fade-in duration-300">
+            <div className="p-4 bg-gradient-to-r from-emerald-950/40 via-[#0a1518] to-black/60 border border-emerald-500/30 rounded-2xl space-y-3 duration-300">
               <div className="flex items-center justify-between gap-3 flex-wrap">
                 <div className="flex items-center gap-2 text-emerald-300 font-bold text-xs">
                   <Sparkles className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -698,7 +698,7 @@ export function ProviderModelCatalogModal({
                           {/* Live Response / Error Result Box */}
                           {testResult && (
                             <div
-                              className={`p-3 rounded-xl border text-xs space-y-2 animate-in fade-in ${
+                              className={`p-3 rounded-xl border text-xs space-y-2 ${
                                 testResult.ok
                                   ? "bg-emerald-500/10 border-emerald-500/30 text-slate-200"
                                   : "bg-rose-500/10 border-rose-500/30 text-rose-200"

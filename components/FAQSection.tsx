@@ -84,7 +84,7 @@ export function FAQSection() {
                 />
               </button>
               {isOpen && (
-                <div className="px-4 sm:px-5 pb-4 sm:pb-5 text-xs text-slate-300 leading-relaxed border-t border-white/5 pt-3 animate-in fade-in duration-200">
+                <div className="px-4 sm:px-5 pb-4 sm:pb-5 text-xs text-slate-300 leading-relaxed border-t border-white/5 pt-3 duration-200">
                   {faq.answer}
                 </div>
               )}

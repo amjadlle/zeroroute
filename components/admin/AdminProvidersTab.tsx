@@ -286,7 +286,7 @@ export function AdminProvidersTab({ providers, onUpdateProviders }: AdminProvide
 
       {/* Benchmark Results Leaderboard Modal */}
       {benchmarkResults && (
-        <div className="bg-[#090d16] border border-red-500/30 rounded-2xl p-6 space-y-4 animate-in fade-in duration-300">
+        <div className="bg-[#090d16] border border-red-500/30 rounded-2xl p-6 space-y-4 duration-300">
           <div className="flex items-center justify-between border-b border-white/10 pb-3">
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-amber-400" />
@@ -572,7 +572,7 @@ export function AdminProvidersTab({ providers, onUpdateProviders }: AdminProvide
               {/* Test Status / Error Display */}
               {result && (
                 <div
-                  className={`p-3 rounded-xl border text-xs space-y-1.5 animate-in fade-in ${
+                  className={`p-3 rounded-xl border text-xs space-y-1.5 ${
                     result.ok
                       ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
                       : "bg-rose-500/10 border-rose-500/30 text-rose-300"
@@ -613,7 +613,7 @@ export function AdminProvidersTab({ providers, onUpdateProviders }: AdminProvide
 
       {/* Error Details Modal */}
       {errorModalProvider && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
           <div className="bg-[#090d16] border border-rose-500/40 rounded-2xl p-6 max-w-lg w-full space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div className="flex items-center gap-2 text-rose-400 font-bold text-sm">

@@ -307,7 +307,7 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
   const isInitialOnly = chatMessages.length === 1 && chatMessages[0].role === "assistant";
 
   return (
-    <div className="max-w-4xl mx-auto w-full bg-[#07090e] border border-dark-border rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[calc(100vh-210px)] min-h-[600px] max-h-[850px] animate-in fade-in duration-200">
+    <div className="max-w-4xl mx-auto w-full bg-[#07090e] border border-dark-border rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[calc(100vh-210px)] min-h-[600px] max-h-[850px] duration-200">
       {/* ChatGPT-Style Top Header Bar */}
       <div className="px-5 py-3.5 bg-dark-card/90 backdrop-blur-md border-b border-dark-border flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
@@ -361,7 +361,7 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
             return (
               <div
                 key={i}
-                className={`flex gap-3.5 ${m.role === "user" ? "justify-end" : "justify-start"} animate-in fade-in duration-200 group`}
+                className={`flex gap-3.5 ${m.role === "user" ? "justify-end" : "justify-start"} duration-200 group`}
               >
                 {/* Assistant Avatar with ZeroRoute Logo */}
                 {m.role === "assistant" && (
@@ -466,7 +466,7 @@ export function WidgetTab({ botTitle, greeting, botId, prompts, apiKey }: Widget
       {/* Bottom Floating Prompt Chips Bar (when active conversation) */}
       {!isInitialOnly && prompts && prompts.length > 0 && (
         <div className="px-4 sm:px-6 py-2 border-t border-white/5 bg-[#050608]/70 backdrop-blur-sm">
-          <div className="max-w-3xl mx-auto flex items-center gap-2 overflow-x-auto scrollbar-none touch-pan-x">
+          <div className="max-w-3xl mx-auto flex items-center gap-2 overflow-x-auto touch-pan-x">
             <span className="text-[10px] font-semibold text-slate-500 uppercase shrink-0">Suggestions:</span>
             {prompts.map((p, idx) => (
               <button

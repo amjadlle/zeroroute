@@ -77,12 +77,12 @@ export function AdminApiKeysModal({ isOpen, onClose, providers }: AdminApiKeysMo
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md duration-200">
       <div className="relative w-full max-w-2xl max-h-[90vh] bg-[#090d16] border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100">
         
         {/* Toast */}
         {toast && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 text-white text-xs font-bold shadow-xl flex items-center gap-2 animate-in fade-in">
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 text-white text-xs font-bold shadow-xl flex items-center gap-2">
             <Check className="w-4 h-4" />
             <span>{toast}</span>
           </div>

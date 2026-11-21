@@ -43,7 +43,7 @@ export function PersonaTab({
   };
 
   return (
-    <div className="w-full bg-dark-card border border-dark-border rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl animate-in fade-in duration-200">
+    <div className="w-full bg-dark-card border border-dark-border rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl duration-200">
       <div className="flex items-center justify-between border-b border-white/5 pb-4">
         <div className="space-y-1">
           <h3 className="text-base font-bold text-white flex items-center gap-2">
@@ -57,7 +57,7 @@ export function PersonaTab({
       </div>
 
       {success && (
-        <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs flex items-center gap-2 animate-in fade-in duration-150">
+        <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs flex items-center gap-2 duration-150">
           <Check className="w-4 h-4 shrink-0" />
           <span className="font-semibold">Persona settings saved and synchronized successfully!</span>
         </div>

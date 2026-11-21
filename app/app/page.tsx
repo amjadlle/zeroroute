@@ -213,7 +213,7 @@ export default function AppDashboard() {
 
       <div className="flex-1 max-w-[1700px] w-full mx-auto px-4 sm:px-8 py-6 space-y-6">
         {/* Navigation Tabs Bar */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-dark-border scrollbar-none text-xs font-semibold -mx-4 px-4 sm:mx-0 sm:px-0 touch-pan-x">
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-dark-border text-xs font-semibold -mx-4 px-4 sm:mx-0 sm:px-0 touch-pan-x">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isSelected = activeTab === tab.id;
