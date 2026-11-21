@@ -218,6 +218,9 @@ interface DocCacheEntry {
   docs: any[];
   expiresAt: number;
 }
+// Ceiling: per-instance memory with a 5 minute TTL. invalidateDocCache only clears the instance
+// that served the write, so other instances can answer from old documents until their entry expires.
+// Upgrade path: a shared cache, or a per-customer version stamp checked before using the entry.
 const docCache = new Map<string, DocCacheEntry>();
 
 export function invalidateDocCache(customerKey?: string) {

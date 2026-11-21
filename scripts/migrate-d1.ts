@@ -37,6 +37,10 @@ async function main() {
   await db.execute("UPDATE customers SET id = key WHERE id IS NULL OR id = '';");
   console.log("✅ Backfilled id on existing customers");
 
+  // One-off: this used to run on every cold start from initDb.
+  await db.execute("UPDATE customers SET monthly_limit = 10000 WHERE monthly_limit = 2000 OR monthly_limit IS NULL;");
+  console.log("✅ Upgraded legacy monthly limits");
+
   await initDb();
   console.log("✅ D1 Migration finished successfully!");
 }
