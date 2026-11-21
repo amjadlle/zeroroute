@@ -7,3 +7,4 @@ Shared console primitives (M1, spec #47, design direction in docs/adr/0001-conso
 - Accessibility is part of the API: labels, roles, focus-visible ring, keyboard support.
 - Each component gets a behaviour test next to it (`*.test.tsx`) and live examples in `app/design/sections/<group>.tsx`.
 - Visual reference: the Graphite+ direction in `prototypes/console-design/index.html` on branch `prototype/console-design-directions`.
+- Overlays: `Modal`, `Drawer` and `ConfirmDialog` sit on native `<dialog>`. Mount `<UiProviders>` once per screen tree to use `useToast()` and `useConfirm()` (replaces `alert()` / `confirm()`).
