@@ -17,7 +17,7 @@ export async function GET(request: Request) {
     const db = getDb();
     const result = await db.execute(`
       SELECT 
-        id, key, email, name, company, website, bot_title, bot_role,
+        id, key, email, name, company, website, bot_title, bot_role, greeting, prompts,
         status, subscription_expires, monthly_requests, monthly_limit,
         bot_id, allowed_domains, created_at, updated_at
       FROM customers 
