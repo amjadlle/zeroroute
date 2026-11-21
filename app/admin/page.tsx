@@ -1,11 +1,11 @@
 "use client";
 
-import { Activity, Gauge, Layers, RefreshCw, Users, Zap } from "lucide-react";
+import { Activity, CircleCheck, Gauge, Layers, RefreshCw, Users, Zap } from "lucide-react";
 import { PageHeader } from "@/components/shell/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { StatTile } from "@/components/ui/StatTile";
-import { AdminAnalyticsTab } from "@/components/admin/AdminAnalyticsTab";
+import { ProviderHealth, RecentErrors, median, providerStatus, useNow } from "@/components/admin/AdminOverview";
 import type { ProviderItem } from "@/components/admin/AdminProvidersTab";
 import type { GlobalLogItem } from "@/components/admin/AdminLogsTab";
 import type { CustomerAdminItem } from "@/components/admin/AdminCustomersTab";
@@ -21,9 +21,12 @@ type Metrics = {
   cacheHitRatio: number;
 };
 
+// Median latency and recent errors come from this many newest requests; totals come from the server.
+const SAMPLE = 200;
+
 export default function AdminOverviewPage() {
   const providers = useAdminData<{ providers?: ProviderItem[] }>("/api/admin/providers");
-  const logs = useAdminData<{ logs?: GlobalLogItem[]; metrics?: Metrics }>("/api/admin/logs?limit=200");
+  const logs = useAdminData<{ logs?: GlobalLogItem[]; metrics?: Metrics }>(`/api/admin/logs?limit=${SAMPLE}`);
   const customers = useAdminData<{ customers?: CustomerAdminItem[] }>("/api/admin/customers");
 
   const all = [providers, logs, customers];
@@ -33,9 +36,13 @@ export default function AdminOverviewPage() {
   };
 
   const providerList = providers.data?.providers ?? [];
+  const now = useNow(Math.max(0, ...providerList.map((p) => p.cooldownUntil || 0)));
+  const readyProviders = providerList.filter((p) => providerStatus(p, now).ready).length;
+
   const m = logs.data?.metrics;
   const hasRequests = !!m && m.totalRequests > 0;
-  const activeProviders = providerList.filter((p) => p.enabled && p.configured).length;
+  const recent = logs.data?.logs ?? [];
+  const p50 = median(recent.map((l) => l.latency_ms));
 
   return (
     <>
@@ -53,30 +60,20 @@ export default function AdminOverviewPage() {
       {logs.error && <LoadError what="request stats" error={logs.error} onRetry={logs.reload} />}
       {customers.error && <LoadError what="customers" error={customers.error} onRetry={customers.reload} />}
 
-      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
-        <StatTile
-          icon={Activity}
-          label="Requests"
-          value={m ? m.totalRequests.toLocaleString() : "—"}
-          hint={hasRequests ? `${m.successRate}% succeeded` : "No requests yet"}
-        />
+      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+        <StatTile icon={Activity} label="Requests" value={m ? m.totalRequests.toLocaleString() : "—"} hint={hasRequests ? "All time" : "No requests yet"} />
+        <StatTile icon={CircleCheck} label="Success rate" value={hasRequests ? `${m.successRate}%` : "—"} hint="All time" />
         <StatTile
           icon={Gauge}
-          label="Average response time"
-          value={hasRequests ? `${m.avgLatencyMs.toLocaleString()} ms` : "—"}
-          hint="Across all requests"
+          label="Response time"
+          value={p50 !== undefined ? `${p50.toLocaleString()} ms` : "—"}
+          hint={recent.length ? `Median of the last ${recent.length.toLocaleString()} requests` : "No requests yet"}
         />
         <StatTile
           icon={Zap}
-          label="Cache hits"
-          value={m ? m.cacheHits.toLocaleString() : "—"}
-          hint={m ? `${m.cacheHitRatio}% of requests, about ${m.cacheSavings} saved` : undefined}
-        />
-        <StatTile
-          icon={Layers}
-          label="Providers on"
-          value={providers.data ? `${activeProviders} / ${providerList.length}` : "—"}
-          hint="Turned on and have a key"
+          label="Cache hit rate"
+          value={hasRequests ? `${m.cacheHitRatio}%` : "—"}
+          hint={hasRequests ? `${m.cacheHits.toLocaleString()} answered from cache` : "All time"}
         />
         <StatTile
           icon={Users}
@@ -84,10 +81,19 @@ export default function AdminOverviewPage() {
           value={customers.data ? (customers.data.customers?.length ?? 0).toLocaleString() : "—"}
           hint="Accounts and admin bots"
         />
+        <StatTile
+          icon={Layers}
+          label="Providers ready"
+          value={providers.data ? `${readyProviders} / ${providerList.length}` : "—"}
+          hint="On, have a key and not paused"
+        />
       </div>
 
       {providers.data && logs.data ? (
-        <AdminAnalyticsTab providers={providerList} logs={logs.data.logs ?? []} onRefresh={refresh} loading={refreshing} />
+        <div className="grid gap-6 lg:grid-cols-2">
+          <ProviderHealth providers={providerList} now={now} />
+          <RecentErrors logs={recent} />
+        </div>
       ) : (
         !providers.error && !logs.error && <PageLoader label="Loading activity" />
       )}
