@@ -228,15 +228,15 @@ export function AdminProvidersTab({ providers, onUpdateProviders }: AdminProvide
 
   return (
     <div className="space-y-6">
-      {/* Top Banner & Automatic Failover Chain Header */}
+      {/* Top Banner & Provider order Header */}
       <div className="bg-[#090d16] border border-white/10 rounded-2xl p-6 relative overflow-hidden backdrop-blur-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <Workflow className="w-5 h-5 text-red-500" />
-            <h2 className="text-lg font-bold text-white tracking-tight">Automatic Failover Chain</h2>
+            <h2 className="text-lg font-bold text-white tracking-tight">Provider order</h2>
           </div>
           <p className="text-xs text-slate-400">
-            Top-priority provider handles traffic first. Click any model name or Manage Models to customize intra-provider fallback chains inline.
+            The top provider is tried first. If it fails, the next one answers. Click a model name to change which models a provider uses.
           </p>
         </div>
 
@@ -268,7 +268,7 @@ export function AdminProvidersTab({ providers, onUpdateProviders }: AdminProvide
           <div className="flex items-center justify-between border-b border-white/10 pb-3">
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-amber-400" />
-              <h3 className="text-sm font-bold text-white">Live Benchmark Race Leaderboard</h3>
+              <h3 className="text-sm font-bold text-white">Speed test results</h3>
             </div>
             <button
               type="button"

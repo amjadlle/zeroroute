@@ -398,7 +398,7 @@ export function AdminPlaygroundTab({ providers }: AdminPlaygroundTabProps) {
                             <span className="text-amber-400">⚡</span>
                             <div className="flex flex-col">
                               <span className="font-bold text-amber-300">Auto Fallback Route</span>
-                              <span className="text-[10px] text-slate-400 font-sans">Dynamic multi-cloud routing with instant failover</span>
+                              <span className="text-[10px] text-slate-400 font-sans">Tries providers in order until one answers</span>
                             </div>
                           </div>
                           {selectedTarget === "auto" && <Check className="w-3.5 h-3.5 text-red-400 shrink-0" />}

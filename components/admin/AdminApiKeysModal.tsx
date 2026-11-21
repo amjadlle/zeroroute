@@ -101,7 +101,7 @@ export function AdminApiKeysModal({ isOpen, onClose, providers }: AdminApiKeysMo
                   <ShieldCheck className="w-3 h-3" /> Encrypted Secrets
                 </span>
               </div>
-              <p className="text-xs text-slate-400">Manage API keys across all 10 free multi-cloud inference providers</p>
+              <p className="text-xs text-slate-400">Which providers have a key set.</p>
             </div>
           </div>
 

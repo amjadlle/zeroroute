@@ -179,10 +179,10 @@ export function AdminCustomersTab({ customers, onRefresh, onViewCustomerLogs }: 
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <Users className="w-5 h-5 text-blue-400" />
-            <h2 className="text-lg font-bold text-white tracking-tight">Subscriber & Bot Directory ({customers.length})</h2>
+            <h2 className="text-lg font-bold text-white tracking-tight">All customers ({customers.length})</h2>
           </div>
           <p className="text-xs text-slate-400">
-            Create unlimited bots for your personal websites, manage tenants, configure domain security, and monitor requests.
+            Create bots for your own sites, pause accounts, and see their requests.
           </p>
         </div>
 
@@ -208,7 +208,7 @@ export function AdminCustomersTab({ customers, onRefresh, onViewCustomerLogs }: 
             className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] rounded-xl bg-gradient-to-b from-[#e5333b] to-[#c71d25] hover:from-[#f03e46] hover:to-[#d6232b] text-white font-semibold text-xs border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_6px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 shrink-0 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>Create Unlimited Bot</span>
+            <span>Create bot</span>
           </button>
         </div>
       </div>
@@ -231,7 +231,7 @@ export function AdminCustomersTab({ customers, onRefresh, onViewCustomerLogs }: 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-bold text-sm text-white">{c.name || "Subscriber"}</span>
+                    <span className="font-bold text-sm text-white">{c.name || "Customer"}</span>
                     <span className="text-xs text-slate-400 font-mono">({c.email})</span>
                     {c.company && (
                       <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-white/5 text-slate-300 border border-white/5">
@@ -240,7 +240,7 @@ export function AdminCustomersTab({ customers, onRefresh, onViewCustomerLogs }: 
                     )}
                     {isUnlimited && (
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
-                        <Sparkles className="w-3 h-3" /> Unlimited Lifetime
+                        <Sparkles className="w-3 h-3" /> No limit
                       </span>
                     )}
                   </div>
@@ -272,7 +272,7 @@ export function AdminCustomersTab({ customers, onRefresh, onViewCustomerLogs }: 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-white/5">
                 {/* Master Key Card */}
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-semibold text-slate-400 block">Master Subscriber Key</label>
+                  <label className="text-[11px] font-semibold text-slate-400 block">API key</label>
                   <div className="flex items-center gap-2 bg-[#080a0f] border border-white/5 rounded-xl px-3 py-2 text-xs font-mono text-slate-300 min-h-[44px]">
                     <Key className="w-3.5 h-3.5 text-red-400 shrink-0" />
                     <span className="truncate flex-1">{maskedKey}</span>
@@ -400,8 +400,8 @@ export function AdminCustomersTab({ customers, onRefresh, onViewCustomerLogs }: 
                   <Bot className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white">Create Unlimited Admin Bot</h3>
-                  <p className="text-xs text-slate-400">Provision a lifetime free bot for your personal websites with custom domain protection.</p>
+                  <h3 className="text-lg font-bold text-white">Create a bot</h3>
+                  <p className="text-xs text-slate-400">A free bot with no request limit, for your own websites.</p>
                 </div>
               </div>
               <button
@@ -421,7 +421,7 @@ export function AdminCustomersTab({ customers, onRefresh, onViewCustomerLogs }: 
                   <div className="space-y-1">
                     <h4 className="text-sm font-bold text-emerald-300">Bot Created & Activated!</h4>
                     <p className="text-xs text-emerald-400/80">
-                      Your bot is active with <strong>Unlimited Lifetime Quota</strong>. Paste the code snippet below before the closing <code>&lt;/body&gt;</code> tag of your website.
+                      The bot is live with no request limit. Paste the code snippet below before the closing <code>&lt;/body&gt;</code> tag of your website.
                     </p>
                   </div>
                 </div>
@@ -616,7 +616,7 @@ export function AdminCustomersTab({ customers, onRefresh, onViewCustomerLogs }: 
                     ) : (
                       <>
                         <Sparkles className="w-3.5 h-3.5" />
-                        <span>Create Bot (Unlimited)</span>
+                        <span>Create bot</span>
                       </>
                     )}
                   </button>
