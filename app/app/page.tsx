@@ -1,292 +1,62 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiFetch, ApiError } from "@/lib/client/api";
-import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { PageHeader } from "@/components/shell/PageHeader";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { useToast } from "@/components/ui/Toast";
 import { OverviewTab } from "@/components/dashboard/OverviewTab";
-import { WidgetTab } from "@/components/dashboard/WidgetTab";
-import { KnowledgeTab, KnowledgeDoc } from "@/components/dashboard/KnowledgeTab";
-import { PersonaTab } from "@/components/dashboard/PersonaTab";
-import { DocsTab } from "@/components/dashboard/DocsTab";
-import { BillingModal } from "@/components/dashboard/BillingTab";
-import { Activity, Bot, BookOpen, SlidersHorizontal, Code2, Loader2 } from "lucide-react";
+import { apiFetch } from "@/lib/client/api";
+import { failMsg, useCustomer } from "./CustomerConsole";
 
-interface CustomerProfile {
-  id: string;
-  key: string;
-  email: string;
-  name: string;
-  company?: string;
-  website?: string;
-  bot_title: string;
-  bot_role: string;
-  tone: string;
-  greeting: string;
-  prompts: string[];
-  persona: string;
-  status: string;
-  subscription_expires?: number;
-  days_remaining: number;
-  monthly_requests: number;
-  monthly_limit: number;
-  bot_id: string;
-  allowed_domains?: string[];
-  knowledge_docs_count: number;
-  is_admin?: boolean;
-}
-
-// `?key=` sign-in: send it as Bearer on the calls that already supported it (unchanged by #10).
-function keyHeaders(): Record<string, string> {
-  const queryKey = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("key") : null;
-  return queryKey ? { Authorization: `Bearer ${queryKey}` } : {};
-}
-
-const failMsg = (e: unknown) => (e instanceof Error ? e.message : String(e));
-
-export default function AppDashboard() {
+export default function HomePage() {
   const router = useRouter();
-  const [profile, setProfile] = useState<CustomerProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"overview" | "widget" | "knowledge" | "persona" | "docs">("overview");
-  const [billingOpen, setBillingOpen] = useState(false);
-
-  const [docs, setDocs] = useState<KnowledgeDoc[]>([]);
+  const toast = useToast();
+  const confirm = useConfirm();
+  const { profile, setProfile, monthlyLimit } = useCustomer();
   const [rotatingKey, setRotatingKey] = useState(false);
-  const [addingDoc, setAddingDoc] = useState(false);
-  const [savingPersona, setSavingPersona] = useState(false);
 
-  const fetchProfile = async () => {
-    try {
-      const data = await apiFetch<{ customer?: CustomerProfile }>("/api/customer/profile", { headers: keyHeaders() });
-      if (data.customer) {
-        setProfile(data.customer);
-      }
-    } catch (e) {
-      // apiFetch already redirects on 401. Use replace to prevent redirect loop in browser history
-      if (!(e instanceof ApiError && e.status === 401)) router.replace("/login");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchDocs = async () => {
-    try {
-      const data = await apiFetch<{ documents?: KnowledgeDoc[] }>("/api/knowledge", { headers: keyHeaders() });
-      if (data.documents) {
-        setDocs(data.documents);
-      }
-    } catch {}
-  };
-
-  useEffect(() => {
-    Promise.all([fetchProfile(), fetchDocs()]);
-  }, []);
-
-  const handleRotateKey = async () => {
-    if (!confirm("Are you sure you want to rotate your API key? All applications using the old key will need to be updated.")) return;
+  const rotateKey = async () => {
+    const ok = await confirm({
+      title: "Get a new API key?",
+      body: "Your current key stops working straight away. Update it everywhere you use it.",
+      confirmLabel: "Get new key",
+      tone: "danger",
+    });
+    if (!ok) return;
     setRotatingKey(true);
     try {
       const data = await apiFetch<{ key?: string }>("/api/customer/key/regenerate", { method: "POST" });
-      if (data.key && profile) {
-        setProfile({ ...profile, key: data.key });
-      }
+      if (data.key) setProfile({ ...profile, key: data.key });
+      toast("Your new API key is ready.", { tone: "success" });
     } catch (e) {
-      alert(`Failed to rotate API key: ${failMsg(e)}`);
-    }
-    setRotatingKey(false);
-  };
-
-  const handleUpdateDomains = async (domains: string[]) => {
-    try {
-      const data = await apiFetch<{ allowedDomains?: string[] }>("/api/customer/domains", {
-        method: "POST",
-        headers: keyHeaders(),
-        body: { domains },
-      });
-      if (data.allowedDomains && profile) {
-        setProfile({ ...profile, allowed_domains: data.allowedDomains });
-      }
-    } catch (e) {
-      alert(e instanceof ApiError ? e.message : "Failed to connect to server. Please try again.");
-    }
-  };
-
-  const handleAddDoc = async (title: string, content: string) => {
-    setAddingDoc(true);
-    try {
-      await apiFetch("/api/knowledge", {
-        method: "POST",
-        body: { title, content, type: "manual_text" },
-      });
-      await fetchDocs();
-      await fetchProfile();
-    } catch (e) {
-      alert(`Failed to add document: ${failMsg(e)}`);
-      throw e; // keeps the KnowledgeTab modal open so the typed text is not lost
+      toast(`Couldn't create a new API key: ${failMsg(e)}`, { tone: "danger" });
     } finally {
-      setAddingDoc(false);
+      setRotatingKey(false);
     }
   };
 
-  const handleDeleteDoc = async (id: string) => {
-    if (!confirm("Delete this document from knowledge base?")) return;
-    try {
-      await apiFetch(`/api/knowledge?id=${encodeURIComponent(id)}`, { method: "DELETE" });
-      await fetchDocs();
-      await fetchProfile();
-    } catch (e) {
-      alert(`Failed to delete document: ${failMsg(e)}`);
-    }
+  // OverviewTab shows its own inline message when this throws.
+  const updateDomains = async (domains: string[]) => {
+    const data = await apiFetch<{ allowedDomains?: string[] }>("/api/customer/domains", { method: "POST", body: { domains } });
+    if (data.allowedDomains) setProfile({ ...profile, allowed_domains: data.allowedDomains });
   };
-
-  const handleSavePersona = async (data: {
-    bot_title: string;
-    bot_role: string;
-    tone: string;
-    greeting: string;
-    persona: string;
-  }) => {
-    setSavingPersona(true);
-    try {
-      await apiFetch("/api/customer/persona", { method: "POST", body: data });
-      await fetchProfile();
-    } catch (e) {
-      alert(`Failed to save persona: ${failMsg(e)}`);
-      throw e; // PersonaTab skips its success banner
-    } finally {
-      setSavingPersona(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await apiFetch("/api/auth/logout", { method: "POST" });
-    } catch {}
-    window.location.href = "/login";
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#050608] flex items-center justify-center text-slate-400 text-xs gap-2">
-        <Loader2 className="w-5 h-5 animate-spin text-red-500" />
-        <span>Loading subscriber console…</span>
-      </div>
-    );
-  }
-
-  const tabs = [
-    { id: "overview", label: "Overview & Telemetry", icon: Activity },
-    { id: "widget", label: "Chatbot & Live Test", icon: Bot },
-    { id: "knowledge", label: `Knowledge Base (${docs.length})`, icon: BookOpen },
-    { id: "persona", label: "Persona & Prompts", icon: SlidersHorizontal },
-    { id: "docs", label: "API Quickstart", icon: Code2 },
-  ];
 
   return (
-    <div className="min-h-screen bg-[#050608] text-slate-100 flex flex-col font-sans selection:bg-red-500/30 selection:text-white">
-      <DashboardHeader
-        name={profile?.name}
-        email={profile?.email}
-        isAdmin={Boolean(profile?.is_admin)}
-        isPro={Boolean(profile?.monthly_limit && profile.monthly_limit >= 10000)}
-        onLogout={handleLogout}
-        onOpenBilling={() => setBillingOpen(true)}
+    <>
+      <PageHeader title="Home" description="Your API key, Bot ID, allowed domains and usage at a glance." />
+      <OverviewTab
+        apiKey={profile.key}
+        botId={profile.bot_id}
+        monthlyRequests={profile.monthly_requests || 0}
+        monthlyLimit={monthlyLimit}
+        daysRemaining={profile.days_remaining || 0}
+        allowedDomains={profile.allowed_domains || []}
+        onUpdateDomains={updateDomains}
+        onOpenBilling={() => router.push("/app/billing")}
+        onRotateKey={rotateKey}
+        rotatingKey={rotatingKey}
       />
-
-      <div className="flex-1 max-w-[1700px] w-full mx-auto px-4 sm:px-8 py-6 space-y-6">
-        {/* Navigation Tabs Bar */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-dark-border text-xs font-semibold -mx-4 px-4 sm:mx-0 sm:px-0 touch-pan-x">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isSelected = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2 px-3.5 py-2.5 min-h-[44px] rounded-xl transition-all whitespace-nowrap cursor-pointer touch-manipulation shrink-0 ${
-                  isSelected
-                    ? "bg-red-600/15 text-red-400 border border-red-500/30 font-bold"
-                    : "text-slate-400 hover:text-white hover:bg-white/5 border border-transparent"
-                }`}
-              >
-                <Icon className="w-4 h-4 shrink-0" />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Tab Views */}
-        {activeTab === "overview" && (
-          <OverviewTab
-            apiKey={profile?.key || "zr_live_demo"}
-            botId={profile?.bot_id || "bot_live_demo"}
-            monthlyRequests={profile?.monthly_requests || 0}
-            monthlyLimit={profile?.monthly_limit || 500}
-            daysRemaining={profile?.days_remaining || 0}
-            allowedDomains={profile?.allowed_domains || []}
-            onUpdateDomains={handleUpdateDomains}
-            onOpenBilling={() => setBillingOpen(true)}
-            onRotateKey={handleRotateKey}
-            rotatingKey={rotatingKey}
-            onNavigateTab={setActiveTab}
-          />
-        )}
-
-        {activeTab === "widget" && (
-          <WidgetTab
-            botTitle={profile?.bot_title || "ZeroRoute AI"}
-            greeting={profile?.greeting || "Hi there!"}
-            botId={profile?.bot_id || "bot_live_demo"}
-            prompts={profile?.prompts || []}
-            apiKey={profile?.key}
-          />
-        )}
-
-        {activeTab === "knowledge" && (
-          <KnowledgeTab
-            docs={docs}
-            onAddDoc={handleAddDoc}
-            onDeleteDoc={handleDeleteDoc}
-            onRefresh={fetchDocs}
-            addingDoc={addingDoc}
-          />
-        )}
-
-        {activeTab === "persona" && (
-          <PersonaTab
-            initialBotTitle={profile?.bot_title || "ZeroRoute AI"}
-            initialBotRole={profile?.bot_role || "AI Assistant"}
-            initialTone={profile?.tone || "helpful and concise"}
-            initialGreeting={profile?.greeting || "Hi there! How can I help you today?"}
-            initialPersona={profile?.persona || ""}
-            onSave={handleSavePersona}
-            saving={savingPersona}
-          />
-        )}
-
-        {activeTab === "docs" && (
-          <DocsTab
-            apiKey={profile?.key || "zr_live_demo"}
-            botId={profile?.bot_id || "bot_live_demo"}
-            initialBotTitle={profile?.bot_title || "ZeroRoute AI"}
-            initialGreeting={profile?.greeting || "Hi! 👋 How can I help you today?"}
-            initialPrompts={profile?.prompts || []}
-          />
-        )}
-      </div>
-
-      {/* Plan & Billing Modal */}
-      <BillingModal
-        isOpen={billingOpen}
-        onClose={() => setBillingOpen(false)}
-        daysRemaining={profile?.days_remaining || 0}
-        monthlyRequests={profile?.monthly_requests || 0}
-        monthlyLimit={profile?.monthly_limit || 2000}
-        email={profile?.email}
-      />
-    </div>
+    </>
   );
 }

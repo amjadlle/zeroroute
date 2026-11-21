@@ -2,14 +2,22 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifyAdminSession } from "@/lib/auth/admin-session";
 
+// Old links carried the API key in the URL. A key never signs a page in; it is stripped instead.
+const URL_SECRET_PARAMS = ["key", "token", "email"];
+
 export async function proxy(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
   const sessionToken = request.cookies.get("zr_session")?.value;
-  const queryKey = searchParams.get("key") || searchParams.get("token");
+
+  if ((pathname.startsWith("/app") || pathname.startsWith("/onboarding")) && URL_SECRET_PARAMS.some((p) => searchParams.has(p))) {
+    const clean = request.nextUrl.clone();
+    URL_SECRET_PARAMS.forEach((p) => clean.searchParams.delete(p));
+    return NextResponse.redirect(clean);
+  }
 
   const isAdmin = await verifyAdminSession(sessionToken);
 
-  const isAuthenticated = Boolean(sessionToken || queryKey);
+  const isAuthenticated = Boolean(sessionToken);
 
   // 1. Protect /admin route - strictly accessible by Admin only
   if (pathname.startsWith("/admin")) {
@@ -24,7 +32,7 @@ export async function proxy(request: NextRequest) {
   if (pathname.startsWith("/app")) {
     if (!isAuthenticated) {
       const loginUrl = new URL("/login", request.url);
-      loginUrl.searchParams.set("redirect", "/app");
+      loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
   }

@@ -29,9 +29,7 @@ import {
 function OnboardingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const tokenFromUrl = searchParams.get("token") || searchParams.get("key") || "";
   const botIdFromUrl = searchParams.get("bot_id") || "";
-  const emailFromUrl = searchParams.get("email") || "";
 
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -69,24 +67,17 @@ function OnboardingContent() {
   // Step 4: Password & Keys
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [customerKey, setCustomerKey] = useState(tokenFromUrl);
+  const [customerKey, setCustomerKey] = useState("");
   const [botId, setBotId] = useState(botIdFromUrl);
-  const [customerEmail, setCustomerEmail] = useState(emailFromUrl);
+  const [customerEmail, setCustomerEmail] = useState("");
 
-  // Prefill key or session if available
+  // Prefill from the session cookie (the API key never travels in the URL)
   useEffect(() => {
-    if (tokenFromUrl) setCustomerKey(tokenFromUrl);
     if (botIdFromUrl) setBotId(botIdFromUrl);
-    if (emailFromUrl) setCustomerEmail(emailFromUrl);
 
     const fetchExisting = async () => {
       try {
-        const queryParams = new URLSearchParams();
-        if (tokenFromUrl) queryParams.set("key", tokenFromUrl);
-        if (emailFromUrl) queryParams.set("email", emailFromUrl);
-        const queryStr = queryParams.toString() ? `?${queryParams.toString()}` : "";
-
-        const res = await fetch(`/api/customer/profile${queryStr}`);
+        const res = await fetch("/api/customer/profile");
         if (res.ok) {
           const data = await res.json();
           if (data.customer) {
@@ -108,7 +99,7 @@ function OnboardingContent() {
       } catch {}
     };
     fetchExisting();
-  }, [tokenFromUrl, botIdFromUrl, emailFromUrl]);
+  }, [botIdFromUrl]);
 
   const steps = [
     { num: 1, title: "Identity", icon: Building },
@@ -127,10 +118,7 @@ function OnboardingContent() {
     setCrawlingUrl(true);
     setError("");
     try {
-      const headers: Record<string, string> = { "Content-Type": "application/json" };
-      if (customerKey || tokenFromUrl) {
-        headers["Authorization"] = `Bearer ${customerKey || tokenFromUrl}`;
-      }
+      const headers = { "Content-Type": "application/json" };
       const res = await fetch("/api/knowledge/crawl", {
         method: "POST",
         headers,
@@ -161,17 +149,12 @@ function OnboardingContent() {
       }
       // Incrementally auto-save Step 1 to database
       try {
-        const headers: Record<string, string> = { "Content-Type": "application/json" };
-        if (customerKey || tokenFromUrl) {
-          headers["Authorization"] = `Bearer ${customerKey || tokenFromUrl}`;
-        }
+        const headers = { "Content-Type": "application/json" };
         fetch("/api/onboarding/setup", {
           method: "POST",
           headers,
           body: JSON.stringify({
-            key: customerKey || tokenFromUrl,
-            token: tokenFromUrl || customerKey,
-            email: customerEmail || emailFromUrl,
+            email: customerEmail,
             name: company.trim(),
             company: company.trim(),
             website: website.trim(),
@@ -183,17 +166,12 @@ function OnboardingContent() {
     } else if (currentStep === 2) {
       // Incrementally auto-save Step 2 to database
       try {
-        const headers: Record<string, string> = { "Content-Type": "application/json" };
-        if (customerKey || tokenFromUrl) {
-          headers["Authorization"] = `Bearer ${customerKey || tokenFromUrl}`;
-        }
+        const headers = { "Content-Type": "application/json" };
         fetch("/api/onboarding/setup", {
           method: "POST",
           headers,
           body: JSON.stringify({
-            key: customerKey || tokenFromUrl,
-            token: tokenFromUrl || customerKey,
-            email: customerEmail || emailFromUrl,
+            email: customerEmail,
             name: company.trim(),
             company: company.trim(),
             website: website.trim(),
@@ -250,18 +228,11 @@ function OnboardingContent() {
     setError("");
 
     try {
-      const headers: Record<string, string> = { "Content-Type": "application/json" };
-      if (customerKey || tokenFromUrl) {
-        headers["Authorization"] = `Bearer ${customerKey || tokenFromUrl}`;
-      }
-
       const res = await fetch("/api/onboarding/setup", {
         method: "POST",
-        headers,
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          key: customerKey || tokenFromUrl,
-          token: tokenFromUrl || customerKey,
-          email: customerEmail || emailFromUrl,
+          email: customerEmail,
           name: company.trim() || botTitle.trim() || "Subscriber",
           company: company.trim(),
           website: website.trim(),
@@ -284,10 +255,7 @@ function OnboardingContent() {
         return;
       }
 
-      // Redirect to /app dashboard with key if present
-      const finalKey = data.customer?.key || customerKey || tokenFromUrl;
-      const targetUrl = finalKey ? `/app?key=${encodeURIComponent(finalKey)}` : "/app";
-      window.location.href = targetUrl;
+      window.location.href = "/app";
     } catch {
       setError("An unexpected error occurred while saving setup.");
       setLoading(false);

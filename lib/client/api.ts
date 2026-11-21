@@ -15,10 +15,15 @@ export type ApiInit = Omit<RequestInit, "body"> & {
   onUnauthorized?: () => void;
 };
 
-export function redirectToLogin() {
-  // Full navigation on purpose: this runs outside React (no router) and drops client state.
-  // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-  window.location.assign(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+export function redirectToLogin(): Promise<void> {
+  // Clear the (stale) session cookie first: while it is set, the proxy sends /login straight back to the console.
+  return fetch("/api/auth/logout", { method: "POST" })
+    .catch(() => {})
+    .then(() => {
+      // Full navigation on purpose: this runs outside React (no router) and drops client state.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.assign(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+    });
 }
 
 const isPlainJson = (b: unknown): b is object =>

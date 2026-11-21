@@ -30,12 +30,13 @@ describe("apiFetch", () => {
     expect(err).toMatchObject({ status: 502, message: "Request failed (502)" });
   });
 
-  it("redirects to /login with the current path on 401", async () => {
-    mockFetch(JSON.stringify({ error: "Unauthorized" }), 401);
+  it("clears the session cookie, then redirects to /login with the current path on 401", async () => {
+    const fetchFn = mockFetch(JSON.stringify({ error: "Unauthorized" }), 401);
     const assign = vi.fn();
     vi.stubGlobal("window", { location: { pathname: "/admin", assign } });
     await expect(apiFetch("/api/admin/providers")).rejects.toMatchObject({ status: 401 });
-    expect(assign).toHaveBeenCalledWith("/login?redirect=%2Fadmin");
+    await vi.waitFor(() => expect(assign).toHaveBeenCalledWith("/login?redirect=%2Fadmin"));
+    expect(fetchFn.mock.calls[1]).toEqual(["/api/auth/logout", { method: "POST" }]);
   });
 
   it("uses an injected onUnauthorized handler instead of redirecting", async () => {
