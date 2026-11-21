@@ -149,14 +149,6 @@
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
-
-  /* Stops iOS zoom-on-focus. Kept for now: removing it shrinks every mobile input that uses
-     text-xs/text-sm. Drop it once the Input component (#4) ships 16px mobile inputs. */
-  @media screen and (max-width: 768px) {
-    input, textarea, select {
-      font-size: 16px !important;
-    }
-  }
 }
 
 .grid-pattern {
