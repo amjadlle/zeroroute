@@ -70,6 +70,7 @@
   --color-accent:       light-dark(oklch(.52 .17 277),  oklch(.76 .17 277));
   --color-accent-hover: light-dark(oklch(.47 .17 277),  oklch(.81 .17 277));
   --color-accent-fg:    light-dark(oklch(.99 .005 277), oklch(.19 .04 277));
+  --color-accent-soft:  light-dark(oklch(.95 .04 277),  oklch(.27 .06 277));
   --color-focus-ring:   light-dark(oklch(.52 .17 277),  oklch(.76 .17 277));
 
   --color-success:      light-dark(oklch(.5 .13 152),  oklch(.79 .15 152));

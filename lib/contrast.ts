@@ -57,6 +57,8 @@ export const CONTRAST_PAIRS: ReadonlyArray<readonly [string, string, number]> = 
   ["accent", "bg", 4.5],
   ["accent", "surface", 4.5],
   ["accent", "surface-raised", 4.5],
+  ["accent", "accent-soft", 4.5],
+  ["text", "accent-soft", 4.5],
   ...(["success", "warning", "danger", "info"] as const).flatMap((s) => [
     [`${s}-fg`, `${s}-soft`, 4.5] as const,
     [`${s}-fg`, "surface", 4.5] as const,
