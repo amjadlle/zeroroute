@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { apiFetch, ApiError } from "@/lib/client/api";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { OverviewTab } from "@/components/dashboard/OverviewTab";
 import { WidgetTab } from "@/components/dashboard/WidgetTab";
@@ -35,6 +36,14 @@ interface CustomerProfile {
   is_admin?: boolean;
 }
 
+// `?key=` sign-in: send it as Bearer on the calls that already supported it (unchanged by #10).
+function keyHeaders(): Record<string, string> {
+  const queryKey = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("key") : null;
+  return queryKey ? { Authorization: `Bearer ${queryKey}` } : {};
+}
+
+const failMsg = (e: unknown) => (e instanceof Error ? e.message : String(e));
+
 export default function AppDashboard() {
   const router = useRouter();
   const [profile, setProfile] = useState<CustomerProfile | null>(null);
@@ -49,25 +58,13 @@ export default function AppDashboard() {
 
   const fetchProfile = async () => {
     try {
-      const urlParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
-      const queryKey = urlParams?.get("key");
-      const headers: Record<string, string> = {};
-      if (queryKey) {
-        headers["Authorization"] = `Bearer ${queryKey}`;
-      }
-
-      const res = await fetch("/api/customer/profile", { headers });
-      if (!res.ok) {
-        // Use replace to prevent redirect loop in browser history
-        router.replace("/login");
-        return;
-      }
-      const data = await res.json();
+      const data = await apiFetch<{ customer?: CustomerProfile }>("/api/customer/profile", { headers: keyHeaders() });
       if (data.customer) {
         setProfile(data.customer);
       }
-    } catch {
-      router.replace("/login");
+    } catch (e) {
+      // apiFetch already redirects on 401. Use replace to prevent redirect loop in browser history
+      if (!(e instanceof ApiError && e.status === 401)) router.replace("/login");
     } finally {
       setLoading(false);
     }
@@ -75,15 +72,7 @@ export default function AppDashboard() {
 
   const fetchDocs = async () => {
     try {
-      const urlParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
-      const queryKey = urlParams?.get("key");
-      const headers: Record<string, string> = {};
-      if (queryKey) {
-        headers["Authorization"] = `Bearer ${queryKey}`;
-      }
-
-      const res = await fetch("/api/knowledge", { headers });
-      const data = await res.json();
+      const data = await apiFetch<{ documents?: KnowledgeDoc[] }>("/api/knowledge", { headers: keyHeaders() });
       if (data.documents) {
         setDocs(data.documents);
       }
@@ -98,61 +87,57 @@ export default function AppDashboard() {
     if (!confirm("Are you sure you want to rotate your API key? All applications using the old key will need to be updated.")) return;
     setRotatingKey(true);
     try {
-      const res = await fetch("/api/customer/key/regenerate", { method: "POST" });
-      const data = await res.json();
+      const data = await apiFetch<{ key?: string }>("/api/customer/key/regenerate", { method: "POST" });
       if (data.key && profile) {
         setProfile({ ...profile, key: data.key });
       }
-    } catch {}
+    } catch (e) {
+      alert(`Failed to rotate API key: ${failMsg(e)}`);
+    }
     setRotatingKey(false);
   };
 
   const handleUpdateDomains = async (domains: string[]) => {
     try {
-      const urlParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
-      const queryKey = urlParams?.get("key");
-      const headers: Record<string, string> = { "Content-Type": "application/json" };
-      if (queryKey) headers["Authorization"] = `Bearer ${queryKey}`;
-
-      const res = await fetch("/api/customer/domains", {
+      const data = await apiFetch<{ allowedDomains?: string[] }>("/api/customer/domains", {
         method: "POST",
-        headers,
-        body: JSON.stringify({ domains }),
+        headers: keyHeaders(),
+        body: { domains },
       });
-      const data = await res.json();
-      if (res.ok && data.allowedDomains && profile) {
+      if (data.allowedDomains && profile) {
         setProfile({ ...profile, allowed_domains: data.allowedDomains });
-      } else if (!res.ok) {
-        alert(data.error || "Failed to update allowed domains.");
       }
-    } catch {
-      alert("Failed to connect to server. Please try again.");
+    } catch (e) {
+      alert(e instanceof ApiError ? e.message : "Failed to connect to server. Please try again.");
     }
   };
 
   const handleAddDoc = async (title: string, content: string) => {
     setAddingDoc(true);
     try {
-      const res = await fetch("/api/knowledge", {
+      await apiFetch("/api/knowledge", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, content, type: "manual_text" }),
+        body: { title, content, type: "manual_text" },
       });
-      if (res.ok) {
-        await fetchDocs();
-        await fetchProfile();
-      }
-    } catch {}
-    setAddingDoc(false);
+      await fetchDocs();
+      await fetchProfile();
+    } catch (e) {
+      alert(`Failed to add document: ${failMsg(e)}`);
+      throw e; // keeps the KnowledgeTab modal open so the typed text is not lost
+    } finally {
+      setAddingDoc(false);
+    }
   };
 
   const handleDeleteDoc = async (id: string) => {
     if (!confirm("Delete this document from knowledge base?")) return;
     try {
-      await fetch(`/api/knowledge?id=${id}`, { method: "DELETE" });
+      await apiFetch(`/api/knowledge?id=${encodeURIComponent(id)}`, { method: "DELETE" });
       await fetchDocs();
       await fetchProfile();
-    } catch {}
+    } catch (e) {
+      alert(`Failed to delete document: ${failMsg(e)}`);
+    }
   };
 
   const handleSavePersona = async (data: {
@@ -164,21 +149,19 @@ export default function AppDashboard() {
   }) => {
     setSavingPersona(true);
     try {
-      const res = await fetch("/api/customer/persona", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (res.ok) {
-        await fetchProfile();
-      }
-    } catch {}
-    setSavingPersona(false);
+      await apiFetch("/api/customer/persona", { method: "POST", body: data });
+      await fetchProfile();
+    } catch (e) {
+      alert(`Failed to save persona: ${failMsg(e)}`);
+      throw e; // PersonaTab skips its success banner
+    } finally {
+      setSavingPersona(false);
+    }
   };
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      await apiFetch("/api/auth/logout", { method: "POST" });
     } catch {}
     window.location.href = "/login";
   };

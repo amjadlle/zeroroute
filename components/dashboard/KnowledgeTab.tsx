@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { apiFetch } from "@/lib/client/api";
 import { 
   BookOpen, Plus, Trash2, Globe, FileText, Loader2, Sparkles, 
   ExternalLink, AlertCircle, UploadCloud, FileUp, RotateCw 
@@ -49,7 +50,11 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
   const handleTextSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
-    await onAddDoc(title || "Knowledge Document", content);
+    try {
+      await onAddDoc(title || "Knowledge Document", content);
+    } catch {
+      return; // onAddDoc already reported the failure; keep the modal and text
+    }
     setTitle("");
     setContent("");
     setModalOpen(false);
@@ -61,22 +66,14 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
     setUploadStatus(`Reading ${file.name}…`);
     try {
       const text = await file.text();
-      const res = await fetch("/api/knowledge", {
+      await apiFetch("/api/knowledge", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        body: {
           title: file.name,
           content: text,
           type: "file_upload",
-        }),
+        },
       });
-
-      const data = await res.json();
-      if (!res.ok) {
-        setUploadError(data.error || "Failed to upload document.");
-        setUploadStatus(null);
-        return;
-      }
 
       setUploadStatus(`✅ Indexed ${file.name} (${text.length} chars)`);
       if (onRefresh) await onRefresh();
@@ -105,18 +102,10 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
     setCrawlError("");
 
     try {
-      const res = await fetch("/api/knowledge/crawl", {
+      await apiFetch("/api/knowledge/crawl", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: cleanUrl, title: crawlTitle.trim() || undefined }),
+        body: { url: cleanUrl, title: crawlTitle.trim() || undefined },
       });
-
-      const data = await res.json();
-      if (!res.ok) {
-        setCrawlError(data.error || "Failed to crawl URL.");
-        setCrawling(false);
-        return;
-      }
 
       setCrawlUrl("");
       setCrawlTitle("");
@@ -135,16 +124,11 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
     if (!doc.source_url) return;
     setSyncingDocId(doc.id);
     try {
-      const res = await fetch("/api/knowledge/crawl", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: doc.source_url }),
-      });
-      if (res.ok && onRefresh) {
-        await onRefresh();
-      }
+      await apiFetch("/api/knowledge/crawl", { method: "POST", body: { url: doc.source_url } });
+      if (onRefresh) await onRefresh();
     } catch (err) {
       console.error("Sync error:", err);
+      alert(`Failed to re-sync ${doc.source_url}: ${(err as Error).message}`);
     } finally {
       setSyncingDocId(null);
     }

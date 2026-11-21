@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { apiFetch } from "@/lib/client/api";
 import { 
   Users, Search, Key, CheckCircle2, PauseCircle, RefreshCw, Trash2, 
   Eye, EyeOff, Plus, Copy, Check, Globe, X, Bot, Shield, Code, Sparkles, Activity
@@ -73,22 +74,13 @@ export function AdminCustomersTab({ customers, onRefresh, onViewCustomerLogs }: 
     setRevealedKeys(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const getAdminHeaders = () => {
-    const adminKey = typeof window !== "undefined" ? localStorage.getItem("admin_key") || "" : "";
-    return {
-      "Content-Type": "application/json",
-      "Authorization": adminKey ? `Bearer ${adminKey}` : "",
-    };
-  };
-
   const handleCreateBot = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const res = await fetch("/api/admin/customers", {
+      const data = await apiFetch<{ success?: boolean; error?: string; bot?: { bot_id: string; key: string } }>("/api/admin/customers", {
         method: "POST",
-        headers: getAdminHeaders(),
-        body: JSON.stringify({
+        body: {
           company: formCompany.trim() || "My Website",
           name: formCompany.trim() || "Admin Bot",
           bot_title: formTitle.trim() || `${formCompany || "ZeroRoute"} AI Assistant`,
@@ -96,10 +88,9 @@ export function AdminCustomersTab({ customers, onRefresh, onViewCustomerLogs }: 
           allowed_domains: formDomains.trim(),
           greeting: formGreeting.trim(),
           prompts: formPrompts.split(",").map(p => p.trim()).filter(Boolean),
-        }),
+        },
       });
 
-      const data = await res.json();
       if (data.success && data.bot) {
         setCreatedBot({
           bot_id: data.bot.bot_id,
@@ -118,7 +109,7 @@ export function AdminCustomersTab({ customers, onRefresh, onViewCustomerLogs }: 
       }
     } catch (err) {
       console.error("Create bot error:", err);
-      alert("Network error creating bot");
+      alert(`Failed to create bot: ${(err as Error).message}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -128,14 +119,11 @@ export function AdminCustomersTab({ customers, onRefresh, onViewCustomerLogs }: 
     const nextStatus = customer.status === "active" ? "paused" : "active";
     setActionLoading(customer.id);
     try {
-      await fetch("/api/admin/customers", {
-        method: "PATCH",
-        headers: getAdminHeaders(),
-        body: JSON.stringify({ id: customer.id, status: nextStatus }),
-      });
+      await apiFetch("/api/admin/customers", { method: "PATCH", body: { id: customer.id, status: nextStatus } });
       await onRefresh();
     } catch (e) {
       console.error("Status toggle error:", e);
+      alert(`Status toggle failed: ${(e as Error).message}`);
     } finally {
       setActionLoading(null);
     }
@@ -145,14 +133,11 @@ export function AdminCustomersTab({ customers, onRefresh, onViewCustomerLogs }: 
     if (!confirm(`Rotate master API key for ${customer.email}?`)) return;
     setActionLoading(customer.id);
     try {
-      await fetch("/api/admin/customers", {
-        method: "PATCH",
-        headers: getAdminHeaders(),
-        body: JSON.stringify({ id: customer.id, rotateKey: true }),
-      });
+      await apiFetch("/api/admin/customers", { method: "PATCH", body: { id: customer.id, rotateKey: true } });
       await onRefresh();
     } catch (e) {
       console.error("Key rotation error:", e);
+      alert(`Key rotation failed: ${(e as Error).message}`);
     } finally {
       setActionLoading(null);
     }
@@ -162,13 +147,11 @@ export function AdminCustomersTab({ customers, onRefresh, onViewCustomerLogs }: 
     if (!confirm(`Permanently delete subscriber ${customer.email} and revoke all keys?`)) return;
     setActionLoading(customer.id);
     try {
-      await fetch(`/api/admin/customers?id=${customer.id}`, {
-        method: "DELETE",
-        headers: getAdminHeaders(),
-      });
+      await apiFetch(`/api/admin/customers?id=${encodeURIComponent(customer.id)}`, { method: "DELETE" });
       await onRefresh();
     } catch (e) {
       console.error("Customer deletion error:", e);
+      alert(`Customer deletion failed: ${(e as Error).message}`);
     } finally {
       setActionLoading(null);
     }

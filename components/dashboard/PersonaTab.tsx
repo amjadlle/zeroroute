@@ -37,7 +37,11 @@ export function PersonaTab({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSave({ bot_title: botTitle, bot_role: botRole, tone, greeting, persona });
+    try {
+      await onSave({ bot_title: botTitle, bot_role: botRole, tone, greeting, persona });
+    } catch {
+      return; // onSave already reported the failure
+    }
     setSuccess(true);
     setTimeout(() => setSuccess(false), 3000);
   };

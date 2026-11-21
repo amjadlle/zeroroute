@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { apiFetch } from "@/lib/client/api";
 import { 
   Key, Copy, Check, Eye, EyeOff, RefreshCw, Bot, 
   Mail, Calendar, Headphones, ExternalLink, Sparkles,
@@ -66,8 +67,7 @@ export function OverviewTab({
   const fetchCustomerLogs = async () => {
     try {
       setLoadingLogs(true);
-      const res = await fetch("/api/customer/stats");
-      const data = await res.json();
+      const data = await apiFetch<{ stats?: { logs?: CustomerLogItem[]; averageLatencyMs?: number } }>("/api/customer/stats");
       if (data.stats) {
         setLogs(data.stats.logs || []);
         setAvgLatency(data.stats.averageLatencyMs || 0);
