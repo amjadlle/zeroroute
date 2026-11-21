@@ -103,12 +103,7 @@ describe("retrieveKnowledgeContext", () => {
     expect(await retrieveKnowledgeContext("", "pricing")).toBe("");
   });
 
-  // BUG: the document-type boost (+5 faq/qa, +2 policy/pricing/terms) is added before any term
-  // matching, so those documents always pass the `score > 0` relevance filter and are injected
-  // into the prompt for every query, even one sharing no words with them. Fix: only apply the
-  // type boost when the document already has a term or phrase match. `type` is client-supplied
-  // on POST /api/knowledge, so these types do occur.
-  it.skip("does not inject FAQ/policy documents for an unrelated query", async () => {
+  it("does not inject FAQ/policy documents for an unrelated query", async () => {
     expect(await retrieveKnowledgeContext("k1", "zzzz qqqq")).toBe("");
   });
 

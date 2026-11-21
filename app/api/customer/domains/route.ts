@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { getDb, initDb } from "@/lib/db";
-import { getSessionFromCookie, getCustomerByTokenOrKey, invalidateCustomerLookupCache, invalidateSessionCache } from "@/lib/auth/session";
+import { getCurrentUser, getCustomerByTokenOrKey, invalidateCustomerLookupCache, invalidateSessionCache } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
-  let session = await getSessionFromCookie();
+  let session = await getCurrentUser();
 
   if (!session) {
     const authHeader = request.headers.get("authorization") || "";

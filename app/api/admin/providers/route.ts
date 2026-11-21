@@ -32,6 +32,8 @@ export async function PUT(request: Request) {
   try {
     const body = await request.json();
     const incomingProviders = body.providers;
+    // Start from the saved settings, not the defaults of a cold instance: every provider is persisted below.
+    await loadSavedProviderConfigs();
 
     if (!Array.isArray(incomingProviders)) {
       return NextResponse.json({ error: "Invalid payload: providers array expected" }, { status: 400 });

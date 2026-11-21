@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { resolveAuth } from "@/lib/auth/session";
 import { providers } from "@/lib/providers/providers";
-import { getRuntimeProviders, runtimeStateMap, TIMEOUT_MS } from "@/lib/providers/state";
+import { ensureProviderConfigs, getRuntimeProviders, runtimeStateMap, TIMEOUT_MS } from "@/lib/providers/state";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +13,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "Unauthorized: Admin privileges required", results: [] }, { status: 401 });
   }
 
+  await ensureProviderConfigs();
   const configured = getRuntimeProviders().filter(p => p.configured && p.enabled);
   if (configured.length === 0) {
     return NextResponse.json({ success: true, results: [] });

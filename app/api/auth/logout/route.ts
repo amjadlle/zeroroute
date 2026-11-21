@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb, initDb } from "@/lib/db";
-import { SESSION_COOKIE_NAME, ROLE_COOKIE_NAME, invalidateSessionCache } from "@/lib/auth/session";
+import { SESSION_COOKIE_NAME, invalidateSessionCache } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
@@ -42,9 +42,9 @@ async function performLogout(req: NextRequest) {
     path: "/",
   });
 
-  // Clear role cookie
+  // Clear the retired zr_role cookie that older logins set (nothing reads it any more).
   response.cookies.set({
-    name: ROLE_COOKIE_NAME,
+    name: "zr_role",
     value: "",
     httpOnly: false,
     secure: process.env.NODE_ENV === "production",
