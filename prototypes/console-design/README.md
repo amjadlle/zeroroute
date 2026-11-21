@@ -2,7 +2,7 @@
 
 Question: which theme, accent and shell structure should the redesigned admin and customer consoles use? (#1, spec #47)
 
-Four directions, switchable with the floating bar or the ← → keys; each has three accents and light/dark:
+Five directions (Graphite+ is the recommended mix: Graphite shell, Daylight setup checklist for new customers, Harbor-style next-step card for live ones), switchable with the floating bar or the ← → keys; each has three accents and light/dark:
 
 | Direction | Shell | Home hierarchy | Type |
 |---|---|---|---|

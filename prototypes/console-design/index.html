@@ -46,7 +46,7 @@
 :root[data-theme="dark"]{ color-scheme: dark }
 
 /* ---------- Direction tokens ---------- */
-:root[data-variant="graphite"]{
+:root[data-variant="graphite"],:root[data-variant="blend"]{
   --font-ui: "Geist", system-ui, sans-serif; --font-display: "Geist", system-ui, sans-serif; --font-mono: "Geist Mono", ui-monospace, monospace;
   --nc: .009; --r: 6px; --rc: 10px; --h: 32px; --fs: 13.5px;
 }
@@ -177,7 +177,13 @@ p{ margin: 0 }
 .table tbody tr.click{ cursor: pointer } .table tbody tr.click:hover{ background: var(--surface-2) }
 .table .r{ text-align: right }
 :root[data-variant="harbor"] .table th{ text-transform: none; letter-spacing: 0; font-size: 13px }
-:root[data-variant="graphite"] .table td{ padding: 8px 14px } :root[data-variant="graphite"] .table th{ padding: 8px 14px }
+:root[data-variant="graphite"] .table td,:root[data-variant="blend"] .table td{ padding: 8px 14px } :root[data-variant="graphite"] .table th,:root[data-variant="blend"] .table th{ padding: 8px 14px }
+/* Graphite+: Harbor's next-step idea in Graphite's restrained skin */
+.next{ display: flex; gap: 16px; align-items: center; padding: 16px 18px; border-radius: var(--rc); background: var(--accent-soft); border: 1px solid color-mix(in oklch, var(--accent) 30%, transparent) }
+.next-ic{ width: 38px; height: 38px; border-radius: 9px; display: grid; place-items: center; background: var(--accent); color: var(--accent-fg); flex: none }
+.next .grow{ flex: 1; min-width: 0 } .next h2{ font-size: 1.02em; font-weight: 600 } .next p{ color: var(--muted); font-size: .93em }
+@media (max-width: 640px){ .next{ flex-wrap: wrap } }
+.proto-note{ display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 8px 12px; border: 1px dashed var(--border-strong); border-radius: var(--r); color: var(--subtle); font-size: 12.5px }
 
 .meter{ height: 8px; border-radius: 999px; background: var(--surface-2); overflow: hidden; box-shadow: inset 0 0 0 1px var(--border) }
 .meter > i{ display: block; height: 100%; border-radius: inherit; background: var(--accent) }
@@ -527,18 +533,21 @@ const NAV = {
   ],
 };
 const V = {
+  blend:    { name:'Graphite+', tag:'Recommended mix', accents:[ {name:'Iris', h:277, c:.17}, {name:'Cobalt', h:255, c:.16}, {name:'Jade', h:165, c:.12, l:.5} ] },
   graphite: { name:'Graphite', tag:'Dense sidebar · command bar', accents:[ {name:'Iris', h:277, c:.17}, {name:'Cobalt', h:255, c:.16}, {name:'Jade', h:165, c:.12, l:.5} ] },
   daylight: { name:'Daylight', tag:'Top nav · guided setup', accents:[ {name:'Ocean', h:238, c:.15}, {name:'Violet', h:298, c:.17}, {name:'Forest', h:150, c:.12, l:.48} ] },
   monolith: { name:'Monolith', tag:'Icon rail · monochrome', accents:[ {name:'Azure', h:248, c:.18}, {name:'Magenta', h:345, c:.19}, {name:'Amber', h:72, c:.15, l:.55, d:.8} ] },
   harbor:   { name:'Harbor', tag:'Floating dock · friendly', accents:[ {name:'Lagoon', h:212, c:.13}, {name:'Plum', h:322, c:.15}, {name:'Cobalt', h:262, c:.16} ] },
 };
-const ORDER = ['graphite','daylight','monolith','harbor'];
+const ORDER = ['blend','graphite','daylight','monolith','harbor'];
 
 /* ---------- State ---------- */
 const store = { get(k){ try { return JSON.parse(localStorage.getItem('zr-proto-' + k)) } catch { return null } }, set(k, v){ try { localStorage.setItem('zr-proto-' + k, JSON.stringify(v)) } catch {} } };
-const S = Object.assign({ v:'graphite', view:'home', con:'app', theme:'auto', acc:{ graphite:0, daylight:0, monolith:0, harbor:0 } }, store.get('state') || {});
+const S = Object.assign({ v:'blend', view:'home', con:'app', theme:'auto' }, store.get('state') || {});
+S.acc = Object.assign({ blend:0, graphite:0, daylight:0, monolith:0, harbor:0 }, S.acc);
+if (!V[S.v]) S.v = 'blend';
 if (location.hash && V[location.hash.slice(1)]) S.v = location.hash.slice(1);
-const UI = { logFilter:'all', usageFilter:'all', custQuery:'', installTab:'html', bot:{ name:'Brightpath Assistant', greeting:'Hi! Ask me anything about lessons, prices or booking.', brand:0, badge:true, instructions:'Be warm and brief. If you are not sure, offer to pass the question to the team at hello@brightpath.example.' }, chat:[], streaming:false, keyShown:false };
+const UI = { stage:'live', logFilter:'all', usageFilter:'all', custQuery:'', installTab:'html', bot:{ name:'Brightpath Assistant', greeting:'Hi! Ask me anything about lessons, prices or booking.', brand:0, badge:true, instructions:'Be warm and brief. If you are not sure, offer to pass the question to the team at hello@brightpath.example.' }, chat:[], streaming:false, keyShown:false };
 UI.chat = [{ who:'bot', text: UI.bot.greeting }];
 const BRANDS = ['oklch(.55 .15 238)', 'oklch(.56 .17 300)', 'oklch(.55 .13 160)', 'oklch(.58 .16 40)', 'oklch(.3 .02 260)'];
 
@@ -579,6 +588,31 @@ const secret = () => `<div class="secret"><code class="mono">${UI.keyShown ? sec
 
 /* ---------- Home: one per direction (different information hierarchy) ---------- */
 const HOME = {
+  blend: () => {
+    const stageBar = `<div class="proto-note">${ic('sparkles')}<span>Prototype: preview this Home as</span><div class="seg" role="radiogroup" aria-label="Customer stage">${[['new','New customer'],['live','Live customer']].map(s => `<button role="radio" aria-checked="${UI.stage === s[0]}" data-act="stage" data-s="${s[0]}">${s[1]}</button>`).join('')}</div></div>`;
+    if (UI.stage === 'new') return `${stageBar}
+    <header class="page-h"><div><h1>Welcome to ZeroRoute</h1><p class="sub">Two steps left before your chatbot is live on brightpath.example.</p></div></header>
+    <div class="grid-side">
+      <section class="card"><div class="card-h"><h2>Get your chatbot live</h2><span class="spacer"></span>${badge('acc', '2 of 4 done')}</div>
+        <div class="card-b stack-sm"><div class="meter" role="meter" aria-valuenow="2" aria-valuemin="0" aria-valuemax="4" aria-label="Setup progress"><i style="width:50%"></i></div>
+        <ol class="steps">
+          <li class="step done"><span class="step-c">${ic('check')}</span><div class="grow"><div class="t">Name your chatbot</div></div></li>
+          <li class="step done"><span class="step-c">${ic('check')}</span><div class="grow"><div class="t">Teach it about your business</div></div></li>
+          <li class="step"><span class="step-c">3</span><div style="flex:1;min-width:0"><div style="font-weight:600">Add the snippet to your website</div><div class="muted" style="font-size:.9em">One line before &lt;/body&gt;. Guides for WordPress, Shopify and Wix.</div></div><button class="btn pri sm" data-go="install">Install</button></li>
+          <li class="step"><span class="step-c">4</span><div style="flex:1;min-width:0"><div style="font-weight:600">Send a test question</div><div class="muted" style="font-size:.9em">Check the answers sound like you.</div></div><button class="btn sec sm" data-go="chatbot">Open test chat</button></li>
+        </ol></div></section>
+      <aside class="stack">
+        <section class="card card-b stack-sm"><div class="row between"><span class="label">Free plan</span>${badge('ok', 'Active', 1)}</div><div class="row between"><span class="kpi-v" style="font-size:1.3em">0</span><span class="muted num">of 500 questions</span></div><div class="meter" role="meter" aria-valuenow="0" aria-valuemin="0" aria-valuemax="500" aria-label="Usage"><i style="width:0%"></i></div><button class="btn ghost sm" data-go="billing" style="justify-self:start">Compare plans</button></section>
+        <section class="card card-b stack-sm"><span class="label">Bot ID</span><div class="secret"><code class="mono">bot_4c1e9a72d0b35f86</code><button class="btn ghost icon sm" data-act="copy" data-copy="bot_4c1e9a72d0b35f86" aria-label="Copy Bot ID">${ic('copy')}</button></div><p class="hint">Already filled in on the Install page.</p></section>
+      </aside>
+    </div>`;
+    return `${stageBar}
+    <header class="page-h"><div><h1>Home</h1><p class="sub">Brightpath Tutors · Pro plan · resets 1 Dec</p></div>
+      <div class="row wrap"><button class="btn sec" data-go="install">${ic('code')}Get snippet</button><button class="btn pri" data-go="chatbot">${ic('bot')}Test chatbot</button></div></header>
+    <section class="next" aria-label="Suggested next step"><span class="next-ic">${ic('sparkles')}</span><div class="grow"><h2>Add how instalment payments work</h2><p>Visitors asked about paying in instalments 11 times this week and the chatbot had no answer.</p></div>
+      <div class="row"><button class="btn ghost sm" data-go="usage">See questions</button><button class="btn pri sm" data-act="add-knowledge">${ic('plus')}Add answer</button></div></section>
+    ${HOME.graphite().split('</header>').slice(1).join('</header>')}`;
+  },
   graphite: () => `
     <header class="page-h"><div><h1>Home</h1><p class="sub">Brightpath Tutors · Pro plan · resets 1 Dec</p></div>
       <div class="row wrap"><button class="btn sec" data-go="install">${ic('code')}Get snippet</button><button class="btn pri" data-go="chatbot">${ic('bot')}Test chatbot</button></div></header>
@@ -804,6 +838,8 @@ const SHELL = {
     <nav class="h-tabs" aria-label="Sections">${NAV[S.con].slice(0, 5).map(n => `<button data-go="${n.id}" ${S.view === n.id ? 'aria-current="page"' : ''}>${ic(n.icon, 'lg')}<span>${n.label}</span></button>`).join('')}</nav></div>`,
 };
 
+SHELL.blend = SHELL.graphite;
+
 /* ---------- Render ---------- */
 function applyTheme(){
   const r = document.documentElement, a = V[S.v].accents[S.acc[S.v]];
@@ -825,7 +861,7 @@ function render(focusMain){
 function renderSwitcher(){
   const v = V[S.v], i = ORDER.indexOf(S.v);
   $('#sw-title').textContent = v.name;
-  $('#sw-sub').textContent = `${i + 1} of 4 · ${v.tag}`;
+  $('#sw-sub').textContent = `${i + 1} of ${ORDER.length} · ${v.tag}`;
   $('#sw-accents').innerHTML = v.accents.map((a, j) => `<button class="acc" role="radio" aria-checked="${S.acc[S.v] === j}" aria-label="${a.name} accent" title="${a.name}" data-acc="${j}"><i style="background:oklch(${a.d || .74} ${a.c} ${a.h})"></i></button>`).join('');
   const th = { auto:['auto','Auto'], light:['sun','Light'], dark:['moon','Dark'] }[S.theme];
   $('#sw-theme-ic').setAttribute('d', I[th[0]]); $('#sw-theme-l').textContent = th[1];
@@ -945,6 +981,7 @@ document.addEventListener('click', e => {
     'reset-chat': () => { UI.chat = [{ who:'bot', text: UI.bot.greeting }]; render(); },
     'install-tab': () => { UI.installTab = t.dataset.t; render(); $('#tab-' + UI.installTab).focus(); },
     verify: () => loading(t, 1400, () => { $('#verify-out').innerHTML = `<div class="alert ok">${ic('check')}<div><b>Found it.</b> The chatbot is live on brightpath.example and answered a test question in 0.8 s.</div></div>`; }),
+    stage: () => { UI.stage = t.dataset.s; render(); },
     'usage-filter': () => { UI.usageFilter = t.dataset.f; render(); },
     'log-filter': () => { UI.logFilter = t.dataset.f; render(); },
     log: () => logDrawer(LOGS[+t.dataset.i]),
