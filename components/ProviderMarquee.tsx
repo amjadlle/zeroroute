@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Zap, BarChart2, Cpu, X } from "lucide-react";
+import { PROVIDER_COUNT } from "@/lib/constants";
 
 export function ProviderMarquee() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -42,10 +43,10 @@ export function ProviderMarquee() {
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
             <Zap className="w-3.5 h-3.5" />
-            <span>12 Pooled AI Clouds</span>
+            <span>{`${PROVIDER_COUNT} Pooled AI Clouds`}</span>
           </div>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
-            Backed by 12 Ultra-Fast AI Clouds
+            {`Backed by ${PROVIDER_COUNT} Ultra-Fast AI Clouds`}
           </h2>
           <p className="text-xs sm:text-sm text-slate-400">
             Intelligent multi-cloud routing. ZeroRoute dynamically distributes requests across healthy clouds in &lt;8ms.
@@ -55,8 +56,8 @@ export function ProviderMarquee() {
         {/* Infinite Sliding Logo Marquee Container */}
         <div className="relative overflow-hidden py-4 border-y border-white/[0.06] bg-white/[0.01]">
           {/* Gradient Edge Masks */}
-          <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-r from-[#050608] to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-l from-[#050608] to-transparent z-10 pointer-events-none" />
+          <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-r from-landing-bg to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-l from-landing-bg to-transparent z-10 pointer-events-none" />
 
           <div className="animate-marquee gap-3 items-center">
             {/* First Set */}
@@ -64,11 +65,11 @@ export function ProviderMarquee() {
               <div
                 key={`p1-${i}`}
                 onClick={() => setModalOpen(true)}
-                className="cursor-pointer flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-dark-card/80 border border-dark-border hover:border-red-500/40 hover:bg-dark-cardHover transition-all shrink-0"
+                className="cursor-pointer flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-landing-card/80 border border-landing-border hover:border-red-500/40 hover:bg-landing-card-hover transition-all shrink-0"
               >
                 <span className="text-sm">{p.emoji}</span>
                 <span className="text-xs font-bold text-white">{p.name}</span>
-                <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold ${getLatencyBadge(p.latency, p.color)}`}>
+                <span className={`text-landing-2xs px-1.5 py-0.5 rounded font-mono font-bold ${getLatencyBadge(p.latency, p.color)}`}>
                   {p.latency}
                 </span>
               </div>
@@ -79,11 +80,11 @@ export function ProviderMarquee() {
               <div
                 key={`p2-${i}`}
                 onClick={() => setModalOpen(true)}
-                className="cursor-pointer flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-dark-card/80 border border-dark-border hover:border-red-500/40 hover:bg-dark-cardHover transition-all shrink-0"
+                className="cursor-pointer flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-landing-card/80 border border-landing-border hover:border-red-500/40 hover:bg-landing-card-hover transition-all shrink-0"
               >
                 <span className="text-sm">{p.emoji}</span>
                 <span className="text-xs font-bold text-white">{p.name}</span>
-                <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold ${getLatencyBadge(p.latency, p.color)}`}>
+                <span className={`text-landing-2xs px-1.5 py-0.5 rounded font-mono font-bold ${getLatencyBadge(p.latency, p.color)}`}>
                   {p.latency}
                 </span>
               </div>
@@ -95,10 +96,10 @@ export function ProviderMarquee() {
           <button
             type="button"
             onClick={() => setModalOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white border border-white/10 transition-all hover:-translate-y-0.5 active:translate-y-0 shadow-sm cursor-pointer min-h-[44px] touch-manipulation"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white border border-white/10 transition-all hover:-translate-y-0.5 active:translate-y-0 shadow-sm cursor-pointer min-h-11 touch-manipulation"
           >
             <BarChart2 className="w-3.5 h-3.5 text-red-400" />
-            <span>Inspect All 12 Cloud AI Providers</span>
+            <span>{`Inspect All ${PROVIDER_COUNT} Cloud AI Providers`}</span>
           </button>
         </div>
       </section>
@@ -106,21 +107,21 @@ export function ProviderMarquee() {
       {/* Benchmarks Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md duration-200">
-          <div className="relative w-full max-w-2xl max-h-[85vh] flex flex-col bg-[#0b0e14] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+          <div className="relative w-full max-w-2xl max-h-[85vh] flex flex-col bg-landing-panel border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
             {/* Modal Header */}
-            <div className="px-5 py-4 border-b border-dark-border flex items-center justify-between bg-dark-card/60">
+            <div className="px-5 py-4 border-b border-landing-border flex items-center justify-between bg-landing-card/60">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400">
                   <Cpu className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white">12 Multi-Cloud AI Benchmarks</h3>
-                  <p className="text-[11px] text-slate-400">High availability • Intelligent multi-cloud routing mesh</p>
+                  <h3 className="text-sm font-bold text-white">{`${PROVIDER_COUNT} Multi-Cloud AI Benchmarks`}</h3>
+                  <p className="text-landing-xs text-slate-400">High availability • Intelligent multi-cloud routing mesh</p>
                 </div>
               </div>
               <button
                 onClick={() => setModalOpen(false)}
-                className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer touch-manipulation"
+                className="p-2.5 min-w-11 min-h-11 flex items-center justify-center rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer touch-manipulation"
                 aria-label="Close"
               >
                 <X className="w-4 h-4" />
@@ -133,7 +134,7 @@ export function ProviderMarquee() {
                 {providers.map((p, i) => (
                   <div
                     key={`modal-${i}`}
-                    className="flex items-center justify-between px-4 py-3 bg-dark-card border border-dark-border rounded-xl hover:border-red-500/30 hover:bg-white/[0.03] transition-all"
+                    className="flex items-center justify-between px-4 py-3 bg-landing-card border border-landing-border rounded-xl hover:border-red-500/30 hover:bg-white/[0.03] transition-all"
                   >
                     <div className="flex items-center gap-2.5">
                       <span className="text-base">{p.emoji}</span>
@@ -141,7 +142,7 @@ export function ProviderMarquee() {
                         {p.name}
                       </span>
                     </div>
-                    <span className={`text-[11px] font-mono font-bold px-2.5 py-1 rounded-lg ${getLatencyBadge(p.latency, p.color)}`}>
+                    <span className={`text-landing-xs font-mono font-bold px-2.5 py-1 rounded-lg ${getLatencyBadge(p.latency, p.color)}`}>
                       {p.latency}
                     </span>
                   </div>
@@ -150,8 +151,8 @@ export function ProviderMarquee() {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-5 py-3 border-t border-dark-border flex items-center justify-between bg-dark-card/40 text-[11px] text-slate-400">
-              <span>All 12 providers auto-balanced in smart routing engine</span>
+            <div className="px-5 py-3 border-t border-landing-border flex items-center justify-between bg-landing-card/40 text-landing-xs text-slate-400">
+              <span>{`All ${PROVIDER_COUNT} providers auto-balanced in smart routing engine`}</span>
               <button
                 onClick={() => setModalOpen(false)}
                 className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors cursor-pointer"
