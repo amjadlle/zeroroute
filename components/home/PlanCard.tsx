@@ -26,7 +26,7 @@ function summary({ isPro, hadPro, status, daysRemaining }: PlanCardProps): strin
 }
 
 export function PlanCard(props: PlanCardProps) {
-  const { isPro, hadPro, status } = props;
+  const { hadPro, status } = props;
   const known = hadPro && status in SUBSCRIPTION_STATUS_LABELS ? (status as SubscriptionStatus) : null;
 
   return (
