@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isRateLimited } from "@/lib/auth/rate-limit";
+import { isRateLimited, getClientIp } from "@/lib/auth/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -75,7 +75,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const ip = request.headers.get("x-forwarded-for") || "checkout_user";
+  const ip = getClientIp(request.headers);
   if (isRateLimited(`checkout:${ip}`, 10, 60_000)) {
     return NextResponse.json({ error: "Too many checkout requests. Please wait a moment." }, { status: 429 });
   }
