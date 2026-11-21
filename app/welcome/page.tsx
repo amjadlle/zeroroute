@@ -145,15 +145,12 @@ function WelcomeContent() {
 
   const activeKey = customer?.key || "";
   const activeBotId = customer?.bot_id || "";
-  const activeEmail = customer?.email || emailParam || "";
   const siteUrl = typeof window !== "undefined" ? window.location.origin : "https://zeroroute.mapki.in";
   const widgetSnippet = activeBotId ? `<script src="${siteUrl}/widget.js" data-bot-id="${activeBotId}"></script>` : "";
 
-  const onboardingHref = activeKey
-    ? `/onboarding?key=${encodeURIComponent(activeKey)}&bot_id=${encodeURIComponent(activeBotId)}&email=${encodeURIComponent(activeEmail)}`
-    : "/onboarding";
-
-  const consoleHref = activeKey ? `/app?key=${encodeURIComponent(activeKey)}` : "/app";
+  // Payment verification already set the session cookie server-side, so plain links are enough.
+  const onboardingHref = "/onboarding";
+  const consoleHref = "/app";
 
   const copyKey = () => {
     navigator.clipboard.writeText(activeKey);

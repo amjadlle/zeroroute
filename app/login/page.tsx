@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AuthCard } from "@/components/AuthCard";
+import { safeRedirectPath } from "@/lib/safeRedirect";
 import { Mail, Lock, User, Eye, EyeOff, Loader2, AlertCircle, ArrowRight, Sparkles } from "lucide-react";
 
 function LoginForm() {
@@ -48,8 +49,8 @@ function LoginForm() {
         return;
       }
 
-      // Dynamic redirect based on role (Admin -> /admin, Customer -> /app)
-      const target = data.redirect || (data.role === "admin" ? "/admin" : "/app");
+      // Back to the page that sent us here (same-origin paths only), else the role's console.
+      const target = (tab === "login" && safeRedirectPath(searchParams.get("redirect"))) || data.redirect || (data.role === "admin" ? "/admin" : "/app");
       window.location.href = target;
     } catch {
       setError("An unexpected network error occurred. Please try again.");

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { apiFetch } from "@/lib/client/api";
+import { useToast } from "@/components/ui/Toast";
 import { 
   BookOpen, Plus, Trash2, Globe, FileText, Loader2, Sparkles, 
   ExternalLink, AlertCircle, UploadCloud, FileUp, RotateCw 
@@ -26,6 +27,7 @@ interface KnowledgeTabProps {
 }
 
 export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc }: KnowledgeTabProps) {
+  const toast = useToast();
   const [modalOpen, setModalOpen] = useState(false);
   const [mode, setMode] = useState<"crawl" | "text" | "upload">("upload");
 
@@ -127,8 +129,7 @@ export function KnowledgeTab({ docs, onAddDoc, onDeleteDoc, onRefresh, addingDoc
       await apiFetch("/api/knowledge/crawl", { method: "POST", body: { url: doc.source_url } });
       if (onRefresh) await onRefresh();
     } catch (err) {
-      console.error("Sync error:", err);
-      alert(`Failed to re-sync ${doc.source_url}: ${(err as Error).message}`);
+      toast(`Couldn't refresh ${doc.source_url}: ${(err as Error).message}`, { tone: "danger" });
     } finally {
       setSyncingDocId(null);
     }
