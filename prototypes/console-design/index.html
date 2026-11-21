@@ -1,0 +1,983 @@
+<title>ZeroRoute Console Directions</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Fragment+Mono&display=swap">
+<style>
+/* PROTOTYPE (throwaway): four console design directions for ZeroRoute (issue #1 / spec #47).
+   Layout concept: each direction owns its shell (sidebar, top nav, icon rail, floating dock) and its Home hierarchy;
+   the other screens share markup but are skinned by that direction's tokens.
+   Color: OKLCH. Neutrals carry a faint tint of the active accent hue (--ah). Red is reserved for "danger".
+   Every token is written once with light-dark(); the viewer's theme or the switcher's theme picks the side. */
+:root{
+  color-scheme: light dark;
+  --ah: 275; --ac: .17; --al: .52; --ad: .76;
+  --font-ui: "Geist", system-ui, sans-serif; --font-display: var(--font-ui); --font-mono: "Geist Mono", ui-monospace, monospace;
+  --nc: .008;
+  --bg: light-dark(oklch(.985 var(--nc) var(--ah)), oklch(.165 var(--nc) var(--ah)));
+  --surface: light-dark(oklch(1 0 0), oklch(.198 var(--nc) var(--ah)));
+  --surface-2: light-dark(oklch(.965 var(--nc) var(--ah)), oklch(.232 var(--nc) var(--ah)));
+  --sunken: light-dark(oklch(.975 var(--nc) var(--ah)), oklch(.145 var(--nc) var(--ah)));
+  --border: light-dark(oklch(.912 var(--nc) var(--ah)), oklch(.28 var(--nc) var(--ah)));
+  --border-strong: light-dark(oklch(.66 .01 var(--ah)), oklch(.53 .01 var(--ah)));
+  --text: light-dark(oklch(.21 .012 var(--ah)), oklch(.965 .005 var(--ah)));
+  --muted: light-dark(oklch(.45 .014 var(--ah)), oklch(.75 .01 var(--ah)));
+  --subtle: light-dark(oklch(.535 .012 var(--ah)), oklch(.655 .01 var(--ah)));
+  --accent: light-dark(oklch(var(--al) var(--ac) var(--ah)), oklch(var(--ad) var(--ac) var(--ah)));
+  --accent-hover: light-dark(oklch(calc(var(--al) - .05) var(--ac) var(--ah)), oklch(calc(var(--ad) + .05) var(--ac) var(--ah)));
+  --accent-fg: light-dark(oklch(.99 .005 var(--ah)), oklch(.19 .04 var(--ah)));
+  --accent-soft: color-mix(in oklch, var(--accent) 13%, transparent);
+  --ok: light-dark(oklch(.5 .13 152), oklch(.79 .15 152));
+  --warn: light-dark(oklch(.52 .12 66), oklch(.83 .14 80));
+  --bad: light-dark(oklch(.52 .19 27), oklch(.73 .17 25));
+  --info: light-dark(oklch(.5 .13 240), oklch(.79 .12 240));
+  --ok-soft: color-mix(in oklch, var(--ok) 14%, transparent);
+  --warn-soft: color-mix(in oklch, var(--warn) 16%, transparent);
+  --bad-soft: color-mix(in oklch, var(--bad) 14%, transparent);
+  --info-soft: color-mix(in oklch, var(--info) 14%, transparent);
+  --scrim: light-dark(oklch(.25 .02 var(--ah) / .35), oklch(.05 0 0 / .6));
+  --r: 6px; --rc: 10px; --h: 32px; --fs: 14px;
+  --card-bg: var(--surface); --card-border: 1px solid var(--border); --card-shadow: none;
+  --pop-shadow: 0 18px 48px -12px oklch(.1 .02 var(--ah) / .35), 0 2px 6px oklch(.1 .02 var(--ah) / .12);
+  /* Switcher is deliberately outside the design being judged: constant ink pill in both themes. */
+  --sw-bg: oklch(.17 .01 260); --sw-fg: oklch(.97 0 0); --sw-mute: oklch(.72 .01 260); --sw-line: oklch(.32 .01 260);
+}
+:root[data-theme="light"]{ color-scheme: light }
+:root[data-theme="dark"]{ color-scheme: dark }
+
+/* ---------- Direction tokens ---------- */
+:root[data-variant="graphite"]{
+  --font-ui: "Geist", system-ui, sans-serif; --font-display: "Geist", system-ui, sans-serif; --font-mono: "Geist Mono", ui-monospace, monospace;
+  --nc: .009; --r: 6px; --rc: 10px; --h: 32px; --fs: 13.5px;
+}
+:root[data-variant="daylight"]{
+  --font-ui: "Plus Jakarta Sans", system-ui, sans-serif; --font-display: "Plus Jakarta Sans", system-ui, sans-serif; --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --nc: .012; --r: 9px; --rc: 14px; --h: 38px; --fs: 14px;
+  --bg: light-dark(oklch(.972 .012 var(--ah)), oklch(.175 .014 var(--ah)));
+  --surface: light-dark(oklch(1 0 0), oklch(.215 .014 var(--ah)));
+  --surface-2: light-dark(oklch(.958 .012 var(--ah)), oklch(.25 .014 var(--ah)));
+  --border: light-dark(oklch(.915 .01 var(--ah)), oklch(.3 .014 var(--ah)));
+  --card-border: 1px solid var(--border);
+  --card-shadow: 0 1px 2px oklch(.2 .03 var(--ah) / .06), 0 8px 24px -12px oklch(.2 .04 var(--ah) / .14);
+}
+:root[data-variant="monolith"]{
+  --font-ui: "Instrument Sans", system-ui, sans-serif; --font-display: "Instrument Sans", system-ui, sans-serif; --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --nc: 0; --r: 5px; --rc: 8px; --h: 34px; --fs: 14px;
+  --bg: light-dark(oklch(1 0 0), oklch(.13 0 0));
+  --surface: light-dark(oklch(1 0 0), oklch(.13 0 0));
+  --surface-2: light-dark(oklch(.965 0 0), oklch(.2 0 0));
+  --sunken: light-dark(oklch(.975 0 0), oklch(.17 0 0));
+  --border: light-dark(oklch(.91 0 0), oklch(.275 0 0));
+  --border-strong: light-dark(oklch(.64 0 0), oklch(.52 0 0));
+  --text: light-dark(oklch(.16 0 0), oklch(.985 0 0));
+  --muted: light-dark(oklch(.44 0 0), oklch(.76 0 0));
+  --subtle: light-dark(oklch(.53 0 0), oklch(.66 0 0));
+  --card-shadow: none;
+}
+:root[data-variant="harbor"]{
+  --font-ui: "Figtree", system-ui, sans-serif; --font-display: "Bricolage Grotesque", "Figtree", system-ui, sans-serif; --font-mono: "Fragment Mono", ui-monospace, monospace;
+  --nc: .02; --r: 999px; --rc: 22px; --h: 40px; --fs: 15px;
+  --bg: light-dark(oklch(.965 .018 var(--ah)), oklch(.185 .022 var(--ah)));
+  --surface: light-dark(oklch(.995 .004 var(--ah)), oklch(.235 .024 var(--ah)));
+  --surface-2: light-dark(oklch(.935 .024 var(--ah)), oklch(.28 .026 var(--ah)));
+  --sunken: light-dark(oklch(.95 .02 var(--ah)), oklch(.205 .022 var(--ah)));
+  --border: light-dark(oklch(.9 .02 var(--ah)), oklch(.32 .024 var(--ah)));
+  --text: light-dark(oklch(.24 .03 var(--ah)), oklch(.96 .01 var(--ah)));
+  --muted: light-dark(oklch(.45 .03 var(--ah)), oklch(.77 .02 var(--ah)));
+  --subtle: light-dark(oklch(.52 .03 var(--ah)), oklch(.68 .02 var(--ah)));
+  --card-border: 1px solid transparent;
+}
+
+/* ---------- Base ---------- */
+*,*::before,*::after{ box-sizing: border-box }
+html,body{ height: 100% }
+body{ background: var(--bg); color: var(--text); font: 400 var(--fs)/1.5 var(--font-ui); -webkit-font-smoothing: antialiased; }
+button,input,select,textarea{ font: inherit; color: inherit }
+a{ color: var(--accent) }
+h1,h2,h3{ font-family: var(--font-display); text-wrap: balance; margin: 0; letter-spacing: -.01em }
+p{ margin: 0 }
+:focus-visible{ outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px }
+.ic{ width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none }
+.ic.lg{ width: 20px; height: 20px }
+.num,.table td,.kpi-v{ font-variant-numeric: tabular-nums }
+.mono{ font-family: var(--font-mono); font-size: .92em }
+.sr{ position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap }
+.muted{ color: var(--muted) } .subtle{ color: var(--subtle) }
+.row{ display: flex; align-items: center; gap: 8px } .between{ justify-content: space-between } .wrap{ flex-wrap: wrap }
+.stack{ display: grid; gap: 16px } .stack-sm{ display: grid; gap: 8px }
+.spacer{ flex: 1 }
+@media (prefers-reduced-motion: reduce){ *{ animation: none !important; transition: none !important } }
+
+/* ---------- Components ---------- */
+.btn{ display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: var(--h); padding: 0 14px; border-radius: var(--r); border: 1px solid transparent; font-weight: 550; font-size: .95em; cursor: pointer; white-space: nowrap; transition: background .15s, border-color .15s, color .15s, transform .1s }
+.btn:active{ transform: translateY(1px) }
+.btn[disabled]{ opacity: .55; cursor: not-allowed }
+.btn.sm{ height: calc(var(--h) - 6px); padding: 0 10px; font-size: .88em }
+.btn.pri{ background: var(--accent); color: var(--accent-fg) } .btn.pri:hover{ background: var(--accent-hover) }
+.btn.sec{ background: var(--surface); border-color: var(--border); color: var(--text) } .btn.sec:hover{ background: var(--surface-2) }
+.btn.ghost{ background: transparent; color: var(--muted) } .btn.ghost:hover{ background: var(--surface-2); color: var(--text) }
+.btn.danger{ background: var(--bad); color: oklch(.99 0 0) } .btn.danger:hover{ filter: brightness(1.08) }
+.btn.icon{ width: var(--h); padding: 0 }
+.btn .spin{ width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: spin .7s linear infinite }
+@keyframes spin{ to{ transform: rotate(360deg) } }
+:root[data-variant="monolith"] .btn.pri{ background: var(--text); color: var(--bg) }
+:root[data-variant="monolith"] .btn.pri:hover{ background: var(--muted) }
+:root[data-variant="daylight"] .btn.pri{ box-shadow: 0 1px 0 oklch(1 0 0 / .18) inset, 0 1px 2px oklch(.2 .05 var(--ah) / .3) }
+:root[data-variant="harbor"] .btn{ font-weight: 650; padding: 0 18px }
+
+.card{ background: var(--card-bg); border: var(--card-border); border-radius: var(--rc); box-shadow: var(--card-shadow); min-width: 0 }
+.card-b{ padding: 18px } .card-h{ display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--border) }
+.card-h h2{ font-size: 1em; font-weight: 600 } .card-h p{ color: var(--muted); font-size: .88em }
+:root[data-variant="harbor"] .card-h{ border-bottom: 0; padding: 20px 22px 4px } :root[data-variant="harbor"] .card-b{ padding: 22px }
+:root[data-variant="monolith"] .card-h h2{ font-size: .8em; text-transform: uppercase; letter-spacing: .08em; color: var(--muted) }
+
+.badge{ display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: 999px; font-size: 12px; font-weight: 550; white-space: nowrap; background: var(--surface-2); color: var(--muted) }
+.badge.ok{ background: var(--ok-soft); color: var(--ok) } .badge.warn{ background: var(--warn-soft); color: var(--warn) }
+.badge.bad{ background: var(--bad-soft); color: var(--bad) } .badge.info{ background: var(--info-soft); color: var(--info) }
+.badge.acc{ background: var(--accent-soft); color: var(--accent) }
+.dot{ width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none }
+.dot.pulse{ box-shadow: 0 0 0 0 currentColor; animation: pulse 2s infinite }
+@keyframes pulse{ 0%{ box-shadow: 0 0 0 0 color-mix(in oklch, currentColor 60%, transparent) } 70%{ box-shadow: 0 0 0 6px transparent } 100%{ box-shadow: 0 0 0 0 transparent } }
+:root[data-variant="monolith"] .badge{ border-radius: 4px; background: transparent; border: 1px solid var(--border) }
+
+.field{ display: grid; gap: 6px } .field label,.label{ font-weight: 550; font-size: .92em }
+.hint{ color: var(--muted); font-size: 12.5px } .err{ color: var(--bad); font-size: 12.5px; display: flex; gap: 6px; align-items: center }
+.input,.textarea,.select{ width: 100%; min-width: 0; height: var(--h); padding: 0 11px; border-radius: min(var(--r), 10px); border: 1px solid var(--border-strong); background: var(--sunken); color: var(--text); transition: border-color .15s, box-shadow .15s }
+.textarea{ height: auto; min-height: 92px; padding: 9px 11px; resize: vertical; line-height: 1.5 }
+.input::placeholder,.textarea::placeholder{ color: var(--subtle) }
+.input:hover,.textarea:hover{ border-color: var(--muted) }
+.input:focus,.textarea:focus,.select:focus{ outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft) }
+.input[aria-invalid="true"]{ border-color: var(--bad) } .input[aria-invalid="true"]:focus{ box-shadow: 0 0 0 3px var(--bad-soft) }
+:root[data-variant="harbor"] .input,:root[data-variant="harbor"] .select{ border-radius: 14px; padding: 0 14px; background: var(--surface); border-color: var(--border) }
+:root[data-variant="harbor"] .textarea{ border-radius: 16px; background: var(--surface); border-color: var(--border) }
+.input-wrap{ position: relative; display: flex } .input-wrap .input{ padding-right: 40px }
+.input-wrap .btn{ position: absolute; right: 3px; top: 3px; height: calc(var(--h) - 6px); width: calc(var(--h) - 6px) }
+.lead{ position: relative } .lead .ic{ position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--subtle) } .lead .input{ padding-left: 34px }
+
+.switch{ position: relative; width: 38px; height: 22px; border-radius: 999px; background: var(--border-strong); border: 0; cursor: pointer; flex: none; transition: background .15s; padding: 0 }
+.switch::after{ content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: oklch(.99 0 0); box-shadow: 0 1px 2px oklch(0 0 0 / .3); transition: transform .18s }
+.switch[aria-checked="true"]{ background: var(--accent) } .switch[aria-checked="true"]::after{ transform: translateX(16px) }
+
+.seg{ display: inline-flex; padding: 3px; gap: 2px; border-radius: calc(min(var(--r), 10px) + 3px); background: var(--surface-2); border: 1px solid var(--border) }
+.seg button{ height: calc(var(--h) - 8px); padding: 0 12px; border: 0; border-radius: min(var(--r), 10px); background: transparent; color: var(--muted); font-weight: 550; font-size: .9em; cursor: pointer; display: inline-flex; gap: 6px; align-items: center }
+.seg button[aria-selected="true"],.seg button[aria-checked="true"]{ background: var(--surface); color: var(--text); box-shadow: 0 1px 2px oklch(.2 .02 var(--ah) / .14), 0 0 0 1px var(--border) }
+:root[data-variant="harbor"] .seg{ border-radius: 999px; border: 0 } :root[data-variant="harbor"] .seg button{ border-radius: 999px }
+
+.tabs{ display: flex; gap: 2px; border-bottom: 1px solid var(--border); overflow-x: auto }
+.tabs button{ position: relative; height: 38px; padding: 0 12px; border: 0; background: none; color: var(--muted); font-weight: 550; cursor: pointer; white-space: nowrap }
+.tabs button[aria-selected="true"]{ color: var(--text) }
+.tabs button[aria-selected="true"]::after{ content: ""; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 2px; border-radius: 2px; background: var(--accent) }
+
+.table-wrap{ overflow-x: auto }
+.table{ width: 100%; border-collapse: collapse; font-size: .93em }
+.table th{ text-align: left; font-weight: 550; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; padding: 10px 14px; border-bottom: 1px solid var(--border); white-space: nowrap }
+.table td{ padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: middle }
+.table tr:last-child td{ border-bottom: 0 }
+.table tbody tr{ transition: background .12s }
+.table tbody tr.click{ cursor: pointer } .table tbody tr.click:hover{ background: var(--surface-2) }
+.table .r{ text-align: right }
+:root[data-variant="harbor"] .table th{ text-transform: none; letter-spacing: 0; font-size: 13px }
+:root[data-variant="graphite"] .table td{ padding: 8px 14px } :root[data-variant="graphite"] .table th{ padding: 8px 14px }
+
+.meter{ height: 8px; border-radius: 999px; background: var(--surface-2); overflow: hidden; box-shadow: inset 0 0 0 1px var(--border) }
+.meter > i{ display: block; height: 100%; border-radius: inherit; background: var(--accent) }
+.meter.warn > i{ background: var(--warn) }
+
+.kbd{ font-family: var(--font-mono); font-size: 11.5px; padding: 1px 6px; border-radius: 5px; border: 1px solid var(--border); background: var(--surface-2); color: var(--muted) }
+.code{ position: relative; background: var(--sunken); border: 1px solid var(--border); border-radius: min(var(--rc), 14px); overflow: hidden }
+.code pre{ margin: 0; padding: 16px 18px; overflow-x: auto; font: 13px/1.65 var(--font-mono); color: var(--text) }
+.code .copy{ position: absolute; top: 8px; right: 8px }
+.tok-t{ color: var(--accent) } .tok-a{ color: var(--info) } .tok-s{ color: var(--ok) } .tok-c{ color: var(--subtle) }
+
+.secret{ display: flex; align-items: center; gap: 6px; padding: 4px 4px 4px 12px; border: 1px solid var(--border); border-radius: min(var(--r), 12px); background: var(--sunken); min-width: 0 }
+.secret code{ flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 13px var(--font-mono) }
+
+.empty{ display: grid; justify-items: center; text-align: center; gap: 8px; padding: 40px 20px; color: var(--muted) }
+.empty .ic{ width: 28px; height: 28px; color: var(--subtle) } .empty h3{ color: var(--text); font-size: 1em }
+
+.alert{ display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: min(var(--rc), 14px); background: var(--info-soft); color: var(--text) }
+.alert .ic{ color: var(--info); margin-top: 2px } .alert.ok{ background: var(--ok-soft) } .alert.ok .ic{ color: var(--ok) }
+.alert.warn{ background: var(--warn-soft) } .alert.warn .ic{ color: var(--warn) }
+
+.avatar{ width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; background: var(--accent-soft); color: var(--accent); flex: none }
+
+.chips{ display: flex; flex-wrap: wrap; gap: 6px }
+.chip{ display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); font-size: 13px; cursor: pointer; color: var(--text) }
+.chip:hover{ border-color: var(--accent); color: var(--accent) }
+.swatches{ display: flex; gap: 8px }
+.swatch{ width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--border); cursor: pointer }
+.swatch[aria-checked="true"]{ box-shadow: 0 0 0 2px var(--text) }
+
+/* Dialog, drawer, toast, palette */
+dialog{ border: 0; padding: 0; color: var(--text); background: var(--surface); border-radius: calc(var(--rc) + 2px); box-shadow: var(--pop-shadow); width: min(480px, calc(100vw - 32px)); max-height: calc(100vh - 48px) }
+dialog::backdrop{ background: var(--scrim); backdrop-filter: blur(2px) }
+dialog[open]{ animation: pop .16s ease-out }
+@keyframes pop{ from{ opacity: 0; transform: translateY(6px) scale(.98) } }
+.dlg-h{ display: flex; gap: 12px; align-items: flex-start; padding: 20px 20px 0 }
+.dlg-h h2{ font-size: 1.1em } .dlg-b{ padding: 14px 20px 20px; display: grid; gap: 14px }
+.dlg-f{ display: flex; justify-content: flex-end; gap: 8px; padding: 14px 20px; border-top: 1px solid var(--border); background: var(--sunken) }
+dialog.drawer{ margin: 0 0 0 auto; height: 100vh; max-height: 100vh; width: min(460px, 100vw); border-radius: 0; animation: slide .2s ease-out }
+@keyframes slide{ from{ transform: translateX(24px); opacity: 0 } }
+dialog.palette{ margin-top: 12vh; width: min(560px, calc(100vw - 32px)) }
+.pal-in{ display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--border) }
+.pal-in input{ flex: 1; border: 0; background: none; outline: none; font-size: 1.05em }
+.pal-list{ list-style: none; margin: 0; padding: 6px; max-height: 340px; overflow: auto }
+.pal-list li{ display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; cursor: pointer; color: var(--muted) }
+.pal-list li[aria-selected="true"]{ background: var(--accent-soft); color: var(--text) }
+.pal-list li small{ margin-left: auto; color: var(--subtle) }
+#toasts{ position: fixed; z-index: 60; right: max(16px, env(safe-area-inset-right, 0px)); top: calc(16px + env(safe-area-inset-top, 0px)); display: grid; gap: 8px; width: min(360px, calc(100vw - 32px)) }
+.toast{ display: flex; gap: 10px; align-items: center; padding: 12px 14px; border-radius: min(var(--rc), 14px); background: var(--surface); border: 1px solid var(--border); box-shadow: var(--pop-shadow); animation: pop .18s ease-out }
+.toast .ic{ color: var(--ok) } .toast.bad .ic{ color: var(--bad) } .toast.info .ic{ color: var(--info) }
+.toast p{ flex: 1 } .toast .btn{ height: 28px }
+
+/* Chat */
+.chat{ display: flex; flex-direction: column; height: 520px; max-height: 70vh }
+.chat-head{ display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--border) }
+.chat-logo{ width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; color: oklch(.99 0 0); background: var(--brand, var(--accent)) }
+.chat-log{ flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px }
+.msg{ max-width: 82%; padding: 9px 13px; border-radius: 14px; line-height: 1.5; white-space: pre-wrap }
+.msg.bot{ align-self: flex-start; background: var(--surface-2); border-bottom-left-radius: 4px }
+.msg.me{ align-self: flex-end; background: var(--brand, var(--accent)); color: oklch(.99 0 0); border-bottom-right-radius: 4px }
+.msg.err{ background: var(--bad-soft); color: var(--text) }
+.typing::after{ content: "▍"; animation: blink 1s steps(1) infinite; color: var(--subtle) }
+@keyframes blink{ 50%{ opacity: 0 } }
+.chat-compose{ display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--border) }
+.chat-compose .input{ flex: 1 }
+
+/* Charts */
+.spark{ display: block; width: 100%; height: 36px; overflow: visible }
+.spark path.l{ fill: none; stroke: var(--accent); stroke-width: 1.8; vector-effect: non-scaling-stroke }
+.spark path.a{ fill: var(--accent-soft) }
+.chart text{ fill: var(--subtle); font: 11px var(--font-ui) }
+.chart .grid{ stroke: var(--border); stroke-width: 1 }
+.chart .bar{ fill: var(--accent) } .chart .bar.dim{ fill: color-mix(in oklch, var(--accent) 35%, transparent) }
+.chart .area{ fill: var(--accent-soft) } .chart .line{ fill: none; stroke: var(--accent); stroke-width: 2 }
+.chart .end{ fill: var(--accent); stroke: var(--surface); stroke-width: 3 }
+
+/* Page scaffolding */
+.page{ display: grid; gap: 20px; padding-block: 24px 120px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); max-width: 1180px; margin: 0 auto; width: 100% }
+.page-h{ display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: flex-end; justify-content: space-between }
+.page-h h1{ font-size: 1.55em; font-weight: 650 } .page-h .sub{ color: var(--muted); margin-top: 2px }
+.grid-2{ display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) }
+.grid-side{ display: grid; gap: 16px; grid-template-columns: minmax(0, 1.55fr) minmax(280px, 1fr) }
+@media (max-width: 900px){ .grid-side{ grid-template-columns: minmax(0, 1fr) } }
+.kpis{ display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)) }
+@media (min-width: 1100px){ .kpis{ grid-template-columns: repeat(4, minmax(0, 1fr)) } }
+.kpi{ padding: 14px 16px; display: grid; gap: 4px }
+.kpi-l{ color: var(--muted); font-size: 12.5px; font-weight: 550 } .kpi-v{ font-size: 1.6em; font-weight: 650; font-family: var(--font-display); letter-spacing: -.02em }
+.delta{ font-size: 12px; font-weight: 600; color: var(--ok) } .delta.down{ color: var(--bad) }
+.list{ list-style: none; margin: 0; padding: 0 }
+.list li{ display: flex; align-items: center; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--border) }
+.list li:last-child{ border-bottom: 0 }
+.list .grow{ flex: 1; min-width: 0 } .list .t{ font-weight: 550 } .list .d{ color: var(--muted); font-size: .9em }
+.form-grid{ display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) }
+.toggle-row{ display: flex; align-items: center; gap: 12px; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--border) }
+
+/* ---------- Shell: Graphite (sidebar + command bar) ---------- */
+.g-shell{ display: grid; grid-template-columns: 244px minmax(0, 1fr); min-height: 100% }
+.g-side{ position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 14px; padding: 14px 10px; border-right: 1px solid var(--border); background: var(--sunken) }
+.brand{ display: flex; align-items: center; gap: 9px; font-weight: 700; font-family: var(--font-display); letter-spacing: -.01em }
+.mark{ width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center; background: var(--accent); color: var(--accent-fg) }
+.mark .ic{ width: 15px; height: 15px; stroke-width: 2.2 }
+.g-side .brand{ padding: 2px 8px }
+.g-search{ display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; border-radius: 7px; border: 1px solid var(--border); background: var(--surface); color: var(--subtle); cursor: pointer; text-align: left }
+.g-search:hover{ border-color: var(--border-strong) } .g-search span{ flex: 1 }
+.nav-g{ display: grid; gap: 1px }
+.nav-g .lbl{ font-size: 11.5px; font-weight: 600; color: var(--subtle); padding: 6px 10px; text-transform: uppercase; letter-spacing: .06em }
+.nav-i{ display: flex; align-items: center; gap: 10px; height: 32px; padding: 0 10px; border-radius: 7px; color: var(--muted); text-decoration: none; border: 0; background: none; cursor: pointer; width: 100%; text-align: left; font-weight: 500 }
+.nav-i:hover{ background: var(--surface-2); color: var(--text) }
+.nav-i[aria-current="page"]{ background: var(--surface); color: var(--text); box-shadow: 0 0 0 1px var(--border), 0 1px 2px oklch(.2 .02 var(--ah) / .08) }
+.nav-i[aria-current="page"] .ic{ color: var(--accent) }
+.nav-i .count{ margin-left: auto; font-size: 11.5px; color: var(--subtle) }
+.g-acct{ margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 8px }
+.g-acct .t{ font-weight: 600; font-size: 13px; line-height: 1.2 } .g-acct .d{ color: var(--subtle); font-size: 12px }
+.g-top{ position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); border-bottom: 1px solid var(--border); background: color-mix(in oklch, var(--bg) 85%, transparent); backdrop-filter: blur(10px) }
+.crumbs{ display: flex; align-items: center; gap: 6px; color: var(--subtle); font-size: 13px; min-width: 0 } .crumbs b{ color: var(--text); font-weight: 550 }
+.mtop-btn{ display: none }
+@media (max-width: 820px){
+  .g-shell{ grid-template-columns: minmax(0,1fr) } .g-side{ display: none } .mtop-btn{ display: inline-flex }
+}
+
+/* ---------- Shell: Daylight (top nav + inspector) ---------- */
+.d-top{ position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in oklch, var(--surface) 88%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border) }
+.d-top-in{ max-width: 1180px; margin: 0 auto; display: flex; align-items: center; gap: 18px; height: 60px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+.d-nav{ display: flex; gap: 2px; overflow-x: auto; flex: 1; min-width: 0; scrollbar-width: none }
+.d-nav button{ position: relative; height: 60px; padding: 0 12px; border: 0; background: none; color: var(--muted); font-weight: 600; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 7px }
+.d-nav button:hover{ color: var(--text) }
+.d-nav button[aria-current="page"]{ color: var(--text) }
+.d-nav button[aria-current="page"]::after{ content: ""; position: absolute; left: 12px; right: 12px; bottom: 0; height: 2px; border-radius: 2px 2px 0 0; background: var(--accent) }
+:root[data-variant="daylight"] .page{ padding-top: 32px }
+:root[data-variant="daylight"] .page-h h1{ font-size: 1.85em; font-weight: 750; letter-spacing: -.025em }
+.d-hero{ padding: 26px; display: grid; gap: 18px; background: linear-gradient(135deg, color-mix(in oklch, var(--accent) 9%, var(--surface)), var(--surface) 60%) }
+.steps{ list-style: none; margin: 0; padding: 0; display: grid; gap: 4px }
+.step{ display: flex; align-items: center; gap: 14px; padding: 12px; border-radius: 12px }
+.step:hover{ background: var(--surface-2) }
+.step-c{ width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; border: 2px solid var(--border-strong); color: var(--subtle); font-weight: 700; font-size: 12px; flex: none }
+.step.done .step-c{ background: var(--ok); border-color: var(--ok); color: oklch(.99 0 0) }
+.step.done .t{ color: var(--muted); text-decoration: line-through; text-decoration-color: var(--border-strong) }
+@media (max-width: 720px){ .d-top-in .seg{ display: none } }
+
+/* ---------- Shell: Monolith (icon rail + context panel) ---------- */
+.m-shell{ display: grid; grid-template-columns: 60px 220px minmax(0, 1fr); min-height: 100% }
+.m-rail{ position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 0; border-right: 1px solid var(--border) }
+.m-rail .rb{ width: 40px; height: 40px; border-radius: 8px; display: grid; place-items: center; border: 0; background: none; color: var(--subtle); cursor: pointer; position: relative }
+.m-rail .rb:hover{ color: var(--text); background: var(--surface-2) }
+.m-rail .rb[aria-pressed="true"]{ color: var(--text) }
+.m-rail .rb[aria-pressed="true"]::before{ content: ""; position: absolute; left: -10px; top: 10px; bottom: 10px; width: 2px; border-radius: 2px; background: var(--accent) }
+.m-panel{ position: sticky; top: 0; height: 100vh; border-right: 1px solid var(--border); padding: 18px 12px; display: flex; flex-direction: column; gap: 14px }
+.m-panel h2{ font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--subtle); padding: 0 10px; font-weight: 600 }
+.m-panel .nav-i[aria-current="page"]{ background: var(--surface-2); box-shadow: none }
+.m-panel .nav-i[aria-current="page"] .ic{ color: var(--text) }
+:root[data-variant="monolith"] .page-h h1{ font-size: 2em; font-weight: 600; letter-spacing: -.035em }
+.m-hero-n{ font-family: var(--font-display); font-size: clamp(3rem, 8vw, 5.4rem); line-height: .95; font-weight: 600; letter-spacing: -.05em }
+.eyebrow{ font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--subtle); font-weight: 600 }
+.timeline{ list-style: none; margin: 0; padding: 0 }
+.timeline li{ display: grid; grid-template-columns: 64px 14px minmax(0, 1fr); gap: 10px; padding: 10px 0; align-items: start }
+.timeline time{ color: var(--subtle); font: 12.5px var(--font-mono); padding-top: 1px }
+.timeline .tl-dot{ width: 9px; height: 9px; border-radius: 50%; margin-top: 6px; border: 2px solid var(--text) }
+.timeline .tl-dot.acc{ border-color: var(--accent); background: var(--accent) }
+.bars-h{ display: grid; gap: 10px }
+.bar-h{ display: grid; grid-template-columns: minmax(0, 1fr) 40px; gap: 4px 10px; font-size: .93em }
+.bar-h i{ grid-column: 1 / -1; height: 4px; border-radius: 2px; background: var(--surface-2) }
+.bar-h i b{ display: block; height: 100%; background: var(--text); border-radius: inherit }
+@media (max-width: 1000px){ .m-shell{ grid-template-columns: 60px minmax(0, 1fr) } .m-panel{ display: none } }
+@media (max-width: 820px){ .m-shell{ grid-template-columns: minmax(0, 1fr) } .m-rail{ display: none } }
+.m-mtop{ display: none } @media (max-width: 1000px){ .m-mtop{ display: flex } }
+
+/* ---------- Shell: Harbor (floating dock + friendly home) ---------- */
+.h-shell{ display: grid; grid-template-columns: 264px minmax(0, 1fr); min-height: 100%; gap: 0 }
+.h-side{ position: sticky; top: 12px; margin: 12px 0 12px 12px; height: calc(100vh - 24px); display: flex; flex-direction: column; gap: 6px; padding: 18px 12px; border-radius: 26px; background: var(--surface) }
+.h-side .brand{ padding: 4px 10px 14px; font-size: 1.15em }
+.h-side .mark{ border-radius: 10px; width: 32px; height: 32px }
+.h-nav{ display: flex; align-items: center; gap: 12px; height: 46px; padding: 0 14px; border-radius: 999px; border: 0; background: none; color: var(--muted); cursor: pointer; font-weight: 600; font-size: 1em; text-align: left }
+.h-nav .ic{ width: 19px; height: 19px }
+.h-nav:hover{ background: var(--surface-2); color: var(--text) }
+.h-nav[aria-current="page"]{ background: var(--accent); color: var(--accent-fg) }
+.h-switch{ margin-top: auto; padding: 14px; border-radius: 20px; background: var(--surface-2); display: grid; gap: 8px }
+:root[data-variant="harbor"] .page{ padding-top: 28px }
+:root[data-variant="harbor"] .page-h h1{ font-size: 2.1em; font-weight: 800; letter-spacing: -.03em }
+:root[data-variant="harbor"] .card{ background: var(--surface) }
+.h-greet{ font-family: var(--font-display); font-weight: 800; font-size: clamp(2rem, 5vw, 3.1rem); line-height: 1.02; letter-spacing: -.035em }
+.h-next{ padding: 26px; display: grid; gap: 14px; background: var(--accent); color: var(--accent-fg); border-radius: var(--rc) }
+.h-next p{ opacity: .92 } .h-next .btn.pri{ background: var(--accent-fg); color: var(--accent) }
+.h-next .btn.ghost{ color: var(--accent-fg) } .h-next .btn.ghost:hover{ background: color-mix(in oklch, var(--accent-fg) 14%, transparent) }
+.bubbles{ display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) }
+.bubble{ padding: 18px 20px; border-radius: var(--rc); background: var(--surface) }
+.bubble .kpi-v{ font-size: 2em; font-weight: 800 }
+.h-tabs{ display: none }
+@media (max-width: 820px){
+  .h-shell{ grid-template-columns: minmax(0, 1fr) } .h-side{ display: none }
+  .h-tabs{ display: flex; position: fixed; z-index: 20; left: 0; right: 0; bottom: 0; padding: 8px max(10px, env(safe-area-inset-right, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(10px, env(safe-area-inset-left, 0px)); background: color-mix(in oklch, var(--surface) 92%, transparent); backdrop-filter: blur(12px); border-top: 1px solid var(--border); justify-content: space-around }
+  .h-tabs button{ display: grid; justify-items: center; gap: 2px; border: 0; background: none; color: var(--muted); font-size: 11.5px; font-weight: 600; padding: 4px 6px; border-radius: 12px; cursor: pointer }
+  .h-tabs button[aria-current="page"]{ color: var(--accent) }
+  :root[data-variant="harbor"] #switcher{ bottom: calc(78px + env(safe-area-inset-bottom, 0px)) }
+}
+
+/* Mobile top bar for rail/sidebar shells */
+.mtop{ position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; align-items: center; gap: 10px; height: 52px; padding: 0 max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); border-bottom: 1px solid var(--border); background: color-mix(in oklch, var(--bg) 88%, transparent); backdrop-filter: blur(10px) }
+body::before{ content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg) }
+
+/* ---------- Prototype switcher (not part of any design) ---------- */
+#switcher{ position: fixed; z-index: 70; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; gap: 4px; padding: 6px; border-radius: 999px; background: var(--sw-bg); color: var(--sw-fg); box-shadow: 0 12px 40px -8px oklch(0 0 0 / .5), 0 0 0 1px oklch(1 0 0 / .08) inset; font: 500 13px/1 "Geist", system-ui, sans-serif; max-width: calc(100vw - 24px); color-scheme: dark }
+#switcher button{ border: 0; background: none; color: inherit; cursor: pointer; height: 32px; min-width: 32px; border-radius: 999px; display: inline-grid; place-items: center; padding: 0 8px }
+#switcher button:hover{ background: oklch(1 0 0 / .1) }
+#switcher button:focus-visible{ outline: 2px solid var(--sw-fg); outline-offset: 1px }
+#switcher .sw-name{ display: grid; gap: 3px; padding: 0 8px; min-width: 128px; text-align: center }
+#switcher .sw-name b{ font-weight: 600 } #switcher .sw-name small{ color: var(--sw-mute); font-size: 11px }
+#switcher .sep{ width: 1px; height: 22px; background: var(--sw-line); margin: 0 4px }
+#switcher .acc{ width: 22px; height: 22px; min-width: 22px; padding: 0; border-radius: 50%; border: 2px solid transparent }
+#switcher .acc[aria-checked="true"]{ border-color: var(--sw-fg) }
+#switcher .acc i{ display: block; width: 14px; height: 14px; border-radius: 50% }
+@media (max-width: 560px){ #switcher .sw-name{ min-width: 92px } #switcher .sw-name small{ display: none } #switcher .th-label{ display: none } }
+</style>
+
+<div id="app"></div>
+<div id="toasts" role="status" aria-live="polite"></div>
+<dialog id="dlg" aria-labelledby="dlg-title"></dialog>
+
+<div id="switcher" role="toolbar" aria-label="Prototype controls">
+  <button id="sw-prev" aria-label="Previous direction"><svg class="ic" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+  <div class="sw-name"><b id="sw-title">Graphite</b><small id="sw-sub">1 of 4 · press ← →</small></div>
+  <button id="sw-next" aria-label="Next direction"><svg class="ic" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+  <span class="sep"></span>
+  <span id="sw-accents" class="row" style="gap:2px" role="radiogroup" aria-label="Accent"></span>
+  <span class="sep"></span>
+  <button id="sw-theme" aria-label="Theme"><span class="row" style="gap:6px"><svg class="ic" viewBox="0 0 24 24"><path id="sw-theme-ic" d=""/></svg><span class="th-label" id="sw-theme-l">Auto</span></span></button>
+</div>
+
+<script>
+/* ---------- Icons (lucide-style strokes) ---------- */
+const I = {
+  home:'M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z',
+  bot:'M12 8V4H8 M6 8h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z M2 14h2 M20 14h2 M15 13v2 M9 13v2',
+  book:'M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5',
+  code:'m16 18 6-6-6-6 M8 6l-6 6 6 6',
+  chart:'M3 3v18h18 M7 15l4-4 3 3 5-6',
+  card:'M3 6h18a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z M2 10h20',
+  gauge:'M12 14l4-4 M3.3 19a10 10 0 1 1 17.4 0',
+  server:'M4 3h16v6H4z M4 15h16v6H4z M8 6h.01 M8 18h.01',
+  users:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M13 7a4 4 0 1 1-8 0a4 4 0 1 1 8 0 M22 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75',
+  list:'M8 6h13 M8 12h13 M8 18h13 M3 6h.01 M3 12h.01 M3 18h.01',
+  search:'M21 21l-4.3-4.3 M19 11a8 8 0 1 1-16 0a8 8 0 1 1 16 0',
+  plus:'M12 5v14 M5 12h14',
+  copy:'M9 9h11v11H9z M5 15H4V4h11v1',
+  eye:'M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z M15 12a3 3 0 1 1-6 0a3 3 0 1 1 6 0',
+  eyeOff:'M3 3l18 18 M10.6 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-2.2 3.2 M6.6 6.6C3.9 8.3 2 12 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6 M9.9 9.9a3 3 0 0 0 4.2 4.2',
+  x:'M18 6 6 18 M6 6l12 12',
+  check:'M20 6 9 17l-5-5',
+  chevR:'m9 18 6-6-6-6',
+  up:'m18 15-6-6-6 6', down:'m6 9 6 6 6-6',
+  sun:'M12 16a4 4 0 1 0 0-8a4 4 0 0 0 0 8z M12 2v2 M12 20v2 M4.9 4.9l1.4 1.4 M17.7 17.7l1.4 1.4 M2 12h2 M20 12h2 M4.9 19.1l1.4-1.4 M17.7 6.3l1.4-1.4',
+  moon:'M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z',
+  auto:'M12 3a9 9 0 1 0 0 18z M12 3a9 9 0 0 1 0 18',
+  upload:'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M17 8l-5-5-5 5 M12 3v12',
+  globe:'M22 12a10 10 0 1 1-20 0a10 10 0 1 1 20 0 M2 12h20 M12 2a15 15 0 0 1 0 20 M12 2a15 15 0 0 0 0 20',
+  file:'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6',
+  text:'M4 7V4h16v3 M9 20h6 M12 4v16',
+  key:'M15.5 7.5 19 4 M21 2l-2 2 M18 5l2 2 M13.4 10.6a5 5 0 1 1-7 7 5 5 0 0 1 7-7z',
+  refresh:'M3 12a9 9 0 0 1 15-6.7L21 8 M21 3v5h-5 M21 12a9 9 0 0 1-15 6.7L3 16 M3 21v-5h5',
+  trash:'M3 6h18 M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6 M10 11v6 M14 11v6 M9 6V4h6v2',
+  send:'M22 2 11 13 M22 2l-7 20-4-9-9-4z',
+  shield:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
+  menu:'M4 6h16 M4 12h16 M4 18h16',
+  zap:'M13 2 3 14h9l-1 8 10-12h-9z',
+  alert:'M12 9v4 M12 17h.01 M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z',
+  info:'M22 12a10 10 0 1 1-20 0a10 10 0 1 1 20 0 M12 16v-4 M12 8h.01',
+  more:'M12 12h.01 M19 12h.01 M5 12h.01',
+  sparkles:'M12 3l1.9 5.8L20 10l-6.1 1.2L12 17l-1.9-5.8L4 10l6.1-1.2z M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z',
+  pause:'M8 5v14 M16 5v14',
+  play:'M6 4l14 8-14 8z',
+  route:'M6 19a2 2 0 1 0 0-4a2 2 0 0 0 0 4z M18 9a2 2 0 1 0 0-4a2 2 0 0 0 0 4z M6 15V9a4 4 0 0 1 4-4h6 M18 9v6a4 4 0 0 1-4 4H8',
+  arrowR:'M5 12h14 M13 6l6 6-6 6',
+};
+const ic = (n, c = '') => `<svg class="ic ${c}" viewBox="0 0 24 24" aria-hidden="true"><path d="${I[n]}"/></svg>`;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+/* ---------- Sample data (examples, not real customers) ---------- */
+const PROVIDERS = [
+  { id:'cerebras', name:'Cerebras', models:['llama-3.3-70b','qwen-3-32b'], on:true, status:'ok', lat:146, key:true },
+  { id:'groq', name:'Groq', models:['llama-3.3-70b-versatile','llama-3.1-8b-instant'], on:true, status:'ok', lat:182, key:true },
+  { id:'ifm', name:'IFM AI', models:['k2-horizon','jais-36b'], on:true, status:'ok', lat:264, key:true },
+  { id:'mistral', name:'Mistral', models:['mistral-small-latest'], on:true, status:'ok', lat:388, key:true },
+  { id:'gemini', name:'Google Gemini', models:['gemini-2.5-flash'], on:true, status:'ok', lat:410, key:true },
+  { id:'openrouter', name:'OpenRouter', models:['deepseek-chat-v3','mistral-small-3.2'], on:true, status:'slow', lat:920, key:true },
+  { id:'github', name:'GitHub Models', models:['gpt-4o-mini'], on:true, status:'cooldown', lat:0, key:true },
+  { id:'sambanova', name:'SambaNova', models:['llama-4-maverick'], on:false, status:'off', lat:0, key:false },
+];
+const CUSTOMERS = [
+  { id:'c1', name:'Brightpath Tutors', email:'hello@brightpath.example', plan:'Pro', used:6420, limit:10000, status:'active' },
+  { id:'c2', name:'Northwind Dental', email:'front@northwind.example', plan:'Pro', used:8890, limit:10000, status:'active' },
+  { id:'c3', name:'Kettle & Crumb Bakery', email:'orders@kettle.example', plan:'Free', used:412, limit:500, status:'active' },
+  { id:'c4', name:'Lumen Legal', email:'intake@lumen.example', plan:'Pro', used:2310, limit:10000, status:'active' },
+  { id:'c5', name:'Atlas Fitness Studio', email:'team@atlasfit.example', plan:'Free', used:96, limit:500, status:'paused' },
+  { id:'c6', name:'Fernwood Realty', email:'agents@fernwood.example', plan:'Pro', used:5034, limit:10000, status:'active' },
+  { id:'c7', name:'Orbit Bikes', email:'shop@orbit.example', plan:'Free', used:0, limit:500, status:'active' },
+];
+let DOCS = [
+  { id:'d1', title:'Pricing and plans', src:'File', size:'84 KB', when:'2 days ago', state:'ready' },
+  { id:'d2', title:'brightpath.example/faq', src:'Website', size:'31 KB', when:'9 days ago', state:'stale' },
+  { id:'d3', title:'Refund policy', src:'Text', size:'3 KB', when:'Today', state:'ready' },
+  { id:'d4', title:'Tutor onboarding guide', src:'Notion', size:'56 KB', when:'Last week', state:'ready' },
+  { id:'d5', title:'Exam season timetable', src:'Google Docs', size:'12 KB', when:'Just now', state:'indexing' },
+];
+const CONVOS = [
+  { q:'Do you offer weekend sessions?', a:true, when:'4 min ago', page:'/tutoring' },
+  { q:'How much is a 10-lesson bundle?', a:true, when:'18 min ago', page:'/pricing' },
+  { q:'Can I pay in instalments?', a:false, when:'41 min ago', page:'/pricing' },
+  { q:'Is there a trial lesson for GCSE maths?', a:true, when:'1 h ago', page:'/' },
+  { q:'Who teaches A-level chemistry?', a:true, when:'2 h ago', page:'/team' },
+  { q:'Do tutors travel to Croydon?', a:false, when:'3 h ago', page:'/contact' },
+  { q:'What happens if I cancel a lesson late?', a:true, when:'5 h ago', page:'/policies' },
+];
+const LOGS = [
+  { t:'21:42:08', cust:'Northwind Dental', model:'llama-3.3-70b', prov:'Cerebras', status:200, ms:612, tok:842 },
+  { t:'21:41:55', cust:'Brightpath Tutors', model:'llama-3.3-70b-versatile', prov:'Groq', status:200, ms:731, tok:1204 },
+  { t:'21:41:31', cust:'Fernwood Realty', model:'gpt-4o-mini', prov:'GitHub Models', status:429, ms:211, tok:0 },
+  { t:'21:41:31', cust:'Fernwood Realty', model:'k2-horizon', prov:'IFM AI', status:200, ms:1088, tok:967 },
+  { t:'21:40:12', cust:'Lumen Legal', model:'gemini-2.5-flash', prov:'Google Gemini', status:200, ms:1420, tok:2210 },
+  { t:'21:39:47', cust:'Kettle & Crumb Bakery', model:'deepseek-chat-v3', prov:'OpenRouter', status:502, ms:9012, tok:0 },
+  { t:'21:39:47', cust:'Kettle & Crumb Bakery', model:'mistral-small-latest', prov:'Mistral', status:200, ms:803, tok:455 },
+  { t:'21:38:02', cust:'Brightpath Tutors', model:'qwen-3-32b', prov:'Cerebras', status:200, ms:498, tok:610 },
+];
+const DAILY = [148,162,155,171,190,184,139,128,201,214,236,229,250,262];
+const MONTH = [120,132,128,140,151,149,160,171,168,180,176,190,198,205,199,214,221,230,226,240,251,246,262,270,268,281,290,286,301,312];
+const ANSWERS = {
+  default: "Yes. We run weekend sessions on Saturdays from 9am to 4pm and Sundays from 10am to 2pm. You can book any open slot from the Tutoring page, and your first trial lesson is free.",
+  refund: "If you cancel more than 24 hours before a lesson you get a full refund. Inside 24 hours we keep 50% so the tutor is paid for the time they held for you.",
+  price: "A single lesson is £38. The 10-lesson bundle is £340, which works out at £34 a lesson, and it is valid for six months.",
+};
+
+/* ---------- Directions ---------- */
+const NAV = {
+  app: [
+    { id:'home', label:'Home', icon:'home' },
+    { id:'chatbot', label:'Chatbot', icon:'bot' },
+    { id:'knowledge', label:'Knowledge', icon:'book', count: DOCS.length },
+    { id:'install', label:'Install', icon:'code' },
+    { id:'usage', label:'Usage', icon:'chart' },
+    { id:'billing', label:'Billing', icon:'card' },
+  ],
+  admin: [
+    { id:'overview', label:'Overview', icon:'gauge' },
+    { id:'providers', label:'Providers', icon:'route' },
+    { id:'customers', label:'Customers', icon:'users' },
+    { id:'logs', label:'Request log', icon:'list' },
+  ],
+};
+const V = {
+  graphite: { name:'Graphite', tag:'Dense sidebar · command bar', accents:[ {name:'Iris', h:277, c:.17}, {name:'Cobalt', h:255, c:.16}, {name:'Jade', h:165, c:.12, l:.5} ] },
+  daylight: { name:'Daylight', tag:'Top nav · guided setup', accents:[ {name:'Ocean', h:238, c:.15}, {name:'Violet', h:298, c:.17}, {name:'Forest', h:150, c:.12, l:.48} ] },
+  monolith: { name:'Monolith', tag:'Icon rail · monochrome', accents:[ {name:'Azure', h:248, c:.18}, {name:'Magenta', h:345, c:.19}, {name:'Amber', h:72, c:.15, l:.55, d:.8} ] },
+  harbor:   { name:'Harbor', tag:'Floating dock · friendly', accents:[ {name:'Lagoon', h:212, c:.13}, {name:'Plum', h:322, c:.15}, {name:'Cobalt', h:262, c:.16} ] },
+};
+const ORDER = ['graphite','daylight','monolith','harbor'];
+
+/* ---------- State ---------- */
+const store = { get(k){ try { return JSON.parse(localStorage.getItem('zr-proto-' + k)) } catch { return null } }, set(k, v){ try { localStorage.setItem('zr-proto-' + k, JSON.stringify(v)) } catch {} } };
+const S = Object.assign({ v:'graphite', view:'home', con:'app', theme:'auto', acc:{ graphite:0, daylight:0, monolith:0, harbor:0 } }, store.get('state') || {});
+if (location.hash && V[location.hash.slice(1)]) S.v = location.hash.slice(1);
+const UI = { logFilter:'all', usageFilter:'all', custQuery:'', installTab:'html', bot:{ name:'Brightpath Assistant', greeting:'Hi! Ask me anything about lessons, prices or booking.', brand:0, badge:true, instructions:'Be warm and brief. If you are not sure, offer to pass the question to the team at hello@brightpath.example.' }, chat:[], streaming:false, keyShown:false };
+UI.chat = [{ who:'bot', text: UI.bot.greeting }];
+const BRANDS = ['oklch(.55 .15 238)', 'oklch(.56 .17 300)', 'oklch(.55 .13 160)', 'oklch(.58 .16 40)', 'oklch(.3 .02 260)'];
+
+/* ---------- Small builders ---------- */
+const badge = (tone, text, dot) => `<span class="badge ${tone}">${dot ? `<span class="dot ${dot === 'pulse' ? 'pulse' : ''}"></span>` : ''}${text}</span>`;
+const pstatus = p => ({ ok: badge('ok', 'Healthy', 1), slow: badge('warn', 'Slow', 1), cooldown: badge('bad', 'Cooling down', 'pulse'), off: badge('', 'Off', 1) })[p.status];
+const fmt = n => n.toLocaleString('en-GB');
+function spark(vals, h = 36){
+  const w = 100, max = Math.max(...vals), min = Math.min(...vals), sx = w / (vals.length - 1);
+  const y = v => h - 3 - ((v - min) / ((max - min) || 1)) * (h - 6);
+  const d = vals.map((v, i) => `${i ? 'L' : 'M'}${(i * sx).toFixed(2)} ${y(v).toFixed(2)}`).join(' ');
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><path class="a" d="${d} L${w} ${h} L0 ${h}Z"/><path class="l" d="${d}"/></svg>`;
+}
+function barChart(vals, labels){
+  const W = 640, H = 210, pl = 34, pb = 26, pt = 10, cw = W - pl - 8, ch = H - pb - pt;
+  const max = 300, ticks = [0, 100, 200, 300], bw = cw / vals.length;
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Questions per day for the last 14 days, rising from 148 to 262" style="width:100%;height:auto">`;
+  ticks.forEach(t => { const y = pt + ch - (t / max) * ch; s += `<line class="grid" x1="${pl}" x2="${W - 8}" y1="${y}" y2="${y}"/><text x="${pl - 8}" y="${y + 4}" text-anchor="end">${t}</text>`; });
+  vals.forEach((v, i) => { const h = (v / max) * ch, x = pl + i * bw + bw * .18; s += `<rect class="bar ${i < vals.length - 7 ? 'dim' : ''}" x="${x}" y="${pt + ch - h}" width="${bw * .64}" height="${h}" rx="3"><title>${labels[i]}: ${v}</title></rect>`; if (i % 2 === 1 || i === vals.length - 1) s += `<text x="${x + bw * .32}" y="${H - 8}" text-anchor="middle">${labels[i]}</text>`; });
+  return s + '</svg>';
+}
+function areaChart(vals){
+  const W = 720, H = 220, pl = 36, pb = 24, pt = 12, cw = W - pl - 12, ch = H - pb - pt, max = 350;
+  const x = i => pl + (i / (vals.length - 1)) * cw, y = v => pt + ch - (v / max) * ch;
+  const d = vals.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(' ');
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Questions per day over 30 days, rising from 120 to 312" style="width:100%;height:auto">`;
+  [0, 100, 200, 300].forEach(t => s += `<line class="grid" x1="${pl}" x2="${W - 12}" y1="${y(t)}" y2="${y(t)}"/><text x="${pl - 8}" y="${y(t) + 4}" text-anchor="end">${t}</text>`);
+  [0, 9, 19, 29].forEach(i => s += `<text x="${x(i)}" y="${H - 6}" text-anchor="${i === 0 ? 'start' : i === 29 ? 'end' : 'middle'}">${['23 Oct','1 Nov','11 Nov','21 Nov'][[0,9,19,29].indexOf(i)]}</text>`);
+  s += `<path class="area" d="${d} L${x(vals.length - 1)} ${y(0)} L${x(0)} ${y(0)}Z"/><path class="line" d="${d}"/>`;
+  s += `<circle class="end" cx="${x(vals.length - 1)}" cy="${y(vals[vals.length - 1])}" r="5"/>`;
+  return s + '</svg>';
+}
+const dayLabels = ['8','9','10','11','12','13','14','15','16','17','18','19','20','21'].map(d => d + ' Nov');
+const secretKey = 'zr_live_9f3c1a7b2e8d4c6f0a5b9e1d7c3f8a2b6e4d0c9a';
+const secret = () => `<div class="secret"><code class="mono">${UI.keyShown ? secretKey : 'zr_live_' + '•'.repeat(18) + '0c9a'}</code>
+  <button class="btn ghost icon sm" data-act="toggle-key" aria-label="${UI.keyShown ? 'Hide' : 'Show'} API key" aria-pressed="${UI.keyShown}">${ic(UI.keyShown ? 'eyeOff' : 'eye')}</button>
+  <button class="btn ghost icon sm" data-act="copy" data-copy="${secretKey}" aria-label="Copy API key">${ic('copy')}</button></div>`;
+
+/* ---------- Home: one per direction (different information hierarchy) ---------- */
+const HOME = {
+  graphite: () => `
+    <header class="page-h"><div><h1>Home</h1><p class="sub">Brightpath Tutors · Pro plan · resets 1 Dec</p></div>
+      <div class="row wrap"><button class="btn sec" data-go="install">${ic('code')}Get snippet</button><button class="btn pri" data-go="chatbot">${ic('bot')}Test chatbot</button></div></header>
+    <section class="kpis" aria-label="This month">
+      ${[['Questions answered','1,284','+12%',DAILY],['Answer rate','96.4%','+1.8 pts',[90,91,93,92,94,95,96]],['Average reply','1.1 s','−0.2 s',[1.6,1.5,1.4,1.3,1.3,1.2,1.1]],['Visitors helped','812','+9%',[60,64,70,68,75,80,84]]]
+        .map(k => `<div class="card kpi"><span class="kpi-l">${k[0]}</span><div class="row between"><span class="kpi-v">${k[1]}</span><span class="delta">${k[2]}</span></div>${spark(k[3])}</div>`).join('')}
+    </section>
+    <div class="grid-side">
+      <section class="card"><div class="card-h"><h2>Recent conversations</h2><span class="spacer"></span><button class="btn ghost sm" data-go="usage">View all ${ic('chevR')}</button></div>
+        <div class="table-wrap"><table class="table"><thead><tr><th>Question</th><th>Result</th><th>Page</th><th class="r">When</th></tr></thead><tbody>
+        ${CONVOS.slice(0, 6).map(c => `<tr><td>${esc(c.q)}</td><td>${c.a ? badge('ok', 'Answered') : badge('warn', 'Sent to you')}</td><td class="mono subtle">${c.page}</td><td class="r subtle">${c.when}</td></tr>`).join('')}
+        </tbody></table></div></section>
+      <section class="card"><div class="card-h"><h2>Needs attention</h2><span class="badge">3</span></div>
+        <ul class="list">
+          <li>${badge('warn', '2', 0)}<div class="grow"><div class="t">Questions the bot couldn't answer</div><div class="d">Instalments and travel area</div></div><button class="btn sec sm" data-go="knowledge">Add answer</button></li>
+          <li>${badge('info', 'Sync', 0)}<div class="grow"><div class="t">Website copy is 9 days old</div><div class="d">brightpath.example/faq</div></div><button class="btn sec sm" data-act="resync">Re-sync</button></li>
+          <li>${badge('ok', 'OK', 0)}<div class="grow"><div class="t">Allowed domains are set</div><div class="d">brightpath.example, www.brightpath.example</div></div></li>
+        </ul>
+        <div class="card-b" style="border-top:1px solid var(--border)"><div class="row between"><span class="label">Usage this month</span><span class="num muted">6,420 / 10,000</span></div><div class="meter" style="margin-top:8px" role="meter" aria-valuenow="6420" aria-valuemin="0" aria-valuemax="10000" aria-label="Usage"><i style="width:64.2%"></i></div></div>
+      </section>
+    </div>`,
+  daylight: () => `
+    <header class="page-h"><div><h1>Welcome back</h1><p class="sub">Two steps left before your chatbot is live on brightpath.example.</p></div></header>
+    <div class="grid-side">
+      <section class="card d-hero">
+        <div class="row between wrap"><div><h2 style="font-size:1.2em">Get your chatbot live</h2><p class="muted">About 5 minutes. You can change everything later.</p></div><span class="badge acc">2 of 4 done</span></div>
+        <div class="meter" role="meter" aria-valuenow="2" aria-valuemin="0" aria-valuemax="4" aria-label="Setup progress"><i style="width:50%"></i></div>
+        <ol class="steps">
+          <li class="step done"><span class="step-c">${ic('check')}</span><div class="grow"><div class="t">Name your chatbot</div></div></li>
+          <li class="step done"><span class="step-c">${ic('check')}</span><div class="grow"><div class="t">Teach it about your business</div></div></li>
+          <li class="step"><span class="step-c">3</span><div class="grow" style="flex:1"><div class="t" style="font-weight:600">Add the snippet to your website</div><div class="muted" style="font-size:.9em">Paste one line before &lt;/body&gt;. Guides for WordPress, Shopify and Wix.</div></div><button class="btn pri" data-go="install">Install</button></li>
+          <li class="step"><span class="step-c">4</span><div class="grow" style="flex:1"><div class="t" style="font-weight:600">Send a test question</div><div class="muted" style="font-size:.9em">Check the answers sound like you.</div></div><button class="btn sec" data-go="chatbot">Open test chat</button></li>
+        </ol>
+      </section>
+      <aside class="stack">
+        <section class="card card-b stack-sm"><div class="row between"><span class="label">Pro plan</span>${badge('ok', 'Active', 1)}</div>
+          <div class="row between"><span class="kpi-v" style="font-size:1.4em">6,420</span><span class="muted num">of 10,000 questions</span></div>
+          <div class="meter" role="meter" aria-valuenow="6420" aria-valuemin="0" aria-valuemax="10000" aria-label="Usage"><i style="width:64.2%"></i></div>
+          <p class="hint">Resets on 1 December</p></section>
+        <section class="card card-b stack-sm"><span class="label">API key</span>${secret()}<p class="hint">Use it to call the API from your server. Keep it private.</p>
+          <span class="label" style="margin-top:6px">Bot ID</span><div class="secret"><code class="mono">bot_4c1e9a72d0b35f86</code><button class="btn ghost icon sm" data-act="copy" data-copy="bot_4c1e9a72d0b35f86" aria-label="Copy Bot ID">${ic('copy')}</button></div></section>
+      </aside>
+    </div>
+    <section class="card"><div class="card-h"><h2>Latest questions</h2><span class="spacer"></span><button class="btn ghost sm" data-go="usage">See all</button></div>
+      <ul class="list">${CONVOS.slice(0, 4).map(c => `<li><div class="grow"><div class="t">${esc(c.q)}</div><div class="d">${c.when} · ${c.page}</div></div>${c.a ? badge('ok', 'Answered') : badge('warn', 'Sent to you')}</li>`).join('')}</ul></section>`,
+  monolith: () => `
+    <section class="stack" style="gap:10px"><span class="eyebrow">Questions answered this month</span>
+      <div class="row wrap" style="align-items:flex-end;gap:18px"><span class="m-hero-n num">6,420</span><span class="delta" style="font-size:14px;margin-bottom:10px">+18% vs October</span></div>
+      <p class="muted">Brightpath Tutors · Pro · 3,580 questions left until 1 Dec</p></section>
+    <section class="card card-b">${areaChart(MONTH)}</section>
+    <div class="grid-2">
+      <section class="card"><div class="card-h"><h2>Activity</h2></div><div class="card-b" style="padding-top:6px"><ol class="timeline">
+        <li><time>21:41</time><span class="tl-dot acc"></span><div><b>Answered</b> "Do you offer weekend sessions?"<div class="subtle">from /tutoring · 0.9 s</div></div></li>
+        <li><time>21:18</time><span class="tl-dot"></span><div><b>Sent to you</b> "Can I pay in instalments?"<div class="subtle">No matching knowledge</div></div></li>
+        <li><time>19:02</time><span class="tl-dot"></span><div><b>Knowledge added</b> Exam season timetable<div class="subtle">Google Docs · indexing</div></div></li>
+        <li><time>14:30</time><span class="tl-dot"></span><div><b>Settings changed</b> Greeting updated</div></li>
+      </ol></div></section>
+      <section class="card"><div class="card-h"><h2>Top topics</h2></div><div class="card-b bars-h">
+        ${[['Prices and bundles',184],['Booking and availability',151],['Cancellations',96],['Exam preparation',71],['Tutors',44]].map(t => `<div class="bar-h"><span>${t[0]}</span><span class="num r subtle" style="text-align:right">${t[1]}</span><i><b style="width:${t[1] / 184 * 100}%"></b></i></div>`).join('')}
+      </div></section>
+    </div>`,
+  harbor: () => `
+    <section class="stack" style="gap:8px"><p class="muted" style="font-weight:600">Friday, 21 November</p><h1 class="h-greet">Good evening.<br>Your chatbot had a busy week.</h1>
+      <p class="muted" style="font-size:1.08em;max-width:60ch">It answered 214 questions and passed 3 to you. Here is the one thing that would help it most.</p></section>
+    <section class="h-next"><span class="row" style="gap:10px;font-weight:700">${ic('sparkles', 'lg')} Suggested next step</span>
+      <h2 style="font-size:1.5em;font-weight:800">Add how instalment payments work</h2>
+      <p>Visitors asked about paying in instalments 11 times this week and the bot had nothing to say.</p>
+      <div class="row wrap"><button class="btn pri" data-act="add-knowledge">${ic('plus')}Add the answer</button><button class="btn ghost" data-go="usage">See the questions</button></div></section>
+    <section class="bubbles">
+      <div class="bubble"><span class="kpi-l">Answered</span><div class="kpi-v num">96%</div><span class="muted">of all questions</span></div>
+      <div class="bubble"><span class="kpi-l">Fastest reply</span><div class="kpi-v num">0.6 s</div><span class="muted">average 1.1 s</span></div>
+      <div class="bubble"><span class="kpi-l">This month</span><div class="kpi-v num">6,420</div><div class="meter" style="margin-top:8px" role="meter" aria-valuenow="6420" aria-valuemin="0" aria-valuemax="10000" aria-label="Usage"><i style="width:64.2%"></i></div></div>
+    </section>
+    <section class="card"><div class="card-h"><h2 style="font-size:1.15em">Last conversation</h2><span class="spacer"></span><span class="subtle">4 min ago</span></div>
+      <div class="card-b stack-sm"><div class="msg me" style="margin-left:auto">Do you offer weekend sessions?</div><div class="msg bot">${ANSWERS.default}</div></div></section>`,
+};
+
+/* ---------- Shared screens ---------- */
+const VIEWS = {
+  chatbot: () => {
+    const b = UI.bot;
+    return `<header class="page-h"><div><h1>Chatbot</h1><p class="sub">How your chatbot looks and talks. Changes show in the test chat straight away.</p></div></header>
+    <div class="grid-side">
+      <form class="card" id="bot-form" novalidate>
+        <div class="card-h"><h2>Settings</h2></div>
+        <div class="card-b stack">
+          <div class="form-grid">
+            <div class="field"><label for="f-name">Name</label><input class="input" id="f-name" value="${esc(b.name)}" maxlength="40"><span class="hint">Shown at the top of the chat window.</span></div>
+            <div class="field"><label for="f-greet">Greeting</label><input class="input" id="f-greet" value="${esc(b.greeting)}" maxlength="120"></div>
+          </div>
+          <div class="field"><label for="f-instr">Instructions</label><textarea class="textarea" id="f-instr" aria-describedby="f-instr-h">${esc(b.instructions)}</textarea><span class="hint" id="f-instr-h">Tone, what to avoid, and who to hand questions to.</span></div>
+          <div class="field"><span class="label" id="brand-l">Brand colour</span><div class="swatches" role="radiogroup" aria-labelledby="brand-l">${BRANDS.map((c, i) => `<button type="button" class="swatch" role="radio" aria-checked="${b.brand === i}" aria-label="Colour ${i + 1}" data-act="brand" data-i="${i}" style="background:${c}"></button>`).join('')}</div></div>
+          <div class="field"><span class="label">Suggested questions</span><div class="chips">${['Prices','Book a trial','Weekend sessions','Cancellation policy'].map(q => `<button type="button" class="chip" data-act="ask" data-q="${q}">${q}</button>`).join('')}<button type="button" class="chip" data-act="toast" data-msg="Add a suggested question (prototype)">${ic('plus')}Add</button></div></div>
+          <div class="toggle-row"><div><div class="label">Show "Powered by ZeroRoute"</div><div class="hint">Pro plans can hide it.</div></div><button type="button" class="switch" role="switch" aria-checked="${b.badge}" aria-label="Show Powered by ZeroRoute" data-act="badge"></button></div>
+          <div class="field"><label for="f-domain">Add an allowed domain</label><input class="input" id="f-domain" placeholder="www.brightpath.example" aria-describedby="f-domain-m"><span class="hint" id="f-domain-m">The chatbot only works on these sites. Try typing "brightpath" without a dot.</span></div>
+        </div>
+        <div class="dlg-f" style="border-radius:0 0 var(--rc) var(--rc)"><button type="button" class="btn ghost" data-act="toast" data-msg="Changes discarded" data-tone="info">Discard</button><button type="submit" class="btn pri" id="save-bot">Save changes</button></div>
+      </form>
+      <section class="card chat" style="--brand:${BRANDS[b.brand]}" aria-label="Test chat">
+        <div class="chat-head"><span class="chat-logo">${ic('bot')}</span><div style="min-width:0"><div class="label" id="chat-name">${esc(b.name)}</div><div class="hint row" style="gap:6px"><span class="dot" style="color:var(--ok)"></span>Test mode · not counted in usage</div></div><span class="spacer"></span><button class="btn ghost icon sm" data-act="reset-chat" aria-label="Clear test chat">${ic('refresh')}</button></div>
+        <div class="chat-log" id="chat-log" aria-live="polite">${UI.chat.map(m => `<div class="msg ${m.who === 'me' ? 'me' : 'bot'}${m.err ? ' err' : ''}">${esc(m.text)}</div>`).join('')}</div>
+        <form class="chat-compose" id="chat-form"><label class="sr" for="chat-in">Message</label><input class="input" id="chat-in" placeholder="Ask about prices, refunds, weekends…" autocomplete="off"><button class="btn pri icon" aria-label="Send" ${UI.streaming ? 'disabled' : ''}>${ic('send')}</button></form>
+      </section>
+    </div>`;
+  },
+  knowledge: () => `<header class="page-h"><div><h1>Knowledge</h1><p class="sub">What your chatbot knows. It only answers from these sources.</p></div><button class="btn pri" data-act="add-knowledge">${ic('plus')}Add knowledge</button></header>
+    ${DOCS.length ? `<section class="card"><div class="table-wrap"><table class="table"><thead><tr><th>Source</th><th>Type</th><th>Status</th><th class="r">Size</th><th class="r">Updated</th><th><span class="sr">Actions</span></th></tr></thead><tbody>
+    ${DOCS.map(d => `<tr><td><div class="row">${ic({ File:'file', Website:'globe', Text:'text', Notion:'book', 'Google Docs':'file' }[d.src] || 'file')}<span style="font-weight:550">${esc(d.title)}</span></div></td><td>${badge('', d.src)}</td>
+      <td>${{ ready: badge('ok', 'Ready', 1), stale: badge('warn', 'Needs re-sync', 1), indexing: badge('info', 'Reading…', 'pulse') }[d.state]}</td><td class="r subtle">${d.size}</td><td class="r subtle">${d.when}</td>
+      <td class="r"><div class="row" style="justify-content:flex-end;gap:2px">${d.state === 'stale' ? `<button class="btn ghost icon sm" aria-label="Re-sync ${esc(d.title)}" data-act="resync">${ic('refresh')}</button>` : ''}<button class="btn ghost icon sm" aria-label="Delete ${esc(d.title)}" data-act="del-doc" data-id="${d.id}">${ic('trash')}</button></div></td></tr>`).join('')}
+    </tbody></table></div></section>` : `<section class="card"><div class="empty">${ic('book')}<h3>Nothing here yet</h3><p>Add a file, a web page or some text so your chatbot has something to answer from.</p><button class="btn pri" data-act="add-knowledge">${ic('plus')}Add knowledge</button></div></section>`}
+    <div class="alert">${ic('info')}<div><b>Tip.</b> Short pages with one topic each give better answers than one long document.</div></div>`,
+  install: () => {
+    const snippets = {
+      html: `<span class="tok-c">&lt;!-- Paste before &lt;/body&gt; --&gt;</span>\n<span class="tok-t">&lt;script</span> <span class="tok-a">src</span>=<span class="tok-s">"https://zeroroute.mapki.in/widget.js"</span>\n  <span class="tok-a">data-bot-id</span>=<span class="tok-s">"bot_4c1e9a72d0b35f86"</span> <span class="tok-a">defer</span><span class="tok-t">&gt;&lt;/script&gt;</span>`,
+      react: `<span class="tok-t">import</span> Script <span class="tok-t">from</span> <span class="tok-s">"next/script"</span>;\n\n<span class="tok-t">export function</span> Chatbot() {\n  <span class="tok-t">return</span> &lt;Script <span class="tok-a">src</span>=<span class="tok-s">"https://zeroroute.mapki.in/widget.js"</span>\n    <span class="tok-a">data-bot-id</span>=<span class="tok-s">"bot_4c1e9a72d0b35f86"</span> /&gt;;\n}`,
+      api: `curl https://zeroroute.mapki.in/v1/chat/completions \\\n  -H <span class="tok-s">"Authorization: Bearer $ZEROROUTE_API_KEY"</span> \\\n  -H <span class="tok-s">"Content-Type: application/json"</span> \\\n  -d <span class="tok-s">'{"model":"auto","messages":[{"role":"user","content":"Hi"}]}'</span>`,
+    };
+    const raw = { html:'<script src="https://zeroroute.mapki.in/widget.js" data-bot-id="bot_4c1e9a72d0b35f86" defer><\/script>', react:'<Script src="https://zeroroute.mapki.in/widget.js" data-bot-id="bot_4c1e9a72d0b35f86" />', api:'curl https://zeroroute.mapki.in/v1/chat/completions -H "Authorization: Bearer $ZEROROUTE_API_KEY" -H "Content-Type: application/json" -d \'{"model":"auto","messages":[{"role":"user","content":"Hi"}]}\'' };
+    return `<header class="page-h"><div><h1>Install</h1><p class="sub">Put your chatbot on your website, or call it from your own code.</p></div></header>
+    <section class="card"><div class="card-b stack">
+      <div class="tabs" role="tablist" aria-label="Install method">${[['html','Any website'],['react','Next.js / React'],['api','API']].map(t => `<button role="tab" id="tab-${t[0]}" aria-selected="${UI.installTab === t[0]}" aria-controls="tab-panel" tabindex="${UI.installTab === t[0] ? 0 : -1}" data-act="install-tab" data-t="${t[0]}">${t[1]}</button>`).join('')}</div>
+      <div id="tab-panel" role="tabpanel" aria-labelledby="tab-${UI.installTab}" class="stack-sm">
+        <div class="code"><pre>${snippets[UI.installTab]}</pre><button class="btn sec sm copy" data-act="copy" data-copy="${esc(raw[UI.installTab])}">${ic('copy')}Copy</button></div>
+        <p class="hint">${UI.installTab === 'api' ? 'Keep your API key on the server. Never put it in browser code.' : 'Works with WordPress, Shopify, Wix and Squarespace. Your Bot ID is already filled in.'}</p>
+      </div>
+      <div class="row wrap between" style="border-top:1px solid var(--border);padding-top:16px"><div><div class="label">Check your installation</div><div class="hint">We look for the snippet on brightpath.example.</div></div><button class="btn sec" data-act="verify" id="verify-btn">${ic('search')}Check now</button></div>
+      <div id="verify-out"></div>
+    </div></section>`;
+  },
+  usage: () => {
+    const rows = CONVOS.filter(c => ({ all: true, answered: c.a, handed: !c.a, none: false })[UI.usageFilter]);
+    return `<header class="page-h"><div><h1>Usage</h1><p class="sub">Questions your visitors asked and how the chatbot did.</p></div><button class="btn sec" data-act="toast" data-msg="Exported 7 conversations as CSV (prototype)">${ic('upload')}Export</button></header>
+    <section class="card"><div class="card-h"><h2>Questions per day</h2><span class="spacer"></span><span class="subtle">Last 14 days · this week highlighted</span></div><div class="card-b">${barChart(DAILY, dayLabels)}</div></section>
+    <section class="card"><div class="card-h"><h2>Conversations</h2><span class="spacer"></span>
+      <div class="seg" role="radiogroup" aria-label="Filter conversations">${[['all','All'],['answered','Answered'],['handed','Sent to you'],['none','Unclear']].map(f => `<button role="radio" aria-checked="${UI.usageFilter === f[0]}" data-act="usage-filter" data-f="${f[0]}">${f[1]}</button>`).join('')}</div></div>
+      ${rows.length ? `<div class="table-wrap"><table class="table"><thead><tr><th>Question</th><th>Result</th><th>Page</th><th class="r">When</th></tr></thead><tbody>${rows.map(c => `<tr><td>${esc(c.q)}</td><td>${c.a ? badge('ok', 'Answered') : badge('warn', 'Sent to you')}</td><td class="mono subtle">${c.page}</td><td class="r subtle">${c.when}</td></tr>`).join('')}</tbody></table></div>`
+      : `<div class="empty">${ic('check')}<h3>No unclear answers this week</h3><p>When the chatbot gives a vague answer it will show up here.</p></div>`}
+    </section>`;
+  },
+  billing: () => `<header class="page-h"><div><h1>Billing</h1><p class="sub">Your plan, usage and invoices.</p></div></header>
+    <div class="grid-2">
+      ${[{ n:'Free', p:'£0', f:['500 questions a month','1 website','ZeroRoute badge shown'], cur:false }, { n:'Pro', p:'£2', f:['10,000 questions a month','3 websites','Hide the badge','Priority models'], cur:true }].map(pl => `
+      <section class="card card-b stack" style="${pl.cur ? 'box-shadow:0 0 0 2px var(--accent)' : ''}"><div class="row between"><h2 style="font-size:1.1em">${pl.n}</h2>${pl.cur ? badge('acc', 'Current plan') : ''}</div>
+        <div><span class="kpi-v">${pl.p}</span><span class="muted"> / month</span></div>
+        <ul class="list" style="margin:0 -18px">${pl.f.map(x => `<li style="padding:8px 18px">${ic('check')}<span>${x}</span></li>`).join('')}</ul>
+        ${pl.cur ? `<button class="btn sec" data-act="cancel-plan">Cancel Pro</button>` : `<button class="btn ghost" disabled>Downgrade at end of period</button>`}</section>`).join('')}
+    </div>
+    <section class="card"><div class="card-h"><h2>Invoices</h2></div><div class="table-wrap"><table class="table"><thead><tr><th>Date</th><th>Description</th><th class="r">Amount</th><th>Status</th></tr></thead><tbody>
+      ${[['1 Nov 2026','Pro, monthly','£2.00'],['1 Oct 2026','Pro, monthly','£2.00'],['1 Sep 2026','Pro, monthly','£2.00']].map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td class="r">${r[2]}</td><td>${badge('ok', 'Paid')}</td></tr>`).join('')}
+    </tbody></table></div></section>`,
+  overview: () => `<header class="page-h"><div><h1>Overview</h1><p class="sub">Last 24 hours across all customers.</p></div><button class="btn sec" data-act="toast" data-msg="Refreshed" data-tone="info">${ic('refresh')}Refresh</button></header>
+    <section class="kpis">${[['Requests','48,210','+6%',DAILY],['Success rate','99.2%','+0.3 pts',[97,98,98,99,99,99,99]],['Median latency','612 ms','−48 ms',[740,700,690,660,650,630,612]],['Cache hits','18.4%','+2.1 pts',[12,13,15,14,16,17,18]]].map(k => `<div class="card kpi"><span class="kpi-l">${k[0]}</span><div class="row between"><span class="kpi-v">${k[1]}</span><span class="delta">${k[2]}</span></div>${spark(k[3])}</div>`).join('')}</section>
+    <div class="grid-side">
+      <section class="card"><div class="card-h"><h2>Providers</h2><span class="spacer"></span><button class="btn ghost sm" data-go="providers">Manage ${ic('chevR')}</button></div>
+        <ul class="list">${PROVIDERS.map(p => `<li><div class="grow"><div class="t">${p.name}</div><div class="d mono">${p.models[0]}</div></div><span class="subtle num">${p.lat ? p.lat + ' ms' : '—'}</span>${pstatus(p)}</li>`).join('')}</ul></section>
+      <section class="card"><div class="card-h"><h2>Recent failures</h2></div><ul class="list">
+        ${LOGS.filter(l => l.status >= 400).map(l => `<li>${badge('bad', l.status)}<div class="grow"><div class="t">${l.prov}</div><div class="d">${l.cust} · retried on the next provider</div></div><span class="subtle mono">${l.t}</span></li>`).join('')}
+      </ul><div class="card-b" style="border-top:1px solid var(--border)"><div class="alert ok">${ic('check')}<div>Every failed request was retried and answered.</div></div></div></section>
+    </div>`,
+  providers: () => `<header class="page-h"><div><h1>Providers</h1><p class="sub">Requests try providers from top to bottom and move on if one fails.</p></div><button class="btn sec" data-act="test-all" id="test-all">${ic('zap')}Test all</button></header>
+    <section class="card"><ul class="list">${PROVIDERS.map((p, i) => `<li>
+      <div class="row" style="gap:2px;flex-direction:column"><button class="btn ghost icon sm" aria-label="Move ${p.name} up" data-act="move" data-i="${i}" data-d="-1" ${i === 0 ? 'disabled' : ''}>${ic('up')}</button><button class="btn ghost icon sm" aria-label="Move ${p.name} down" data-act="move" data-i="${i}" data-d="1" ${i === PROVIDERS.length - 1 ? 'disabled' : ''}>${ic('down')}</button></div>
+      <span class="num subtle" style="width:18px">${i + 1}</span>
+      <div class="grow"><div class="row wrap"><span class="t">${p.name}</span>${pstatus(p)}${p.key ? '' : badge('warn', 'Key missing')}</div><div class="chips" style="margin-top:6px">${p.models.map((m, j) => `<span class="badge" title="${j ? 'Fallback model' : 'Main model'}"><span class="mono">${m}</span></span>`).join('')}</div></div>
+      <span class="subtle num" style="min-width:64px;text-align:right">${p.lat ? p.lat + ' ms' : '—'}</span>
+      <button class="switch" role="switch" aria-checked="${p.on}" aria-label="Use ${p.name}" data-act="prov-toggle" data-i="${i}" ${p.key ? '' : 'disabled'}></button></li>`).join('')}</ul></section>`,
+  customers: () => {
+    const q = UI.custQuery.toLowerCase(), rows = CUSTOMERS.filter(c => !q || (c.name + c.email).toLowerCase().includes(q));
+    return `<header class="page-h"><div><h1>Customers</h1><p class="sub">${CUSTOMERS.length} customers · ${CUSTOMERS.filter(c => c.plan === 'Pro').length} on Pro</p></div><button class="btn pri" data-act="toast" data-msg="Create a chatbot for a customer (prototype)">${ic('plus')}New chatbot</button></header>
+    <section class="card"><div class="card-h"><div class="lead" style="flex:1;max-width:340px">${ic('search')}<label class="sr" for="cust-q">Search customers</label><input class="input" id="cust-q" placeholder="Search by name or email" value="${esc(UI.custQuery)}"></div></div>
+      <div id="cust-body">${custTable(rows)}</div></section>`;
+  },
+  logs: () => {
+    const rows = LOGS.filter(l => UI.logFilter === 'all' || (UI.logFilter === 'ok' ? l.status < 400 : l.status >= 400));
+    return `<header class="page-h"><div><h1>Request log</h1><p class="sub">Every request through the gateway. Click a row for details.</p></div>
+      <div class="seg" role="radiogroup" aria-label="Filter by result">${[['all','All'],['ok','Succeeded'],['err','Failed']].map(f => `<button role="radio" aria-checked="${UI.logFilter === f[0]}" data-act="log-filter" data-f="${f[0]}">${f[1]}</button>`).join('')}</div></header>
+    <section class="card"><div class="table-wrap"><table class="table"><thead><tr><th>Time</th><th>Customer</th><th>Provider</th><th>Model</th><th>Status</th><th class="r">Latency</th><th class="r">Tokens</th></tr></thead><tbody>
+    ${rows.map(l => `<tr class="click" tabindex="0" data-act="log" data-i="${LOGS.indexOf(l)}"><td class="mono subtle">${l.t}</td><td>${l.cust}</td><td>${l.prov}</td><td class="mono">${l.model}</td><td>${l.status < 400 ? badge('ok', l.status) : badge('bad', l.status)}</td><td class="r ${l.ms > 3000 ? '' : 'subtle'}" style="${l.ms > 3000 ? 'color:var(--warn);font-weight:600' : ''}">${fmt(l.ms)} ms</td><td class="r subtle">${l.tok ? fmt(l.tok) : '—'}</td></tr>`).join('')}
+    </tbody></table></div></section>`;
+  },
+};
+function custTable(rows){
+  if (!rows.length) return `<div class="empty">${ic('search')}<h3>No customers match "${esc(UI.custQuery)}"</h3><p>Try a different name or email.</p></div>`;
+  return `<div class="table-wrap"><table class="table"><thead><tr><th>Customer</th><th>Plan</th><th style="min-width:160px">Usage</th><th>Status</th><th><span class="sr">Actions</span></th></tr></thead><tbody>
+  ${rows.map(c => { const pct = c.used / c.limit * 100; return `<tr><td><div class="row"><span class="avatar">${c.name.split(' ').map(w => w[0]).slice(0, 2).join('')}</span><div style="min-width:0"><div style="font-weight:550">${esc(c.name)}</div><div class="subtle" style="font-size:12.5px">${esc(c.email)}</div></div></div></td>
+    <td>${c.plan === 'Pro' ? badge('acc', 'Pro') : badge('', 'Free')}</td>
+    <td><div class="stack-sm" style="gap:4px"><span class="num subtle" style="font-size:12.5px">${fmt(c.used)} / ${fmt(c.limit)}</span><div class="meter ${pct > 85 ? 'warn' : ''}" role="meter" aria-valuenow="${c.used}" aria-valuemin="0" aria-valuemax="${c.limit}" aria-label="Usage for ${esc(c.name)}"><i style="width:${pct}%"></i></div></div></td>
+    <td>${c.status === 'active' ? badge('ok', 'Active', 1) : badge('warn', 'Paused', 1)}</td>
+    <td class="r"><div class="row" style="justify-content:flex-end;gap:2px"><button class="btn ghost icon sm" aria-label="${c.status === 'active' ? 'Pause' : 'Resume'} ${esc(c.name)}" data-act="cust-pause" data-id="${c.id}">${ic(c.status === 'active' ? 'pause' : 'play')}</button><button class="btn ghost icon sm" aria-label="New API key for ${esc(c.name)}" data-act="rotate" data-id="${c.id}">${ic('key')}</button><button class="btn ghost icon sm" aria-label="View requests from ${esc(c.name)}" data-go="logs">${ic('list')}</button></div></td></tr>`; }).join('')}
+  </tbody></table></div>`;
+}
+
+/* ---------- Shells: one per direction ---------- */
+function navItems(cls){ return NAV[S.con].map(n => `<button class="${cls}" data-go="${n.id}" ${S.view === n.id ? 'aria-current="page"' : ''}>${ic(n.icon)}<span>${n.label}</span>${n.count && cls === 'nav-i' ? `<span class="count">${n.count}</span>` : ''}</button>`).join(''); }
+const conSeg = () => `<div class="seg" role="radiogroup" aria-label="Console">${[['app','Customer'],['admin','Admin']].map(c => `<button role="radio" aria-checked="${S.con === c[0]}" data-con="${c[0]}">${c[1]}</button>`).join('')}</div>`;
+const brand = () => `<span class="brand"><span class="mark">${ic('route')}</span>ZeroRoute</span>`;
+const curLabel = () => (NAV[S.con].find(n => n.id === S.view) || {}).label;
+const SHELL = {
+  graphite: main => `<div class="g-shell">
+    <aside class="g-side" aria-label="Main">${brand()}${conSeg()}
+      <button class="g-search" data-act="palette">${ic('search')}<span>Search or jump to…</span><span class="kbd">Ctrl K</span></button>
+      <nav class="nav-g" aria-label="${S.con === 'app' ? 'Customer console' : 'Admin console'}"><span class="lbl">${S.con === 'app' ? 'Your chatbot' : 'Gateway'}</span>${navItems('nav-i')}</nav>
+      <div class="g-acct"><span class="avatar">${S.con === 'app' ? 'BT' : 'ZR'}</span><div style="min-width:0"><div class="t">${S.con === 'app' ? 'Brightpath Tutors' : 'ZeroRoute admin'}</div><div class="d">${S.con === 'app' ? 'Pro plan' : 'Owner'}</div></div></div></aside>
+    <div style="min-width:0"><div class="g-top"><button class="btn ghost icon mtop-btn" data-act="mnav" aria-label="Open menu">${ic('menu')}</button>
+      <div class="crumbs"><span>${S.con === 'app' ? 'Customer' : 'Admin'}</span>${ic('chevR')}<b>${curLabel()}</b></div><span class="spacer"></span>
+      <button class="btn ghost sm" data-act="palette" aria-label="Search">${ic('search')}</button><button class="btn ghost sm" data-act="toast" data-msg="Docs open in a new tab (prototype)" data-tone="info">Docs</button></div>
+      <main id="main" class="page" tabindex="-1">${main}</main></div></div>`,
+  daylight: main => `<header class="d-top"><div class="d-top-in">${brand()}<nav class="d-nav" aria-label="Main">${navItems('')}</nav>${conSeg()}<span class="avatar" title="Brightpath Tutors">${S.con === 'app' ? 'BT' : 'ZR'}</span></div></header>
+    <main id="main" class="page" tabindex="-1">${main}</main>`,
+  monolith: main => `<div class="m-shell">
+    <nav class="m-rail" aria-label="Console"><span class="mark" style="margin-bottom:10px">${ic('route')}</span>
+      <button class="rb" data-con="app" aria-pressed="${S.con === 'app'}" aria-label="Customer console" title="Customer console">${ic('bot', 'lg')}</button>
+      <button class="rb" data-con="admin" aria-pressed="${S.con === 'admin'}" aria-label="Admin console" title="Admin console">${ic('shield', 'lg')}</button>
+      <span class="spacer"></span><button class="rb" data-act="palette" aria-label="Search" title="Search (Ctrl K)">${ic('search', 'lg')}</button><span class="avatar">${S.con === 'app' ? 'BT' : 'ZR'}</span></nav>
+    <aside class="m-panel"><h2>${S.con === 'app' ? 'Brightpath Tutors' : 'Gateway admin'}</h2><nav class="nav-g" aria-label="Sections">${navItems('nav-i')}</nav></aside>
+    <div style="min-width:0"><div class="mtop m-mtop"><button class="btn ghost icon" data-act="mnav" aria-label="Open menu">${ic('menu')}</button><b>${curLabel()}</b><span class="spacer"></span>${conSeg()}</div>
+      <main id="main" class="page" tabindex="-1">${main}</main></div></div>`,
+  harbor: main => `<div class="h-shell">
+    <aside class="h-side" aria-label="Main">${brand()}<nav class="stack-sm" style="gap:4px" aria-label="Sections">${navItems('h-nav')}</nav>
+      <div class="h-switch"><span class="label">${S.con === 'app' ? 'Brightpath Tutors' : 'ZeroRoute admin'}</span><span class="hint">${S.con === 'app' ? 'Pro plan · 6,420 of 10,000 used' : 'Owner access'}</span><button class="btn sec sm" data-con="${S.con === 'app' ? 'admin' : 'app'}">${ic(S.con === 'app' ? 'shield' : 'bot')}Switch to ${S.con === 'app' ? 'admin' : 'customer'}</button></div></aside>
+    <main id="main" class="page" tabindex="-1">${main}</main>
+    <nav class="h-tabs" aria-label="Sections">${NAV[S.con].slice(0, 5).map(n => `<button data-go="${n.id}" ${S.view === n.id ? 'aria-current="page"' : ''}>${ic(n.icon, 'lg')}<span>${n.label}</span></button>`).join('')}</nav></div>`,
+};
+
+/* ---------- Render ---------- */
+function applyTheme(){
+  const r = document.documentElement, a = V[S.v].accents[S.acc[S.v]];
+  r.dataset.variant = S.v; r.style.setProperty('--ah', a.h); r.style.setProperty('--ac', a.c);
+  r.style.setProperty('--al', a.l || .52); r.style.setProperty('--ad', a.d || .76);
+  if (S.theme === 'auto') delete r.dataset.theme; else r.dataset.theme = S.theme;
+}
+function render(focusMain){
+  if (!NAV[S.con].some(n => n.id === S.view)) S.view = NAV[S.con][0].id;
+  applyTheme();
+  const body = S.view === 'home' ? HOME[S.v]() : VIEWS[S.view]();
+  $('#app').innerHTML = SHELL[S.v](body);
+  renderSwitcher();
+  if (focusMain) $('#main').focus({ preventScroll: true });
+  const log = $('#chat-log'); if (log) log.scrollTop = log.scrollHeight;
+  try { history.replaceState(null, '', '#' + S.v); } catch {}
+  store.set('state', S);
+}
+function renderSwitcher(){
+  const v = V[S.v], i = ORDER.indexOf(S.v);
+  $('#sw-title').textContent = v.name;
+  $('#sw-sub').textContent = `${i + 1} of 4 · ${v.tag}`;
+  $('#sw-accents').innerHTML = v.accents.map((a, j) => `<button class="acc" role="radio" aria-checked="${S.acc[S.v] === j}" aria-label="${a.name} accent" title="${a.name}" data-acc="${j}"><i style="background:oklch(${a.d || .74} ${a.c} ${a.h})"></i></button>`).join('');
+  const th = { auto:['auto','Auto'], light:['sun','Light'], dark:['moon','Dark'] }[S.theme];
+  $('#sw-theme-ic').setAttribute('d', I[th[0]]); $('#sw-theme-l').textContent = th[1];
+  $('#sw-theme').setAttribute('aria-label', `Theme: ${th[1]}. Click to change.`);
+}
+function cycle(d){ const i = ORDER.indexOf(S.v); S.v = ORDER[(i + d + ORDER.length) % ORDER.length]; render(); }
+
+/* ---------- Feedback ---------- */
+function toast(msg, tone = 'ok', action){
+  const el = document.createElement('div'); el.className = 'toast ' + tone;
+  el.innerHTML = `${ic(tone === 'bad' ? 'alert' : tone === 'info' ? 'info' : 'check')}<p>${esc(msg)}</p>${action ? `<button class="btn ghost sm">${action.label}</button>` : ''}<button class="btn ghost icon sm" aria-label="Dismiss">${ic('x')}</button>`;
+  const kill = () => el.remove();
+  const btns = el.querySelectorAll('button'); btns[btns.length - 1].onclick = kill;
+  if (action) btns[0].onclick = () => { action.run(); kill(); };
+  $('#toasts').prepend(el); setTimeout(kill, action ? 6000 : 3200);
+}
+function loading(btn, ms, done){
+  const html = btn.innerHTML; btn.disabled = true; btn.setAttribute('aria-busy', 'true'); btn.innerHTML = `<span class="spin" aria-hidden="true"></span>${btn.textContent.trim() || ''}`;
+  setTimeout(() => { if (btn.isConnected){ btn.disabled = false; btn.removeAttribute('aria-busy'); btn.innerHTML = html; } done(); }, ms);
+}
+async function copy(text){
+  try { await navigator.clipboard.writeText(text); toast('Copied to clipboard'); }
+  catch { toast('Copy is blocked here. Select the text and press Ctrl C.', 'bad'); }
+}
+const dlg = $('#dlg');
+function openDialog(html, cls = ''){ dlg.className = cls; dlg.innerHTML = html; dlg.showModal(); const f = dlg.querySelector('[autofocus], input, button.pri, button'); f && f.focus(); }
+dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+function confirmDialog({ title, body, ok, tone = 'pri', run }){
+  openDialog(`<div class="dlg-h">${tone === 'danger' ? `<span class="badge bad" style="height:32px;width:32px;justify-content:center;padding:0">${ic('alert')}</span>` : ''}<div><h2 id="dlg-title">${title}</h2><p class="muted" style="margin-top:4px">${body}</p></div></div>
+    <div class="dlg-f" style="margin-top:18px"><button class="btn ghost" data-close>Cancel</button><button class="btn ${tone}" data-ok>${ok}</button></div>`);
+  dlg.querySelector('[data-close]').onclick = () => dlg.close();
+  dlg.querySelector('[data-ok]').onclick = e => loading(e.currentTarget, 700, () => { dlg.close(); run(); });
+}
+function addKnowledgeDialog(mode = 'file'){
+  const panes = {
+    file: `<div class="field"><span class="label">File</span><label class="card card-b" style="border-style:dashed;display:grid;justify-items:center;gap:6px;cursor:pointer;text-align:center">${ic('upload', 'lg')}<span><b>Choose a file</b> or drag it here</span><span class="hint">PDF, Word, Markdown or text, up to 5 MB</span><input type="file" class="sr" id="k-file"></label></div>`,
+    web: `<div class="field"><label for="k-url">Web page address</label><input class="input" id="k-url" placeholder="https://brightpath.example/pricing" aria-describedby="k-url-h"><span class="hint" id="k-url-h">We read the page and keep it in sync once a week.</span></div>`,
+    text: `<div class="field"><label for="k-title">Title</label><input class="input" id="k-title" value="Paying in instalments"></div><div class="field"><label for="k-text">Text</label><textarea class="textarea" id="k-text">You can split a 10-lesson bundle into 3 monthly payments of £114 at no extra cost.</textarea></div>`,
+  };
+  openDialog(`<div class="dlg-h"><div><h2 id="dlg-title">Add knowledge</h2><p class="muted">Give your chatbot something new to answer from.</p></div><span class="spacer"></span><button class="btn ghost icon sm" data-close aria-label="Close">${ic('x')}</button></div>
+    <div class="dlg-b"><div class="seg" role="radiogroup" aria-label="Source">${[['file','File','file'],['web','Web page','globe'],['text','Text','text']].map(m => `<button role="radio" aria-checked="${mode === m[0]}" data-mode="${m[0]}">${ic(m[2])}${m[1]}</button>`).join('')}</div>${panes[mode]}</div>
+    <div class="dlg-f"><button class="btn ghost" data-close>Cancel</button><button class="btn pri" data-ok>Add to knowledge</button></div>`);
+  $$('[data-close]', dlg).forEach(b => b.onclick = () => dlg.close());
+  $$('[data-mode]', dlg).forEach(b => b.onclick = () => addKnowledgeDialog(b.dataset.mode));
+  dlg.querySelector('[data-ok]').onclick = e => {
+    if (mode === 'web'){ const u = $('#k-url'); if (!/^https?:\/\/[^\s.]+\.[^\s]+$/.test(u.value.trim())){ u.setAttribute('aria-invalid', 'true'); $('#k-url-h').outerHTML = `<span class="err" id="k-url-h">${ic('alert')}Enter a full address starting with https://</span>`; u.focus(); return; } }
+    loading(e.currentTarget, 900, () => {
+      const title = mode === 'text' ? ($('#k-title') || {}).value || 'New text' : mode === 'web' ? $('#k-url').value.replace(/^https?:\/\//, '') : 'Uploaded file.pdf';
+      DOCS.unshift({ id:'d' + Date.now(), title, src: { file:'File', web:'Website', text:'Text' }[mode], size: mode === 'text' ? '1 KB' : '—', when:'Just now', state:'indexing' });
+      dlg.close(); S.con = 'app'; S.view = 'knowledge'; render(); toast(`Added "${title}". Your chatbot can use it in a few seconds.`);
+      setTimeout(() => { const d = DOCS[0]; if (d && d.state === 'indexing'){ d.state = 'ready'; d.size = d.size === '—' ? '18 KB' : d.size; if (S.view === 'knowledge') render(); } }, 2600);
+    });
+  };
+}
+function logDrawer(l){
+  const json = JSON.stringify({ id:'req_7f2' + l.t.replace(/:/g, ''), customer:l.cust, provider:l.prov, model:l.model, status:l.status, latency_ms:l.ms, tokens:{ prompt: Math.round(l.tok * .7), completion: l.tok - Math.round(l.tok * .7) }, cache:false, attempts: l.status >= 400 ? 1 : 1 }, null, 2);
+  openDialog(`<div class="dlg-h"><div><h2 id="dlg-title">Request at ${l.t}</h2><p class="muted">${l.cust}</p></div><span class="spacer"></span><button class="btn ghost icon sm" data-close aria-label="Close">${ic('x')}</button></div>
+    <div class="dlg-b"><div class="kpis" style="grid-template-columns:repeat(2,1fr)">${[['Status', l.status < 400 ? badge('ok', l.status + ' OK') : badge('bad', l.status + ' failed')],['Latency', fmt(l.ms) + ' ms'],['Provider', l.prov],['Tokens', l.tok ? fmt(l.tok) : '—']].map(k => `<div class="card kpi"><span class="kpi-l">${k[0]}</span><span style="font-weight:600">${k[1]}</span></div>`).join('')}</div>
+    ${l.status >= 400 ? `<div class="alert warn">${ic('alert')}<div>${l.prov} returned ${l.status}. The request moved to the next provider automatically.</div></div>` : ''}
+    <div class="code"><pre>${esc(json)}</pre><button class="btn sec sm copy" data-copyjson>${ic('copy')}Copy</button></div></div>`, 'drawer');
+  $$('[data-close]', dlg).forEach(b => b.onclick = () => dlg.close());
+  dlg.querySelector('[data-copyjson]').onclick = () => copy(json);
+}
+function mobileNav(){
+  openDialog(`<div class="dlg-h"><div>${brand()}</div><span class="spacer"></span><button class="btn ghost icon sm" data-close aria-label="Close menu">${ic('x')}</button></div><div class="dlg-b">${conSeg()}<nav class="nav-g" aria-label="Sections">${navItems('nav-i')}</nav></div>`, 'drawer');
+  $$('[data-close]', dlg).forEach(b => b.onclick = () => dlg.close());
+}
+function palette(){
+  const items = [...NAV.app.map(n => ({ ...n, con:'app', grp:'Customer' })), ...NAV.admin.map(n => ({ ...n, con:'admin', grp:'Admin' })),
+    { id:'act-add', label:'Add knowledge', icon:'plus', grp:'Action', run: () => addKnowledgeDialog() },
+    { id:'act-theme', label:'Switch light / dark', icon:'moon', grp:'Action', run: () => { S.theme = S.theme === 'dark' ? 'light' : 'dark'; render(); } },
+    ...ORDER.map(k => ({ id:'dir-' + k, label:`Direction: ${V[k].name}`, icon:'sparkles', grp:'Prototype', run: () => { S.v = k; render(); } }))];
+  let sel = 0, list = items;
+  openDialog(`<div class="pal-in">${ic('search')}<label class="sr" for="pal-q">Search</label><input id="pal-q" placeholder="Jump to a page or run an action…" autocomplete="off" role="combobox" aria-controls="pal-l" aria-expanded="true"><span class="kbd">Esc</span></div><ul class="pal-list" id="pal-l" role="listbox"></ul>`, 'palette');
+  const q = $('#pal-q'), ul = $('#pal-l');
+  const draw = () => { ul.innerHTML = list.map((it, i) => `<li role="option" id="pal-${i}" aria-selected="${i === sel}" data-i="${i}">${ic(it.icon)}<span>${it.label}</span><small>${it.grp}</small></li>`).join('') || `<li aria-disabled="true">No matches</li>`; q.setAttribute('aria-activedescendant', 'pal-' + sel); };
+  const go = it => { dlg.close(); if (!it) return; if (it.run) it.run(); else { S.con = it.con; S.view = it.id; render(true); } };
+  q.oninput = () => { const t = q.value.toLowerCase(); list = items.filter(it => it.label.toLowerCase().includes(t) || it.grp.toLowerCase().includes(t)); sel = 0; draw(); };
+  q.onkeydown = e => { if (e.key === 'ArrowDown'){ sel = Math.min(sel + 1, list.length - 1); draw(); e.preventDefault(); } else if (e.key === 'ArrowUp'){ sel = Math.max(sel - 1, 0); draw(); e.preventDefault(); } else if (e.key === 'Enter'){ go(list[sel]); e.preventDefault(); } };
+  ul.onclick = e => { const li = e.target.closest('li[data-i]'); li && go(list[+li.dataset.i]); };
+  draw(); q.focus();
+}
+
+/* ---------- Chat simulation ---------- */
+function sendChat(text){
+  if (!text.trim() || UI.streaming) return;
+  UI.chat.push({ who:'me', text }); UI.chat.push({ who:'bot', text:'' }); UI.streaming = true; render();
+  const t = text.toLowerCase();
+  const reply = /refund|cancel/.test(t) ? ANSWERS.refund : /price|cost|bundle|how much/.test(t) ? ANSWERS.price : /instal/.test(t) ? null : ANSWERS.default;
+  const log = $('#chat-log'), bubble = log.lastElementChild; bubble.classList.add('typing');
+  if (!reply){ setTimeout(() => { const m = UI.chat[UI.chat.length - 1]; m.text = "I don't have that in my knowledge yet, so I've passed your question to the team. They'll reply by email."; m.err = false; UI.streaming = false; render(); toast('Sent to you: "Can I pay in instalments?"', 'info'); }, 900); return; }
+  const words = reply.split(' '); let i = 0;
+  const tick = setInterval(() => {
+    const m = UI.chat[UI.chat.length - 1]; m.text += (i ? ' ' : '') + words[i++];
+    const b = $('#chat-log') && $('#chat-log').lastElementChild; if (b){ b.textContent = m.text; b.classList.add('typing'); b.parentElement.scrollTop = 1e6; }
+    if (i >= words.length){ clearInterval(tick); UI.streaming = false; if (S.view === 'chatbot') render(); }
+  }, 38);
+}
+
+/* ---------- Events ---------- */
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-go],[data-con],[data-act],[data-acc]'); if (!t) return;
+  if (t.closest('#switcher') && t.dataset.acc !== undefined){ S.acc[S.v] = +t.dataset.acc; render(); return; }
+  if (t.dataset.go){ if (dlg.open) dlg.close(); S.view = t.dataset.go; if (!NAV[S.con].some(n => n.id === S.view)) S.con = S.con === 'app' ? 'admin' : 'app'; render(true); window.scrollTo(0, 0); return; }
+  if (t.dataset.con){ if (dlg.open) dlg.close(); if (S.con !== t.dataset.con){ S.con = t.dataset.con; S.view = NAV[S.con][0].id; render(true); } return; }
+  const a = t.dataset.act;
+  ({
+    palette, mnav: mobileNav, 'add-knowledge': () => addKnowledgeDialog(),
+    copy: () => copy(t.dataset.copy),
+    'toggle-key': () => { UI.keyShown = !UI.keyShown; render(); },
+    toast: () => toast(t.dataset.msg, t.dataset.tone || 'ok'),
+    resync: () => loading(t, 1100, () => { const d = DOCS.find(x => x.state === 'stale'); if (d){ d.state = 'ready'; d.when = 'Just now'; } if (S.view === 'knowledge') render(); toast('Website re-synced. 3 pages updated.'); }),
+    'del-doc': () => { const d = DOCS.find(x => x.id === t.dataset.id); confirmDialog({ title:`Delete "${esc(d.title)}"?`, body:'Your chatbot will stop using it straight away.', ok:'Delete', tone:'danger', run: () => { const idx = DOCS.indexOf(d); DOCS.splice(idx, 1); render(); toast(`Deleted "${d.title}"`, 'ok', { label:'Undo', run: () => { DOCS.splice(idx, 0, d); render(); } }); } }); },
+    brand: () => { UI.bot.brand = +t.dataset.i; render(); },
+    badge: () => { UI.bot.badge = !UI.bot.badge; t.setAttribute('aria-checked', UI.bot.badge); },
+    ask: () => sendChat(t.dataset.q === 'Prices' ? 'How much does it cost?' : t.dataset.q === 'Cancellation policy' ? 'What is your cancellation and refund policy?' : t.dataset.q === 'Book a trial' ? 'Can I book a trial lesson?' : 'Do you offer weekend sessions?'),
+    'reset-chat': () => { UI.chat = [{ who:'bot', text: UI.bot.greeting }]; render(); },
+    'install-tab': () => { UI.installTab = t.dataset.t; render(); $('#tab-' + UI.installTab).focus(); },
+    verify: () => loading(t, 1400, () => { $('#verify-out').innerHTML = `<div class="alert ok">${ic('check')}<div><b>Found it.</b> The chatbot is live on brightpath.example and answered a test question in 0.8 s.</div></div>`; }),
+    'usage-filter': () => { UI.usageFilter = t.dataset.f; render(); },
+    'log-filter': () => { UI.logFilter = t.dataset.f; render(); },
+    log: () => logDrawer(LOGS[+t.dataset.i]),
+    'cancel-plan': () => confirmDialog({ title:'Cancel Pro?', body:'You keep Pro until 1 December. After that your chatbot moves to Free: 500 questions a month and the ZeroRoute badge.', ok:'Cancel Pro', tone:'danger', run: () => toast('Pro cancelled. It stays active until 1 December.') }),
+    'test-all': () => loading(t, 1600, () => toast('6 of 7 providers answered. GitHub Models is cooling down until 21:47.', 'info')),
+    move: () => { const i = +t.dataset.i, j = i + +t.dataset.d; [PROVIDERS[i], PROVIDERS[j]] = [PROVIDERS[j], PROVIDERS[i]]; render(); const b = $(`[data-act="move"][data-i="${j}"][data-d="${t.dataset.d}"]`) || $(`[data-act="move"][data-i="${j}"]`); b && b.focus(); toast(`${PROVIDERS[j].name} moved to position ${j + 1}`); },
+    'prov-toggle': () => { const p = PROVIDERS[+t.dataset.i]; p.on = !p.on; p.status = p.on ? 'ok' : 'off'; p.lat = p.on ? 300 : 0; render(); toast(`${p.name} ${p.on ? 'turned on' : 'turned off'}`); },
+    'cust-pause': () => { const c = CUSTOMERS.find(x => x.id === t.dataset.id); c.status = c.status === 'active' ? 'paused' : 'active'; render(); toast(`${c.name} ${c.status === 'paused' ? 'paused. Their chatbot stops answering.' : 'resumed'}`, c.status === 'paused' ? 'info' : 'ok'); },
+    rotate: () => { const c = CUSTOMERS.find(x => x.id === t.dataset.id); confirmDialog({ title:`Create a new API key for ${esc(c.name)}?`, body:'The current key stops working immediately. Any server using it will fail until it is updated.', ok:'Create new key', tone:'danger', run: () => toast(`New key created for ${c.name}. Send it to them securely.`) }); },
+  }[a] || (() => {}))();
+});
+document.addEventListener('keydown', e => {
+  const typing = e.target.closest('input, textarea, select, [contenteditable]');
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k'){ e.preventDefault(); palette(); return; }
+  if (!typing && !dlg.open && (e.key === 'ArrowLeft' || e.key === 'ArrowRight') && !e.target.closest('[role="tablist"]')){ cycle(e.key === 'ArrowLeft' ? -1 : 1); }
+  if (e.target.matches('tr.click') && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); e.target.click(); }
+  if (e.target.matches('[role="tab"]') && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')){ const tabs = $$('[role="tab"]'), i = tabs.indexOf(e.target); tabs[(i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length].click(); }
+});
+document.addEventListener('input', e => {
+  if (e.target.id === 'cust-q'){ UI.custQuery = e.target.value; const q = UI.custQuery.toLowerCase(); $('#cust-body').innerHTML = custTable(CUSTOMERS.filter(c => !q || (c.name + c.email).toLowerCase().includes(q))); }
+  if (e.target.id === 'f-name'){ UI.bot.name = e.target.value; const n = $('#chat-name'); if (n) n.textContent = e.target.value || 'Your chatbot'; }
+  if (e.target.id === 'f-greet'){ UI.bot.greeting = e.target.value; if (UI.chat.length === 1){ UI.chat[0].text = e.target.value; const b = $('#chat-log .msg'); if (b) b.textContent = e.target.value; } }
+  if (e.target.id === 'f-instr') UI.bot.instructions = e.target.value;
+  if (e.target.id === 'f-domain'){ const v = e.target.value.trim(), bad = v && !/^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(v); e.target.setAttribute('aria-invalid', bad); $('#f-domain-m').outerHTML = bad ? `<span class="err" id="f-domain-m">${ic('alert')}That doesn't look like a domain. Use something like www.example.com</span>` : `<span class="hint" id="f-domain-m">${v ? 'Looks good. It will be added when you save.' : 'The chatbot only works on these sites.'}</span>`; }
+});
+document.addEventListener('submit', e => {
+  e.preventDefault();
+  if (e.target.id === 'chat-form'){ const i = $('#chat-in'); const v = i.value; i.value = ''; sendChat(v); }
+  if (e.target.id === 'bot-form'){ const d = $('#f-domain'); if (d.getAttribute('aria-invalid') === 'true'){ d.focus(); toast('Fix the highlighted field first', 'bad'); return; } loading($('#save-bot'), 900, () => toast('Chatbot settings saved')); }
+});
+$('#sw-prev').onclick = () => cycle(-1);
+$('#sw-next').onclick = () => cycle(1);
+$('#sw-theme').onclick = () => { S.theme = { auto:'light', light:'dark', dark:'auto' }[S.theme]; render(); };
+window.addEventListener('hashchange', () => { const k = location.hash.slice(1); if (V[k] && k !== S.v){ S.v = k; render(); } });
+render();
+</script>
