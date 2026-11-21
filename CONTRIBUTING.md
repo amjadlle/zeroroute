@@ -59,3 +59,13 @@ Thank you for your interest in contributing to ZeroRoute! We welcome contributio
 ## 📜 Code of Conduct
 
 Please treat all community members with kindness, respect, and constructive collaboration.
+
+---
+
+## ✅ Tests
+
+- `npm test` runs the suite once (Vitest). `npm run test:watch` re-runs on change; `npm run test:coverage` writes `coverage/`.
+- Two Vitest projects: **node** for `lib/`, route handlers and `tests/` (`*.test.ts`), **dom** (jsdom + Testing Library) for components (`*.test.tsx`).
+- Database tests: `import { testDb } from "@/tests/db"` gives a schema-initialised in-memory libSQL database, fresh per test file. Tests never touch Cloudflare D1.
+- Test behaviour through public interfaces (props, rendered roles/text, HTTP responses), not internals.
+- `npm run typecheck` runs `tsc --noEmit`.
