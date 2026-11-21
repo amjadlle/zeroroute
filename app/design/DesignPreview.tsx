@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { CONTRAST_PAIRS, contrastRatio } from "@/lib/contrast";
+import { SECTIONS } from "./sections";
 
 type Theme = "system" | "dark" | "light";
 
@@ -202,6 +203,13 @@ export function DesignPreview() {
             </a>
           </div>
         </section>
+
+        {SECTIONS.map(({ id, title, Component }) => (
+          <section key={id} aria-labelledby={id} className="space-y-3">
+            <h2 id={id} className="text-heading font-semibold">{title}</h2>
+            <Component />
+          </section>
+        ))}
       </div>
     </main>
   );
