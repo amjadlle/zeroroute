@@ -70,6 +70,7 @@
   --color-accent:       light-dark(oklch(.52 .17 277),  oklch(.76 .17 277));
   --color-accent-hover: light-dark(oklch(.47 .17 277),  oklch(.81 .17 277));
   --color-accent-fg:    light-dark(oklch(.99 .005 277), oklch(.19 .04 277));
+  --color-accent-soft:  light-dark(oklch(.95 .04 277),  oklch(.27 .06 277));
   --color-focus-ring:   light-dark(oklch(.52 .17 277),  oklch(.76 .17 277));
 
   --color-success:      light-dark(oklch(.5 .13 152),  oklch(.79 .15 152));
@@ -150,8 +151,8 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* Stops iOS zoom-on-focus. Kept for now: removing it shrinks every mobile input that uses
-     text-xs/text-sm. Drop it once the Input component (#4) ships 16px mobile inputs. */
+  /* Stops iOS zoom-on-focus for raw inputs. components/ui Input, Textarea and Select already use 16px
+     below md, so this can go once every raw input has moved to components/ui (the M2 tickets). */
   @media screen and (max-width: 768px) {
     input, textarea, select {
       font-size: 16px !important;
