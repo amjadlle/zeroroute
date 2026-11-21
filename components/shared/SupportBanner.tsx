@@ -10,7 +10,7 @@ type SupportBannerProps = {
 
 /**
  * "Free setup help" banner: email or book a call. Styled with the landing tokens (the landing pricing section).
- * The console overview has an older copy of this banner (components/dashboard/OverviewTab.tsx) still to move here.
+ * app/welcome/page.tsx still has its own copy of these links; move it here when that page is migrated.
  */
 export function SupportBanner({
   emailHref = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent("ZeroRoute Free Setup Assistance")}`,
