@@ -113,7 +113,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`dark scroll-smooth ${jakarta.variable} ${jetbrains.variable} ${geist.variable} ${geistMono.variable}`}>
+    // suppressHydrationWarning: ConsoleShell's inline theme script sets data-theme on <html> before hydration (#9).
+    <html lang="en" suppressHydrationWarning className={`dark scroll-smooth ${jakarta.variable} ${jetbrains.variable} ${geist.variable} ${geistMono.variable}`}>
       <body className="bg-dark-bg text-slate-100 min-h-screen font-sans antialiased selection:bg-red-500 selection:text-white">
         <div className="fixed inset-0 grid-pattern pointer-events-none z-0" />
         <div className="relative z-10 flex flex-col min-h-screen">
