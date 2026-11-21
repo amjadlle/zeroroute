@@ -97,7 +97,7 @@ export async function GET(request: Request) {
     ]);
 
     const logs = logsResult.rows || [];
-    const stats = statsResult.rows[0] as any || {};
+    const stats = statsResult.rows[0] ?? {};
     const totalRequests = Number(stats.total_count || 0);
     const avgLatency = Math.round(Number(stats.avg_latency || 0));
     const successCount = Number(stats.success_count || 0);

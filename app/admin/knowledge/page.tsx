@@ -1,19 +1,60 @@
 "use client";
 
+import { useState } from "react";
 import { PageHeader } from "@/components/shell/PageHeader";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Field } from "@/components/ui/Field";
 import { PageLoader } from "@/components/ui/PageLoader";
-import { AdminKnowledgeTab } from "@/components/admin/AdminKnowledgeTab";
+import { Select } from "@/components/ui/Select";
+import { KnowledgeList, type KnowledgeSource } from "@/components/shared/knowledge/KnowledgeList";
 import type { CustomerAdminItem } from "@/components/admin/AdminCustomersTab";
 import { LoadError, useAdminData } from "@/components/admin/useAdminData";
 
 export default function AdminKnowledgePage() {
   const { data, error, reload } = useAdminData<{ customers?: CustomerAdminItem[] }>("/api/admin/customers");
+  const [picked, setPicked] = useState<string>();
+  const customers = data?.customers ?? [];
+  // Derived, not set in an effect: the list never loads for an empty key first.
+  const selected = customers.some((c) => c.key === picked) ? picked : customers[0]?.key;
 
   return (
     <>
-      <PageHeader title="Knowledge" description="Files and web pages a bot answers from. Pick a bot, then add or remove sources." />
-      {error && <LoadError what="bots" error={error} onRetry={reload} />}
-      {data ? <AdminKnowledgeTab customers={data.customers ?? []} /> : !error && <PageLoader label="Loading bots" />}
+      <PageHeader title="Knowledge" description="What each customer's chatbot answers from. Pick a customer, then add or remove sources." />
+      {error && <LoadError what="customers" error={error} onRetry={reload} />}
+      {!data ? (
+        !error && <PageLoader label="Loading customers" />
+      ) : !selected ? (
+        <EmptyState title="No customers yet" description="Knowledge belongs to a customer's chatbot. Add a customer first." />
+      ) : (
+        <>
+          <Field label="Customer" className="mb-4 max-w-sm">
+            <Select value={selected} onChange={(e) => setPicked(e.target.value)}>
+              {customers.map((c) => (
+                <option key={c.key} value={c.key}>
+                  {c.company || c.name || c.bot_title || "Unnamed"} ({c.email || c.bot_id})
+                </option>
+              ))}
+            </Select>
+          </Field>
+          {/* Keyed by customer: switching remounts, so a slow reply for the previous customer can't show up here. */}
+          <CustomerSources key={selected} targetKey={selected} />
+        </>
+      )}
     </>
+  );
+}
+
+function CustomerSources({ targetKey }: { targetKey: string }) {
+  const { data, error, reload } = useAdminData<{ documents?: KnowledgeSource[] }>(
+    `/api/knowledge?target_key=${encodeURIComponent(targetKey)}`,
+  );
+  return (
+    <KnowledgeList
+      sources={data ? (data.documents ?? []) : undefined}
+      error={error}
+      onRetry={reload}
+      targetKey={targetKey}
+      onChange={reload}
+    />
   );
 }
