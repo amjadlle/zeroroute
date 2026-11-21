@@ -4,7 +4,7 @@ import crypto from "crypto";
 import { isMasterAdminKey, getCachedCustomer, setCachedCustomer } from "@/lib/auth/session";
 import { getDb } from "@/lib/db";
 import { isRateLimited, getClientIp } from "@/lib/auth/rate-limit";
-import { getEligibleProviders, TIMEOUT_MS, COOLDOWN_MS } from "@/lib/providers/state";
+import { ensureProviderConfigs, getEligibleProviders, TIMEOUT_MS, COOLDOWN_MS } from "@/lib/providers/state";
 import { responseCache } from "@/lib/providers/cache";
 import { buildDynamicSystemPrompt, retrieveKnowledgeContext, getDefaultLandingKnowledge } from "@/lib/providers/rag";
 import {
@@ -384,6 +384,7 @@ export async function POST(request: Request) {
   }
 
   // 6. Multi-Cloud Provider Pool Failover Routing
+  await ensureProviderConfigs();
   const candidates = getEligibleProviders(body.model);
   if (candidates.length === 0) {
     return NextResponse.json(

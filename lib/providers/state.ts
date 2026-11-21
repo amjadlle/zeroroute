@@ -138,12 +138,29 @@ export function updateProviderTelemetry(
   }
 }
 
+// Ceiling: saved settings are cached in this instance's memory and re-read at most every
+// PROVIDER_CONFIG_TTL_MS, so an admin change reaches other serverless instances within that
+// window (the instance that served the PUT sees it at once). Upgrade path: a shared store with
+// change notification, or a settings version row checked per request.
+export const PROVIDER_CONFIG_TTL_MS = 30_000;
+let configsLoadedAt = 0;
+let configsLoading: Promise<void> | null = null;
+
+/** Applies the saved admin settings before routing; cheap once loaded, refreshes after the TTL. */
+export function ensureProviderConfigs(): Promise<void> {
+  if (Date.now() - configsLoadedAt < PROVIDER_CONFIG_TTL_MS) return Promise.resolve();
+  return (configsLoading ??= loadSavedProviderConfigs().finally(() => {
+    configsLoading = null;
+  }));
+}
+
 export async function loadSavedProviderConfigs(): Promise<void> {
   try {
     const { getDb, initDb } = await import("../db");
     await initDb();
     const db = getDb();
     const res = await db.execute("SELECT * FROM provider_configs");
+    configsLoadedAt = Date.now();
     if (res && res.rows && res.rows.length > 0) {
       res.rows.forEach((row: any) => {
         const existing = runtimeStateMap.get(row.id as string);

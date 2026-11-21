@@ -22,6 +22,9 @@ export function isMasterAdminKey(token: string): boolean {
   return false;
 }
 
+// Ceiling: both caches below are per-instance memory with a 30 second TTL. The invalidate helpers
+// only clear the instance that handled the change, so other instances may serve the old customer
+// row (status, key, limits) for up to 30 seconds. Upgrade path: a shared store such as Redis.
 interface SessionCacheEntry {
   customer: Customer;
   expiresAt: number;
