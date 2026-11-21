@@ -3,7 +3,7 @@ import crypto from "crypto";
 import { getDb, initDb } from "@/lib/db";
 import { verifyPassword, generateSessionToken } from "@/lib/auth/password";
 import { isRateLimited, getClientIp } from "@/lib/auth/rate-limit";
-import { SESSION_COOKIE_NAME, ROLE_COOKIE_NAME, ADMIN_EMAILS } from "@/lib/auth/session";
+import { SESSION_COOKIE_NAME, ADMIN_EMAILS } from "@/lib/auth/session";
 import { signAdminSession, ADMIN_SESSION_MAX_AGE } from "@/lib/auth/admin-session";
 
 function safeEqual(a: string, b: string): boolean {
@@ -60,16 +60,6 @@ export async function POST(req: NextRequest) {
         name: SESSION_COOKIE_NAME,
         value: adminSessionToken,
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: ADMIN_SESSION_MAX_AGE,
-        path: "/",
-      });
-
-      response.cookies.set({
-        name: ROLE_COOKIE_NAME,
-        value: "admin",
-        httpOnly: false,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         maxAge: ADMIN_SESSION_MAX_AGE,
@@ -152,16 +142,6 @@ export async function POST(req: NextRequest) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 30 * 24 * 60 * 60, // 30 days
-      path: "/",
-    });
-
-    response.cookies.set({
-      name: ROLE_COOKIE_NAME,
-      value: targetRole,
-      httpOnly: false,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 30 * 24 * 60 * 60,
       path: "/",
     });
 

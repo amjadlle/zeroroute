@@ -66,7 +66,9 @@ export function Overlay({ open, onClose, title, description, footer, children, c
       aria-describedby={description ? descriptionId : undefined}
       onCancel={onCancel}
       // Chrome may close without a cancelable cancel (repeated Esc); keep the parent's state in sync.
-      onClose={() => shown.current && onCloseRef.current()}
+      // `close` is queued, so one from our own effect cleanup can land after a Strict Mode remount
+      // reopened the dialog; a dialog that is open again was not closed, so ignore it.
+      onClose={(e) => shown.current && !e.currentTarget.open && onCloseRef.current()}
       onClick={onClick}
       className={cn(
         "flex-col overflow-hidden border border-border bg-surface p-0 font-ui text-body text-text shadow-overlay open:flex",
