@@ -149,6 +149,14 @@
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
+
+  /* Stops iOS zoom-on-focus for raw inputs. components/ui Input, Textarea and Select already use 16px
+     below md, so this can go once every raw input has moved to components/ui (the M2 tickets). */
+  @media screen and (max-width: 768px) {
+    input, textarea, select {
+      font-size: 16px !important;
+    }
+  }
 }
 
 .grid-pattern {
