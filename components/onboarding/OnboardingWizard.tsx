@@ -24,7 +24,7 @@ const STEPS = [
   { label: "Account", title: "Your account", description: "Tell us who the chatbot is for." },
   { label: "Chatbot", title: "Your chatbot", description: "Choose how it greets and talks to visitors." },
   { label: "Knowledge", title: "Knowledge", description: "The chatbot answers questions from what you add here." },
-  { label: "Finish", title: "You're all set", description: "Add the chatbot to your website." },
+  { label: "Finish", title: "You're all set", description: "Your settings are saved. Here's how to put the chatbot live." },
 ] as const;
 
 const message = (e: unknown) => (e instanceof Error && e.message ? e.message : "Something went wrong.");
