@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import localFont from "next/font/local";
 import "./globals.css";
+import { PROVIDER_COUNT } from "@/lib/constants";
 
 // Self-hosted variable fonts (latin subset, OFL) so builds never fetch from Google Fonts (#64).
 // To add a weight range or subset, download the matching woff2 from fonts.gstatic.com into app/fonts.
@@ -51,7 +52,7 @@ export const metadata: Metadata = {
     template: "%s | ZeroRoute",
   },
   description:
-    "Add a custom AI chatbot to your website in 1 minute. Intelligent multi-cloud routing across 11 pooled AI providers (Gemini, Groq, Cerebras, Mistral, SambaNova, Cohere, and more). 10,000 monthly requests included.",
+    `Add a custom AI chatbot to your website in 1 minute. Intelligent multi-cloud routing across ${PROVIDER_COUNT} pooled AI providers (Gemini, Groq, Cerebras, Mistral, SambaNova, Cohere, and more). 10,000 monthly requests included.`,
   keywords: [
     "AI chatbot",
     "embeddable chatbot",
@@ -92,7 +93,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "ZeroRoute — 1-Line Custom AI Chatbot & Multi-Cloud Gateway",
     description:
-      "Embed a custom AI chatbot in 1 minute. Intelligent routing across 11 pooled AI cloud providers with sub-8ms fallback. 10,000 monthly requests included.",
+      `Embed a custom AI chatbot in 1 minute. Intelligent routing across ${PROVIDER_COUNT} pooled AI cloud providers with sub-8ms fallback. 10,000 monthly requests included.`,
     url: "https://zeroroute.mapki.in",
     siteName: "ZeroRoute",
     locale: "en_US",
@@ -102,7 +103,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "ZeroRoute — 1-Line Custom AI Chatbot & Multi-Cloud Gateway",
     description:
-      "Embed a custom AI chatbot in 1 minute. Intelligent routing across 11 pooled AI cloud providers with sub-8ms fallback.",
+      `Embed a custom AI chatbot in 1 minute. Intelligent routing across ${PROVIDER_COUNT} pooled AI cloud providers with sub-8ms fallback.`,
     creator: "@amjadlle",
   },
 };
