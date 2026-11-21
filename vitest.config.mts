@@ -9,8 +9,10 @@ export default defineConfig({
   test: {
     coverage: {
       provider: "v8",
-      include: ["lib/**", "app/**/route.ts", "components/**", "proxy.ts"],
+      include: ["lib/**/*.ts", "app/**/route.ts", "components/**/*.{ts,tsx}", "proxy.ts"],
       reporter: ["text-summary", "html", "json-summary"],
+      // About 5 points under the current numbers (lines 84, statements 84, functions 83, branches 76): raise them as coverage grows.
+      thresholds: { lines: 79, statements: 78, functions: 77, branches: 70 },
     },
     projects: [
       {
