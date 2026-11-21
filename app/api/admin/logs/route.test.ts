@@ -28,3 +28,10 @@ it("computes success rate, cache hits and latency from the rows", async () => {
   await seed("d", 500, 400);
   expect(await metrics()).toMatchObject({ totalRequests: 4, avgLatencyMs: 250, successRate: 75, cacheHits: 2, cacheHitRatio: 50 });
 });
+
+it("filters to one customer's requests when customer_key is given", async () => {
+  await seed("a", 200, 100);
+  await (await testDb()).execute(`INSERT INTO request_logs (id, customer_key, timestamp, provider, model, latency_ms, status) VALUES ('b', 'other', 0, 'groq', 'm', 1, 200)`);
+  const res = await GET(new Request("http://localhost/api/admin/logs?customer_key=other"));
+  expect((await res.json()).logs.map((l: { id: string }) => l.id)).toEqual(["b"]);
+});
