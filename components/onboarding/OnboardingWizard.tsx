@@ -14,7 +14,7 @@ import type { CustomerProfile } from "@/app/app/CustomerConsole";
 import type { KnowledgeSource } from "@/components/shared/knowledge/KnowledgeList";
 import { apiFetch, ApiError } from "@/lib/client/api";
 import { AccountStep, type AccountValues } from "./AccountStep";
-import { ChatbotStep, type ChatbotSettings } from "./ChatbotStep";
+import { ChatbotSettingsForm, type ChatbotSettings } from "@/components/dashboard/ChatbotSettingsForm";
 import { FinishStep } from "./FinishStep";
 import { KnowledgeStep } from "./KnowledgeStep";
 import { Stepper } from "./Stepper";
@@ -35,7 +35,7 @@ export function OnboardingWizard() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [step, setStep] = useState(0);
   const [account, setAccount] = useState<AccountValues>({ company: "", website: "", password: "" });
-  const [chatbot, setChatbot] = useState<ChatbotSettings>({ bot_title: "", greeting: "", persona: "", prompts: [] });
+  const [chatbot, setChatbot] = useState<ChatbotSettings>({ bot_title: "", greeting: "", persona: "", prompts: [], brand_color: "", logo_url: "" });
   const [sources, setSources] = useState<KnowledgeSource[] | undefined>();
   const [sourcesError, setSourcesError] = useState<string | null>(null);
   const { save, saving, error, clearError } = useOnboardingSave();
@@ -50,7 +50,7 @@ export function OnboardingWizard() {
       if (!c) throw new Error("Your account details came back empty.");
       setProfile(c);
       setAccount({ company: c.company ?? "", website: c.website ?? "", password: "" });
-      setChatbot({ bot_title: c.bot_title, greeting: c.greeting, persona: c.persona, prompts: c.prompts ?? [] });
+      setChatbot({ bot_title: c.bot_title, greeting: c.greeting, persona: c.persona, prompts: c.prompts ?? [], brand_color: c.brand_color ?? "", logo_url: c.logo_url ?? "" });
     } catch (e) {
       if (!(e instanceof ApiError && e.status === 401)) setLoadError(message(e));
     }
@@ -133,7 +133,7 @@ export function OnboardingWizard() {
             </div>
             {error && <Alert tone="danger" title="Couldn't save. Your changes are still here.">{error}</Alert>}
             {step === 0 && <AccountStep value={account} onChange={setAccount} onSubmit={saveAccount} saving={saving} />}
-            {step === 1 && <ChatbotStep value={chatbot} onChange={setChatbot} onSubmit={saveChatbot} saving={saving} actions={back} />}
+            {step === 1 && <ChatbotSettingsForm value={chatbot} onChange={setChatbot} onSubmit={saveChatbot} saving={saving} submitLabel="Save and continue" actions={back} />}
             {step === 2 && (
               <KnowledgeStep sources={sources} error={sourcesError} onRetry={loadSources} onAdded={loadSources} onContinue={() => go(3)} actions={back} />
             )}

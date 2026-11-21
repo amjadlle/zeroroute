@@ -63,7 +63,7 @@ it("keeps input and shows the error when a save fails, then advances on retry", 
   expect(posts("/api/onboarding/setup").at(-1)?.body).toEqual({ name: "Acme", company: "Acme", website: "", password: "longenough" });
 });
 
-it("saves the chatbot, skips knowledge and finishes without saving knowledge again", async () => {
+it("saves the chatbot with its brand colour, skips knowledge and finishes without saving knowledge again", async () => {
   const user = userEvent.setup();
   render(<OnboardingWizard />);
   await user.type(await screen.findByLabelText(/Company or project name/), "Acme");
@@ -71,9 +71,10 @@ it("saves the chatbot, skips knowledge and finishes without saving knowledge aga
 
   await user.click(await screen.findByRole("button", { name: "Add question" }));
   await user.type(screen.getByLabelText("Suggested question 2"), "  Shipping?  ");
+  await user.type(screen.getByLabelText("Brand colour"), "#4f46e5");
   await user.click(screen.getByRole("button", { name: "Save and continue" }));
   expect(await screen.findByRole("heading", { name: "Knowledge" })).toBeInTheDocument();
-  expect(posts("/api/customer/persona")[0].body).toMatchObject({ bot_title: "Helper", greeting: "Hi!", prompts: ["What do you sell?", "Shipping?"] });
+  expect(posts("/api/customer/persona")[0].body).toMatchObject({ bot_title: "Helper", greeting: "Hi!", prompts: ["What do you sell?", "Shipping?"], brand_color: "#4f46e5", logo_url: "" });
 
   await user.click(screen.getByRole("button", { name: "Skip for now" }));
   expect(await screen.findByRole("heading", { name: "You're all set" })).toBeInTheDocument();
