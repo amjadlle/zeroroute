@@ -1,4 +1,4 @@
-import { createClient, Client } from "@libsql/client";
+import { createClient, Client, InStatement } from "@libsql/client";
 import path from "path";
 import fs from "fs";
 
@@ -65,7 +65,7 @@ class LibSqlAdapter implements DatabaseAdapter {
   }
 
   async execute(stmt: { sql: string; args?: unknown[] } | string): Promise<QueryResult> {
-    const res = await this.client.execute(stmt as any);
+    const res = await this.client.execute(stmt as InStatement);
     return {
       rows: (res.rows as unknown as Record<string, unknown>[]) || [],
       rowsAffected: res.rowsAffected,
@@ -185,6 +185,13 @@ export const initDb = async (): Promise<void> => {
           prompt_tokens INTEGER DEFAULT 0,
           completion_tokens INTEGER DEFAULT 0,
           total_tokens INTEGER DEFAULT 0
+        );
+      `),
+      db.execute(`
+        CREATE TABLE IF NOT EXISTS checkout_claims (
+          id TEXT PRIMARY KEY,
+          email TEXT NOT NULL,
+          claimed_at INTEGER NOT NULL
         );
       `),
       db.execute(`

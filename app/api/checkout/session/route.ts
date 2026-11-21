@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import crypto from "crypto";
 import { getDb, initDb } from "@/lib/db";
+import { generateSessionToken } from "@/lib/auth/password";
 
 export const dynamic = "force-dynamic";
 
@@ -9,8 +9,6 @@ export async function GET(request: Request) {
   const sessionId = url.searchParams.get("session_id") || url.searchParams.get("id");
   const subscriptionId = url.searchParams.get("subscription_id");
   const paymentId = url.searchParams.get("payment_id");
-  let emailParam = url.searchParams.get("email")?.trim().toLowerCase();
-  const statusParam = (url.searchParams.get("status") || "").toLowerCase();
 
   const apiKey = process.env.DODO_API_KEY;
   const isLive = process.env.DODO_ENVIRONMENT === "live_mode";
@@ -32,45 +30,40 @@ export async function GET(request: Request) {
   }
 
   let customerEmail = "";
-  let customerName = "Subscriber";
-  let customerCompany = "My Application";
   let isPaymentSuccessful = false;
 
   // 1. Strictly verify payment status with Dodo Payments API
   try {
     if (subscriptionId) {
-      const subRes = await fetch(`${dodoApiBase}/subscriptions/${subscriptionId}`, {
+      const subRes = await fetch(`${dodoApiBase}/subscriptions/${encodeURIComponent(subscriptionId)}`, {
         headers: { Authorization: `Bearer ${apiKey}` },
       });
       if (subRes.ok) {
         const subData = await subRes.json();
         if (subData.customer?.email) customerEmail = subData.customer.email.toLowerCase();
-        if (subData.customer?.name) customerName = subData.customer.name;
         if (subData.status === "active" || subData.status === "on_trial") {
           isPaymentSuccessful = true;
         }
       }
     } else if (sessionId) {
-      const dodoRes = await fetch(`${dodoApiBase}/checkouts/${sessionId}`, {
+      const dodoRes = await fetch(`${dodoApiBase}/checkouts/${encodeURIComponent(sessionId)}`, {
         headers: { Authorization: `Bearer ${apiKey}` },
       });
       if (dodoRes.ok) {
         const sessionData = await dodoRes.json();
         if (sessionData.customer?.email) customerEmail = sessionData.customer.email.toLowerCase();
-        if (sessionData.customer?.name) customerName = sessionData.customer.name;
         const status = sessionData.payment_status || sessionData.status;
         if (status === "succeeded" || status === "paid" || status === "complete" || status === "active") {
           isPaymentSuccessful = true;
         }
       }
     } else if (paymentId) {
-      const payRes = await fetch(`${dodoApiBase}/payments/${paymentId}`, {
+      const payRes = await fetch(`${dodoApiBase}/payments/${encodeURIComponent(paymentId)}`, {
         headers: { Authorization: `Bearer ${apiKey}` },
       });
       if (payRes.ok) {
         const payData = await payRes.json();
         if (payData.customer?.email) customerEmail = payData.customer.email.toLowerCase();
-        if (payData.customer?.name) customerName = payData.customer.name;
         if (payData.status === "succeeded" || payData.status === "paid") {
           isPaymentSuccessful = true;
         }
@@ -98,102 +91,66 @@ export async function GET(request: Request) {
     sql: `SELECT * FROM customers WHERE email = ? LIMIT 1`,
     args: [customerEmail],
   });
+  const customer = existingRes.rows[0];
 
-  let customer = existingRes.rows[0] as any;
+  // Entitlements come only from the signed webhook. Until it has created the
+  // account, report the payment as pending without consuming the id.
+  if (!customer) {
+    return NextResponse.json({ success: false, paid: true, pending: true }, { status: 202 });
+  }
+
+  // One-time claim: every presented id is recorded; any id seen before means
+  // this is a repeat lookup, which only gets the payment status back.
+  // Ceiling: ids of the same purchase that were never presented (e.g. a linked
+  // payment_id when only subscription_id was used) remain claimable once.
   const now = Date.now();
-    const expiresAt = now + 30 * 24 * 60 * 60 * 1000;
-
-    if (!customer) {
-      const id = crypto.randomUUID();
-      const key = `zr_live_${crypto.randomBytes(18).toString("hex")}`;
-      const botId = `bot_${crypto.randomBytes(8).toString("hex")}`;
-      const sessionToken = `zr_sess_${crypto.randomBytes(24).toString("hex")}`;
-
-      await db.execute({
-        sql: `INSERT INTO customers (
-          id, key, email, name, company, bot_id, status,
-          subscription_expires, monthly_requests, monthly_limit,
-          session_token, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, 0, 10000, ?, ?, ?)`,
-        args: [
-          id,
-          key,
-          customerEmail,
-          customerName,
-          customerCompany,
-          botId,
-          expiresAt,
-          sessionToken,
-          now,
-          now,
-        ],
-      });
-
-      customer = {
-        id,
-        key,
-        email: customerEmail,
-        name: customerName,
-        company: customerCompany,
-        bot_id: botId,
-        status: "active",
-        session_token: sessionToken,
-      };
-
-    } else {
-      // Ensure status is active and upgrade quota to 10,000 requests/month
-      const sessionToken = `zr_sess_${crypto.randomBytes(24).toString("hex")}`;
-      await db.execute({
-        sql: `UPDATE customers SET status = 'active', monthly_limit = 10000, subscription_expires = ?, session_token = ?, updated_at = ? WHERE id = ?`,
-        args: [expiresAt, sessionToken, now, customer.id],
-      });
-      customer.session_token = sessionToken;
-      customer.status = "active";
-      customer.monthly_limit = 10000;
-    }
-
-    // Dispatch welcome credentials email upon successful checkout
-    try {
-      const { sendWelcomeCredentialsEmail } = await import("@/lib/email");
-      await sendWelcomeCredentialsEmail({
-        email: customer.email || customerEmail,
-        name: customer.name || customerName,
-        key: customer.key,
-        botId: customer.bot_id,
-      });
-    } catch (emailErr) {
-      console.warn("[DodoCheckout] Welcome email warning:", emailErr);
-    }
-
-    const response = NextResponse.json({
-      success: true,
-      key: customer.key,
-      email: customer.email,
-      name: customer.name,
-      company: customer.company,
-      botId: customer.bot_id,
-      sessionToken: customer.session_token,
+  let firstClaim = true;
+  for (const id of [subscriptionId, sessionId, paymentId].filter(Boolean)) {
+    const res = await db.execute({
+      sql: `INSERT OR IGNORE INTO checkout_claims (id, email, claimed_at) VALUES (?, ?, ?)`,
+      args: [id, customerEmail, now],
     });
+    if (!res.rowsAffected) firstClaim = false;
+  }
+  if (!firstClaim) {
+    return NextResponse.json({ success: false, paid: true, claimed: true });
+  }
 
-    response.cookies.set({
-      name: "zr_session",
-      value: customer.session_token,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 30 * 24 * 60 * 60,
-      path: "/",
-    });
+  const sessionToken = generateSessionToken();
+  await db.execute({
+    sql: `UPDATE customers SET session_token = ?, updated_at = ? WHERE id = ?`,
+    args: [sessionToken, now, customer.id],
+  });
 
-    response.cookies.set({
-      name: "zr_role",
-      value: "customer",
-      httpOnly: false,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 30 * 24 * 60 * 60,
-      path: "/",
-    });
+  const response = NextResponse.json({
+    success: true,
+    key: customer.key,
+    email: customer.email,
+    name: customer.name,
+    company: customer.company,
+    botId: customer.bot_id,
+    sessionToken,
+  });
 
-    return response;
+  response.cookies.set({
+    name: "zr_session",
+    value: sessionToken,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 30 * 24 * 60 * 60,
+    path: "/",
+  });
+
+  response.cookies.set({
+    name: "zr_role",
+    value: "customer",
+    httpOnly: false,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 30 * 24 * 60 * 60,
+    path: "/",
+  });
+
+  return response;
 }

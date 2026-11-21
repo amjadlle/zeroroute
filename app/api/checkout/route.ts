@@ -3,11 +3,10 @@ import { isRateLimited } from "@/lib/auth/rate-limit";
 
 export const dynamic = "force-dynamic";
 
-async function createDodoCheckoutSession(request: Request, customerData?: { email?: string; name?: string }) {
+async function createDodoCheckoutSession(customerData?: { email?: string; name?: string }) {
   const isLive = process.env.DODO_ENVIRONMENT === "live_mode";
   const productId = process.env.DODO_PRODUCT_ID || "pdt_0Nml3W2yZao32si4mSs6b";
-  const originHeader = request.headers.get("origin") || request.headers.get("host") ? `https://${request.headers.get("host")}` : "";
-  const siteBase = originHeader && !originHeader.includes("localhost") ? originHeader.replace(/\/$/, "") : (process.env.APP_URL || "https://zeroroute.mapki.in");
+  const siteBase = (process.env.APP_URL || "https://zeroroute.mapki.in").replace(/\/$/, "");
   const returnUrl = `${siteBase}/welcome`;
   const cancelUrl = `${siteBase}/#pricing`;
 
@@ -58,7 +57,7 @@ async function createDodoCheckoutSession(request: Request, customerData?: { emai
 }
 
 export async function GET(request: Request) {
-  const checkoutUrl = await createDodoCheckoutSession(request);
+  const checkoutUrl = await createDodoCheckoutSession();
 
   const url = new URL(request.url);
   const acceptHeader = request.headers.get("accept") || "";
@@ -81,12 +80,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Too many checkout requests. Please wait a moment." }, { status: 429 });
   }
 
-  let body: any = {};
+  let body: { email?: string; name?: string } = {};
   try {
     body = await request.json();
   } catch {}
 
-  const checkoutUrl = await createDodoCheckoutSession(request, {
+  const checkoutUrl = await createDodoCheckoutSession({
     email: body.email,
     name: body.name
   });
