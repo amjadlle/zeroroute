@@ -363,13 +363,6 @@ export async function retrieveKnowledgeContext(
 
       let score = 0;
 
-      // Document type boost — FAQ/QA docs are pre-structured for Q&A and highest quality
-      if (docType === "faq" || docType === "qa" || docType === "q&a") {
-        score += 5; // Base boost for structured Q&A content
-      } else if (docType === "policy" || docType === "pricing" || docType === "terms") {
-        score += 2; // Boost for authoritative definitive-fact documents
-      }
-
       // Bigram phrase matches — highest signal (20 pts title / 10 pts content)
       for (const bigram of bigrams) {
         if (fullText.includes(bigram)) {
@@ -390,6 +383,16 @@ export async function retrieveKnowledgeContext(
         if (stemmed.length < 3) continue;
         const stemOccurrences = fullText.split(stemmed).length - 1;
         score += Math.min(stemOccurrences, 3) * 0.5;
+      }
+
+      // Document type boost, only for documents that already match the query (otherwise these
+      // types would pass the relevance filter for every query).
+      if (score > 0) {
+        if (docType === "faq" || docType === "qa" || docType === "q&a") {
+          score += 5; // Base boost for structured Q&A content
+        } else if (docType === "policy" || docType === "pricing" || docType === "terms") {
+          score += 2; // Boost for authoritative definitive-fact documents
+        }
       }
 
       return { title, content, score };
