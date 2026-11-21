@@ -1,617 +1,106 @@
 "use client";
 
-import { apiFetch } from "@/lib/client/api";
 import { useState } from "react";
-import {
-  Layers,
-  Zap,
-  Play,
-  CheckCircle2,
-  AlertTriangle,
-  Loader2,
-  Sparkles,
-  ChevronUp,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  ExternalLink,
-  Plus,
-  Trash2,
-  Key,
-  Workflow,
-  AlertCircle
-} from "lucide-react";
-import { PROVIDER_PORTALS, PROVIDER_CATALOGS } from "@/lib/providers/catalog";
+import { Server } from "lucide-react";
+import { apiFetch } from "@/lib/client/api";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { useToast } from "@/components/ui/Toast";
 import { ProviderModelCatalogModal } from "./ProviderModelCatalogModal";
+import { ErrorDialog } from "./providers/ErrorDialog";
+import { ProviderRow } from "./providers/ProviderRow";
+import { modelsOf, move, toChange, type ProviderChange, type ProviderItem, type TestResult } from "./providers/helpers";
 
-import { RateLimitTelemetry } from "@/lib/providers/types";
+export type { ProviderItem } from "./providers/helpers";
 
-export interface ProviderItem {
-  id: string;
-  name: string;
-  model: string;
-  models: string[];
-  enabled: boolean;
-  order: number;
-  configured: boolean;
-  consecutiveFailures: number;
-  cooldownUntil: number;
-  lastLatencyMs?: number;
-  lastError?: string;
-  rateLimits?: RateLimitTelemetry;
-  lastUsedAt?: number;
-}
-
-interface BenchmarkResult {
-  providerId: string;
-  providerName: string;
-  model: string;
-  status: "ok" | "error";
-  latencyMs: number;
-  response?: string;
-  error?: string | null;
-}
-
-interface AdminProvidersTabProps {
+type Props = {
   providers: ProviderItem[];
-  onUpdateProviders: (updated: ProviderItem[]) => Promise<void>;
-}
+  /** PUTs only the given providers; rejects when the server refuses. */
+  onSave: (changes: ProviderChange[]) => Promise<void>;
+  /** Re-reads providers (a test updates latency and failure counts on the server). */
+  onRefresh: () => void;
+};
 
-export function AdminProvidersTab({ providers, onUpdateProviders }: AdminProvidersTabProps) {
-  const [testingId, setTestingId] = useState<string | null>(null);
-  const [testResults, setTestResults] = useState<
-    Record<string, { ok: boolean; latencyMs: number; response?: string; error?: string }>
-  >({});
-  const [benchmarking, setBenchmarking] = useState(false);
-  const [benchmarkResults, setBenchmarkResults] = useState<BenchmarkResult[] | null>(null);
-  const [activeCatalogProvider, setActiveCatalogProvider] = useState<ProviderItem | null>(null);
-  const [errorModalProvider, setErrorModalProvider] = useState<ProviderItem | null>(null);
-  const [savingAction, setSavingAction] = useState<string | null>(null);
+const message = (e: unknown) => (e instanceof Error && e.message ? e.message : "Something went wrong.");
 
-  // Sort providers strictly by order
-  const sortedProviders = [...providers].sort((a, b) => a.order - b.order);
+export function AdminProvidersTab({ providers, onSave, onRefresh }: Props) {
+  const toast = useToast();
+  const [busy, setBusy] = useState(false);
+  const [testing, setTesting] = useState<Record<string, boolean>>({});
+  const [results, setResults] = useState<Record<string, TestResult>>({});
+  const [modelsFor, setModelsFor] = useState<string | null>(null);
+  const [errorFor, setErrorFor] = useState<string | null>(null);
 
-  const handleTestPrimary = async (providerId: string) => {
-    setTestingId(providerId);
-    const provider = providers.find((p) => p.id === providerId);
-    const targetModel = provider?.models?.[0] || provider?.model;
+  const sorted = [...providers].sort((a, b) => a.order - b.order);
+  const byId = (id: string | null) => providers.find((p) => p.id === id) ?? null;
+  const modelsProvider = byId(modelsFor);
 
+  // The list always shows what the server returned, so a failed save leaves the old state on screen.
+  const save = async (changes: ProviderChange[]) => {
+    setBusy(true);
     try {
-      const data = await apiFetch<{ ok?: boolean; latencyMs?: number; response?: string; error?: string }>("/api/admin/providers/test", {
+      await onSave(changes);
+    } catch (e) {
+      toast(`Couldn't save: ${message(e)}`, { tone: "danger" });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const moveProvider = (index: number, delta: -1 | 1) => {
+    const list = move(sorted, index, index + delta);
+    // Renumber 1..N and send only the providers whose position changed.
+    void save(list.flatMap((p, i) => (p.order === i + 1 ? [] : [toChange(p, { order: i + 1 })])));
+  };
+
+  const test = async (p: ProviderItem) => {
+    setTesting((t) => ({ ...t, [p.id]: true }));
+    let result: TestResult;
+    try {
+      const d = await apiFetch<Partial<TestResult>>("/api/admin/providers/test", {
         method: "POST",
-        body: { providerId, model: targetModel },
+        body: { providerId: p.id, model: modelsOf(p)[0] },
       });
-      setTestResults((prev) => ({
-        ...prev,
-        [providerId]: {
-          ok: Boolean(data.ok),
-          latencyMs: data.latencyMs || 0,
-          response: data.response || (data.ok ? "OK" : undefined),
-          error: data.error,
-        },
-      }));
-
-      // Update provider latency in parent if successful
-      if (data.ok) {
-        const updated = providers.map((p) =>
-          p.id === providerId
-            ? { ...p, lastLatencyMs: data.latencyMs, consecutiveFailures: 0, lastError: undefined }
-            : p
-        );
-        await onUpdateProviders(updated);
-      }
-    } catch (e: any) {
-      setTestResults((prev) => ({
-        ...prev,
-        [providerId]: {
-          ok: false,
-          latencyMs: 0,
-          error: e.message || "Network test failed",
-        },
-      }));
-    } finally {
-      setTestingId(null);
+      result = { ok: Boolean(d.ok), latencyMs: d.latencyMs || 0, response: d.response, error: d.error, telemetry: d.telemetry };
+    } catch (e) {
+      result = { ok: false, latencyMs: 0, error: message(e) };
     }
+    setResults((r) => ({ ...r, [p.id]: result }));
+    setTesting((t) => ({ ...t, [p.id]: false }));
+    onRefresh();
   };
 
-  const handleRunBenchmark = async () => {
-    setBenchmarking(true);
-    setBenchmarkResults(null);
-    try {
-      const data = await apiFetch<{ results?: BenchmarkResult[] }>("/api/admin/providers/benchmark", {
-        method: "POST",
-      });
-      if (data.results) {
-        setBenchmarkResults(data.results);
-      }
-    } catch (err) {
-      console.error("Benchmark error:", err);
-      alert(`Benchmark failed: ${(err as Error).message}`);
-    } finally {
-      setBenchmarking(false);
-    }
-  };
-
-  const handleToggleEnable = async (providerId: string) => {
-    const actionKey = `toggle-${providerId}`;
-    setSavingAction(actionKey);
-    try {
-      const updated = providers.map((p) => (p.id === providerId ? { ...p, enabled: !p.enabled } : p));
-      await onUpdateProviders(updated);
-    } finally {
-      setSavingAction(null);
-    }
-  };
-
-  const handleMoveProvider = async (currentIndex: number, delta: number) => {
-    const targetIndex = currentIndex + delta;
-    if (targetIndex < 0 || targetIndex >= sortedProviders.length) return;
-
-    const actionKey = `move-prov-${sortedProviders[currentIndex]?.id}`;
-    setSavingAction(actionKey);
-    try {
-      const list = [...sortedProviders];
-      const temp = list[currentIndex];
-      list[currentIndex] = list[targetIndex];
-      list[targetIndex] = temp;
-
-      // Re-assign order 1..N
-      const updated = list.map((p, idx) => ({ ...p, order: idx + 1 }));
-      await onUpdateProviders(updated);
-    } finally {
-      setSavingAction(null);
-    }
-  };
-
-  const handleMoveModelInProvider = async (providerId: string, modelIndex: number, delta: number) => {
-    const targetProvider = providers.find((p) => p.id === providerId);
-    if (!targetProvider) return;
-
-    const currentModels = targetProvider.models && targetProvider.models.length > 0
-      ? [...targetProvider.models]
-      : [targetProvider.model];
-
-    const targetModelIndex = modelIndex + delta;
-    if (targetModelIndex < 0 || targetModelIndex >= currentModels.length) return;
-
-    const actionKey = `move-model-${providerId}-${modelIndex}`;
-    setSavingAction(actionKey);
-    try {
-      const temp = currentModels[modelIndex];
-      currentModels[modelIndex] = currentModels[targetModelIndex];
-      currentModels[targetModelIndex] = temp;
-
-      const updated = providers.map((p) =>
-        p.id === providerId
-          ? { ...p, models: currentModels, model: currentModels[0] }
-          : p
-      );
-      await onUpdateProviders(updated);
-    } finally {
-      setSavingAction(null);
-    }
-  };
-
-  const handleRemoveModelFromProvider = async (providerId: string, modelName: string) => {
-    const targetProvider = providers.find((p) => p.id === providerId);
-    if (!targetProvider) return;
-
-    const currentModels = targetProvider.models && targetProvider.models.length > 0
-      ? [...targetProvider.models]
-      : [targetProvider.model];
-
-    if (currentModels.length <= 1) {
-      alert("Each provider must keep at least 1 model in its chain.");
-      return;
-    }
-
-    const actionKey = `remove-model-${providerId}-${modelName}`;
-    setSavingAction(actionKey);
-    try {
-      const filtered = currentModels.filter((m) => m !== modelName);
-      const updated = providers.map((p) =>
-        p.id === providerId
-          ? { ...p, models: filtered, model: filtered[0] }
-          : p
-      );
-      await onUpdateProviders(updated);
-    } finally {
-      setSavingAction(null);
-    }
-  };
-
-  const handleUpdateSingleProvider = async (updatedItem: ProviderItem) => {
-    const updated = providers.map((p) => (p.id === updatedItem.id ? updatedItem : p));
-    await onUpdateProviders(updated);
-    setActiveCatalogProvider(updatedItem);
-  };
+  if (sorted.length === 0) return <EmptyState icon={Server} title="No providers" description="The gateway has no providers set up." />;
 
   return (
-    <div className="space-y-6">
-      {/* Top Banner & Provider order Header */}
-      <div className="bg-[#090d16] border border-white/10 rounded-2xl p-6 relative overflow-hidden backdrop-blur-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <Workflow className="w-5 h-5 text-red-500" />
-            <h2 className="text-lg font-bold text-white tracking-tight">Provider order</h2>
-          </div>
-          <p className="text-xs text-slate-400">
-            The top provider is tried first. If it fails, the next one answers. Click a model name to change which models a provider uses.
-          </p>
-        </div>
+    <>
+      <ol className="space-y-2">
+        {sorted.map((p, i) => (
+          <li key={p.id}>
+            <ProviderRow
+              provider={p}
+              position={i + 1}
+              isFirst={i === 0}
+              isLast={i === sorted.length - 1}
+              busy={busy}
+              testing={Boolean(testing[p.id])}
+              result={results[p.id]}
+              onMove={(delta) => moveProvider(i, delta)}
+              onToggle={(enabled) => save([toChange(p, { enabled })])}
+              onTest={() => test(p)}
+              onModelsChange={(models) => save([toChange(p, { models })])}
+              onOpenModels={() => setModelsFor(p.id)}
+              onShowError={() => setErrorFor(p.id)}
+            />
+          </li>
+        ))}
+      </ol>
 
-        <div className="flex items-center gap-2 flex-wrap">
-          <button
-            type="button"
-            onClick={handleRunBenchmark}
-            disabled={benchmarking}
-            className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-b from-[#e5333b] to-[#c71d25] hover:from-[#f03e46] hover:to-[#d6232b] text-white border border-white/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_6px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed touch-manipulation"
-          >
-            {benchmarking ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Racing 10 Clouds…</span>
-              </>
-            ) : (
-              <>
-                <Zap className="w-4 h-4" />
-                <span>Benchmark All</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* Benchmark Results Leaderboard Modal */}
-      {benchmarkResults && (
-        <div className="bg-[#090d16] border border-red-500/30 rounded-2xl p-6 space-y-4 duration-300">
-          <div className="flex items-center justify-between border-b border-white/10 pb-3">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-amber-400" />
-              <h3 className="text-sm font-bold text-white">Speed test results</h3>
-            </div>
-            <button
-              type="button"
-              onClick={() => setBenchmarkResults(null)}
-              className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-xs text-slate-400 hover:text-white cursor-pointer touch-manipulation"
-            >
-              Close
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {benchmarkResults.map((r, i) => (
-              <div
-                key={i}
-                className={`p-3 rounded-xl border flex flex-col justify-between gap-2 text-xs ${
-                  r.status === "ok"
-                    ? "bg-emerald-500/5 border-emerald-500/20 text-slate-200"
-                    : "bg-red-500/5 border-red-500/20 text-slate-300"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-white">{r.providerName}</span>
-                  <span
-                    className={`font-mono text-[11px] font-semibold px-2 py-0.5 rounded-lg ${
-                      r.status === "ok" ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"
-                    }`}
-                  >
-                    {r.status === "ok" ? `${r.latencyMs}ms` : "Error"}
-                  </span>
-                </div>
-                <div className="font-mono text-[11px] text-slate-400 truncate">{r.model}</div>
-                {r.error && <div className="text-[10px] text-red-400/90 truncate">{r.error}</div>}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Provider Failover Rows */}
-      <div className="space-y-4">
-        {sortedProviders.map((p, index) => {
-          const isTesting = testingId === p.id;
-          const result = testResults[p.id];
-          const portalUrl = PROVIDER_PORTALS[p.id] || "https://zeroroute.app";
-          const modelsList = p.models && p.models.length > 0 ? p.models : [p.model];
-          const isFirst = index === 0;
-          const isLast = index === sortedProviders.length - 1;
-
-          return (
-            <div
-              key={p.id}
-              className={`bg-[#090d16] border rounded-2xl p-5 space-y-4 transition-all ${
-                p.enabled ? "border-white/10" : "border-white/5 opacity-50 grayscale"
-              }`}
-            >
-              {/* Row 1: Order, Provider Info, Actions */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-start sm:items-center gap-3.5 flex-1 min-w-0">
-                  {/* Priority Order & Up/Down Arrows */}
-                  <div className="flex sm:flex-col items-center gap-1 shrink-0 pt-0.5 sm:pt-0">
-                    <span className="w-8 h-8 rounded-xl bg-black/50 border border-white/10 text-xs font-mono font-bold flex items-center justify-center text-slate-300">
-                      {index + 1}
-                    </span>
-                    <div className="flex sm:flex-col gap-0.5">
-                      <button
-                        type="button"
-                        disabled={isFirst || Boolean(savingAction)}
-                        onClick={() => handleMoveProvider(index, -1)}
-                        className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg hover:bg-white/10 text-slate-400 hover:text-white disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer touch-manipulation"
-                        title="Move Up in Failover Chain"
-                        aria-label="Move up"
-                      >
-                        {savingAction === `move-prov-${p.id}` ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin text-red-400" />
-                        ) : (
-                          <ChevronUp className="w-4 h-4" />
-                        )}
-                      </button>
-                      <button
-                        type="button"
-                        disabled={isLast || Boolean(savingAction)}
-                        onClick={() => handleMoveProvider(index, 1)}
-                        className="p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg hover:bg-white/10 text-slate-400 hover:text-white disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer touch-manipulation"
-                        title="Move Down in Failover Chain"
-                        aria-label="Move down"
-                      >
-                        {savingAction === `move-prov-${p.id}` ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin text-red-400" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Provider Details */}
-                  <div className="flex-1 min-w-0 space-y-1">
-                    <div className="flex items-center gap-2.5 flex-wrap">
-                      <a
-                        href={portalUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-bold text-sm sm:text-base text-white hover:text-red-400 flex items-center gap-1.5 transition-colors truncate min-h-[36px]"
-                      >
-                        <span>{p.name}</span>
-                        <ExternalLink className="w-3.5 h-3.5 text-slate-500 opacity-70 shrink-0" />
-                      </a>
-
-                      <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-semibold ${
-                          p.configured
-                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                            : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                        }`}
-                      >
-                        {p.configured ? "• Active" : "+ Needs Key"}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-3 text-xs text-slate-400 flex-wrap pt-0.5">
-                      <span className="flex items-center gap-1 font-mono">
-                        ⚡ Latency:{" "}
-                        <strong className="text-slate-200">
-                          {p.lastLatencyMs ? `${p.lastLatencyMs}ms` : "--"}
-                        </strong>
-                      </span>
-                      <span className="font-mono">
-                        Failures:{" "}
-                        <strong className={p.consecutiveFailures > 0 ? "text-amber-400" : "text-slate-300"}>
-                          {p.consecutiveFailures || 0}
-                        </strong>
-                      </span>
-                      {p.lastError && (
-                        <button
-                          type="button"
-                          onClick={() => setErrorModalProvider(p)}
-                          className="inline-flex items-center gap-1 text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/25 px-2 py-1 min-h-[32px] rounded-lg text-[11px] font-mono transition-all cursor-pointer touch-manipulation"
-                        >
-                          <AlertCircle className="w-3 h-3 text-rose-400 shrink-0" />
-                          <span className="truncate max-w-[180px]">{p.lastError}</span>
-                          <span className="underline font-sans text-rose-300 ml-0.5">View Log</span>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Actions: Enabled Toggle & Test Primary Button */}
-                <div className="flex items-center justify-end gap-2 shrink-0">
-                  <button
-                    type="button"
-                    disabled={Boolean(savingAction)}
-                    onClick={() => handleToggleEnable(p.id)}
-                    className={`px-3.5 py-2 min-h-[44px] rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50 touch-manipulation ${
-                      p.enabled
-                        ? "bg-red-500/15 text-red-400 border border-red-500/30 hover:bg-red-500/25"
-                        : "bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10"
-                    }`}
-                  >
-                    {savingAction === `toggle-${p.id}` ? (
-                      <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        <span>Saving…</span>
-                      </>
-                    ) : (
-                      <span>{p.enabled ? "Enabled" : "Disabled"}</span>
-                    )}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleTestPrimary(p.id)}
-                    disabled={isTesting || Boolean(savingAction)}
-                    className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 min-h-[44px] rounded-xl text-xs font-semibold bg-black/40 hover:bg-white/5 border border-white/10 text-slate-200 transition-all active:scale-95 cursor-pointer disabled:opacity-50 touch-manipulation"
-                  >
-                    {isTesting ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin text-red-400" />
-                    ) : (
-                      <Play className="w-3.5 h-3.5 text-emerald-400" />
-                    )}
-                    <span>Test Primary</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Row 2: Dynamic Intra-Provider Model Fallback Chain */}
-              <div className="p-3.5 bg-black/40 border border-white/5 rounded-xl space-y-2.5">
-                <div className="flex items-center justify-between gap-2 flex-wrap">
-                  <div className="flex items-center gap-2 text-xs font-semibold text-slate-300">
-                    <Layers className="w-3.5 h-3.5 text-red-400" />
-                    <span>Intra-Provider Model Fallback Chain</span>
-                    <span className="text-[11px] text-slate-500 font-normal">
-                      (Fails over in sequence before switching provider)
-                    </span>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setActiveCatalogProvider(p)}
-                    className="text-xs font-semibold text-red-400 hover:text-red-300 flex items-center gap-1 transition-all cursor-pointer"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Manage Models</span>
-                  </button>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2">
-                  {modelsList.map((m, mIdx) => {
-                    const isPrimary = mIdx === 0;
-                    const isMovingThis = savingAction === `move-model-${p.id}-${mIdx}`;
-                    const isRemovingThis = savingAction === `remove-model-${p.id}-${m}`;
-
-                    return (
-                      <div
-                        key={m}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-mono shadow-sm transition-all ${
-                          isPrimary
-                            ? "bg-red-500/15 text-red-300 border border-red-500/30 font-bold"
-                            : "bg-[#0b101c] text-slate-300 border border-white/10"
-                        } ${isMovingThis || isRemovingThis ? "opacity-75 ring-1 ring-red-400/50" : ""}`}
-                      >
-                        {(isMovingThis || isRemovingThis) ? (
-                          <Loader2 className="w-3 h-3 animate-spin text-red-400 shrink-0" />
-                        ) : (
-                          <span
-                            className={`text-[10px] font-bold ${
-                              isPrimary ? "text-red-400 uppercase font-sans" : "text-slate-500"
-                            }`}
-                          >
-                            {isPrimary ? "#1 PRIMARY" : `#${mIdx + 1}`}
-                          </span>
-                        )}
-
-                        <span
-                          onClick={() => setActiveCatalogProvider(p)}
-                          className="font-bold max-w-[180px] truncate cursor-pointer hover:underline"
-                          title={`${m} (Click to inspect model catalog)`}
-                        >
-                          {m}
-                        </span>
-
-                        <div className="flex items-center gap-0.5 ml-1 border-l border-white/10 pl-1.5">
-                          <button
-                            type="button"
-                            disabled={mIdx === 0 || Boolean(savingAction)}
-                            onClick={() => handleMoveModelInProvider(p.id, mIdx, -1)}
-                            className="p-0.5 text-slate-500 hover:text-white disabled:opacity-20 transition-all cursor-pointer"
-                            title="Move Up / Promote in Chain"
-                          >
-                            <ChevronLeft className="w-3 h-3" />
-                          </button>
-                          <button
-                            type="button"
-                            disabled={mIdx === modelsList.length - 1 || Boolean(savingAction)}
-                            onClick={() => handleMoveModelInProvider(p.id, mIdx, 1)}
-                            className="p-0.5 text-slate-500 hover:text-white disabled:opacity-20 transition-all cursor-pointer"
-                            title="Move Down / Demote in Chain"
-                          >
-                            <ChevronRight className="w-3 h-3" />
-                          </button>
-                          {modelsList.length > 1 && (
-                            <button
-                              type="button"
-                              disabled={Boolean(savingAction)}
-                              onClick={() => handleRemoveModelFromProvider(p.id, m)}
-                              className="p-0.5 text-slate-500 hover:text-rose-400 disabled:opacity-20 transition-all cursor-pointer ml-0.5"
-                              title="Remove model from chain"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Test Status / Error Display */}
-              {result && (
-                <div
-                  className={`p-3 rounded-xl border text-xs space-y-1.5 ${
-                    result.ok
-                      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
-                      : "bg-rose-500/10 border-rose-500/30 text-rose-300"
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5 font-bold">
-                      {result.ok ? (
-                        <>
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                          <span>Ping OK ({result.latencyMs}ms)</span>
-                        </>
-                      ) : (
-                        <>
-                          <AlertTriangle className="w-4 h-4 text-rose-400" />
-                          <span>Ping Failed ({result.latencyMs}ms)</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  <pre className="text-[11px] font-mono bg-black/40 p-2 rounded border border-white/5 whitespace-pre-wrap select-all">
-                    {result.ok ? result.response || "OK" : result.error}
-                  </pre>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Provider Model Catalog Modal */}
       <ProviderModelCatalogModal
-        provider={activeCatalogProvider}
-        isOpen={Boolean(activeCatalogProvider)}
-        onClose={() => setActiveCatalogProvider(null)}
-        onUpdateProvider={handleUpdateSingleProvider}
+        provider={modelsProvider}
+        onClose={() => setModelsFor(null)}
+        onSave={(models) => onSave(modelsProvider ? [toChange(modelsProvider, { models })] : [])}
       />
-
-      {/* Error Details Modal */}
-      {errorModalProvider && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#090d16] border border-rose-500/40 rounded-2xl p-6 max-w-lg w-full space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <div className="flex items-center gap-2 text-rose-400 font-bold text-sm">
-                <AlertCircle className="w-4 h-4" />
-                <span>{errorModalProvider.name} Error Log</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setErrorModalProvider(null)}
-                className="text-slate-400 hover:text-white text-xs cursor-pointer"
-              >
-                Close
-              </button>
-            </div>
-            <pre className="text-xs font-mono text-rose-200 bg-black/60 p-3.5 rounded-xl border border-rose-500/20 leading-relaxed whitespace-pre-wrap select-all max-h-60 overflow-y-auto">
-              {errorModalProvider.lastError}
-            </pre>
-          </div>
-        </div>
-      )}
-    </div>
+      <ErrorDialog provider={byId(errorFor)} onClose={() => setErrorFor(null)} />
+    </>
   );
 }
