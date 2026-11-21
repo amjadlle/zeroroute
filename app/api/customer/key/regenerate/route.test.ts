@@ -42,8 +42,7 @@ it("lets the new key authenticate and rejects the old one", async () => {
   expect(await profileStatus(A.key)).toBe(401);
 });
 
-// BUG: skipped until fixed; details reported privately on #34.
-it.skip("rejects the old key right after rotation even if it was just used", async () => {
+it("rejects the old key right after rotation even if it was just used", async () => {
   expect(await profileStatus(B.key)).toBe(200);
   await rotate(B.key);
   expect(await profileStatus(B.key)).toBe(401);

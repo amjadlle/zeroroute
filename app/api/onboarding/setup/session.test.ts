@@ -61,8 +61,7 @@ it("prefers the cookie session over a key for another customer", async () => {
   expect((await row(B.id)).company).toBeNull();
 });
 
-// BUG: a password under 6 characters is dropped silently and the request still succeeds.
-it.skip("rejects a too-short password instead of ignoring it", async () => {
+it("rejects a too-short password instead of ignoring it", async () => {
   loginAs(A);
   expect((await setup({ password: "123" })).status).toBe(400);
 });

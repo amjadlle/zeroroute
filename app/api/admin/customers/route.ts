@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
-import { resolveAuth } from "@/lib/auth/session";
+import { resolveAuth, invalidateCustomer } from "@/lib/auth/session";
 import { getDb } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -148,6 +148,10 @@ export async function PATCH(request: Request) {
 
     const db = getDb();
     const now = Date.now();
+    // Any change below must apply at once, not after the 30s auth cache expires.
+    const target = await db.execute({ sql: `SELECT id FROM customers WHERE key = ? OR id = ? LIMIT 1`, args: [key || "", id || ""] });
+    const targetId = target.rows[0]?.id as string | undefined;
+    if (targetId) invalidateCustomer(targetId);
 
     if (rotateKey) {
       const custRes = await db.execute({
@@ -173,6 +177,7 @@ export async function PATCH(request: Request) {
         });
       }
 
+      if (targetId) invalidateCustomer(targetId);
       return NextResponse.json({ success: true, newKey });
     }
 
@@ -204,6 +209,7 @@ export async function PATCH(request: Request) {
       }
     }
 
+    if (targetId) invalidateCustomer(targetId);
     return NextResponse.json({ success: true, message: "Customer updated successfully" });
   } catch (err) {
     console.error("[AdminCustomers Patch Error]:", err);

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb, initDb } from "@/lib/db";
 import { getCurrentUser, getCustomerByTokenOrKey } from "@/lib/auth/session";
 import { generateSalt, hashPassword } from "@/lib/auth/password";
+import { MIN_PASSWORD_LENGTH } from "@/lib/constants";
 
 export async function POST(req: NextRequest) {
   try {
@@ -54,7 +55,13 @@ export async function POST(req: NextRequest) {
     let passwordHash = activeCust.password_hash;
     let passwordSalt = activeCust.password_salt;
 
-    if (body.password && body.password.length >= 6) {
+    if (body.password && body.password.length < MIN_PASSWORD_LENGTH) {
+      return NextResponse.json(
+        { error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters.` },
+        { status: 400 }
+      );
+    }
+    if (body.password) {
       passwordSalt = generateSalt();
       passwordHash = hashPassword(body.password, passwordSalt);
     }

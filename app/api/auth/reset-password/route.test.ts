@@ -55,8 +55,7 @@ it("signs out the account's other session", async () => {
   expect((await me(req("/api/auth/me"))).status).toBe(401);
 });
 
-// BUG: skipped until fixed; details reported privately on #34.
-it.skip("signs out the account's other session even if it was just used", async () => {
+it("signs out the account's other session even if it was just used", async () => {
   loginAs(A);
   expect((await me(req("/api/auth/me"))).status).toBe(200);
   await issue();

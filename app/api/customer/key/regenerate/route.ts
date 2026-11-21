@@ -42,10 +42,8 @@ export async function POST(req: NextRequest) {
       args: [newKey, customer.key],
     });
 
-    const { invalidateSessionCache, invalidateCustomerLookupCache } = await import("@/lib/auth/session");
-    if (customer.session_token) invalidateSessionCache(customer.session_token);
-    invalidateCustomerLookupCache(customer.key);
-    invalidateCustomerLookupCache(newKey);
+    const { invalidateCustomer } = await import("@/lib/auth/session");
+    invalidateCustomer(customer.id);
 
     return NextResponse.json({
       success: true,

@@ -7,7 +7,7 @@ import {
 } from "@/lib/auth/password";
 import { MIN_PASSWORD_LENGTH } from "@/lib/constants";
 import { isRateLimited, getClientIp } from "@/lib/auth/rate-limit";
-import { SESSION_COOKIE_NAME } from "@/lib/auth/session";
+import { SESSION_COOKIE_NAME, invalidateCustomer } from "@/lib/auth/session";
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req.headers);
@@ -94,6 +94,10 @@ export async function POST(req: NextRequest) {
       `,
       args: [passwordHash, salt, sessionToken, now, email],
     });
+
+    // Sign out the old session everywhere this instance has it cached.
+    const { rows } = await db.execute({ sql: "SELECT id FROM customers WHERE email = ?", args: [email] });
+    if (rows[0]?.id) invalidateCustomer(rows[0].id as string);
 
     // Clean up OTP
     await db.execute({ sql: "DELETE FROM auth_otps WHERE email = ?", args: [email] });

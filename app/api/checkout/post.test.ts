@@ -4,7 +4,7 @@ import { GET, POST } from "./route";
 
 let ip = 0;
 const checkout = (body?: string, from = `198.51.100.${++ip}`) =>
-  POST(new NextRequest("http://localhost/api/checkout", { method: "POST", headers: { "x-forwarded-for": from }, body }));
+  POST(new NextRequest("http://localhost/api/checkout", { method: "POST", headers: { "x-real-ip": from }, body }));
 const sentBody = (f: ReturnType<typeof vi.fn>) => JSON.parse((f.mock.calls[0] as unknown as [string, RequestInit])[1].body as string);
 
 beforeEach(() => {
@@ -86,8 +86,7 @@ it("rate-limits one client to ten checkouts a minute", async () => {
   expect(statuses[10]).toBe(429);
 });
 
-// BUG: skipped until fixed; details reported privately on #34.
-it.skip("rate-limits by the platform's client IP header", async () => {
+it("rate-limits by the platform's client IP header", async () => {
   vi.stubGlobal("fetch", vi.fn(async () => Response.json({ checkout_url: "https://checkout.test/s" })));
   const statuses = [];
   for (let i = 0; i < 11; i++) {

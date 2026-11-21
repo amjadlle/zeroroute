@@ -70,6 +70,17 @@ export function invalidateCustomerLookupCache(tokenOrKey?: string) {
   }
 }
 
+/**
+ * Drops every cached entry for one customer (cookie session, API key, bot id, lookups), so a key
+ * rotation, password reset or status change takes effect on this instance at once.
+ * Linear scan over both caches; fine at current sizes. Upgrade path: index entries by customer id.
+ */
+export function invalidateCustomer(customerId: string) {
+  for (const cache of [sessionCache, customerLookupCache] as Map<string, { customer: Customer }>[]) {
+    for (const [k, v] of cache) if (v.customer.id === customerId) cache.delete(k);
+  }
+}
+
 export async function getCurrentUser(): Promise<Customer | null> {
   const cookieStore = await cookies();
   const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
