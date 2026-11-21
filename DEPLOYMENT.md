@@ -64,10 +64,7 @@ npm run start
    ```bash
    npx wrangler d1 create zeroroute-production
    ```
-2. Run database migration:
-   ```bash
-   npx wrangler d1 execute zeroroute-production --file=./scripts/schema.sql
-   ```
+2. No manual migration: the app creates its tables on first use from `lib/db/schema.ts`.
 3. Deploy:
    ```bash
    npx @opennextjs/cloudflare

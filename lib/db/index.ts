@@ -1,6 +1,7 @@
 import { createClient, Client, InStatement } from "@libsql/client";
 import path from "path";
 import fs from "fs";
+import { SCHEMA_INDEXES, SCHEMA_TABLES } from "./schema";
 
 export interface QueryResult {
   rows: Record<string, unknown>[];
@@ -74,9 +75,9 @@ class LibSqlAdapter implements DatabaseAdapter {
 }
 
 let activeAdapter: DatabaseAdapter | null = null;
-let initialized = false;
 
-export const getDb = (): DatabaseAdapter => {
+// The raw connection, without the schema guard. Only initDb uses it directly.
+const connect = (): DatabaseAdapter => {
   if (activeAdapter) return activeAdapter;
 
   const cfAccountId = process.env.CLOUDFLARE_ACCOUNT_ID;
@@ -107,130 +108,29 @@ export const getDb = (): DatabaseAdapter => {
   return activeAdapter;
 };
 
+// Every query waits for the schema, so no route can reach a fresh database before initDb has run.
+// Once init has succeeded this is one already-resolved await per query.
+const guardedDb: DatabaseAdapter = {
+  execute: async stmt => {
+    await initDb();
+    return connect().execute(stmt);
+  },
+};
+
+export const getDb = (): DatabaseAdapter => guardedDb;
+
 let initPromise: Promise<void> | null = null;
 
-export const initDb = async (): Promise<void> => {
-  if (initialized) return;
-  if (initPromise) return initPromise;
+// Memoised per instance. A failed init is forgotten so the next request retries it
+// instead of every request failing until the instance restarts.
+export const initDb = (): Promise<void> =>
+  (initPromise ??= applySchema(connect()).catch(err => {
+    initPromise = null;
+    throw err;
+  }));
 
-  initPromise = (async () => {
-    const db = getDb();
-
-    // Run core table creation concurrently
-    await Promise.all([
-      db.execute(`
-        CREATE TABLE IF NOT EXISTS customers (
-          id TEXT PRIMARY KEY,
-          key TEXT UNIQUE NOT NULL,
-          email TEXT UNIQUE NOT NULL,
-          password_hash TEXT,
-          password_salt TEXT,
-          name TEXT,
-          company TEXT,
-          website TEXT,
-          bot_title TEXT DEFAULT 'ZeroRoute AI',
-          bot_role TEXT DEFAULT 'AI Assistant',
-          tone TEXT DEFAULT 'helpful and concise',
-          greeting TEXT DEFAULT 'Hi there! How can I help you today?',
-          prompts TEXT DEFAULT '[]',
-          persona TEXT,
-          status TEXT DEFAULT 'active',
-          subscription_expires INTEGER,
-          monthly_requests INTEGER DEFAULT 0,
-          monthly_limit INTEGER DEFAULT 10000,
-          period_start INTEGER,
-          period_end INTEGER,
-          bot_id TEXT UNIQUE,
-          allowed_domains TEXT DEFAULT '[]',
-          session_token TEXT,
-          created_at INTEGER NOT NULL,
-          updated_at INTEGER NOT NULL
-        );
-      `),
-      db.execute(`
-        CREATE TABLE IF NOT EXISTS auth_otps (
-          email TEXT PRIMARY KEY,
-          code TEXT NOT NULL,
-          expires_at INTEGER NOT NULL,
-          attempts INTEGER DEFAULT 0
-        );
-      `),
-      db.execute(`
-        CREATE TABLE IF NOT EXISTS knowledge_documents (
-          id TEXT PRIMARY KEY,
-          customer_key TEXT NOT NULL,
-          title TEXT NOT NULL,
-          type TEXT NOT NULL,
-          content TEXT NOT NULL,
-          char_count INTEGER NOT NULL,
-          source_url TEXT,
-          created_at INTEGER NOT NULL
-        );
-      `),
-      db.execute(`
-        CREATE TABLE IF NOT EXISTS request_logs (
-          id TEXT PRIMARY KEY,
-          customer_key TEXT NOT NULL,
-          timestamp INTEGER NOT NULL,
-          origin TEXT,
-          prompt_preview TEXT,
-          response_preview TEXT,
-          provider TEXT NOT NULL,
-          model TEXT NOT NULL,
-          latency_ms INTEGER NOT NULL,
-          status INTEGER NOT NULL,
-          is_stream INTEGER DEFAULT 0,
-          is_cache_hit INTEGER DEFAULT 0,
-          failovers TEXT DEFAULT '[]',
-          prompt_tokens INTEGER DEFAULT 0,
-          completion_tokens INTEGER DEFAULT 0,
-          total_tokens INTEGER DEFAULT 0
-        );
-      `),
-      db.execute(`
-        CREATE TABLE IF NOT EXISTS checkout_claims (
-          id TEXT PRIMARY KEY,
-          email TEXT NOT NULL,
-          claimed_at INTEGER NOT NULL
-        );
-      `),
-      db.execute(`
-        CREATE TABLE IF NOT EXISTS provider_configs (
-          id TEXT PRIMARY KEY,
-          name TEXT NOT NULL,
-          enabled INTEGER DEFAULT 1,
-          priority INTEGER DEFAULT 1,
-          sort_order INTEGER DEFAULT 1,
-          primary_model TEXT NOT NULL,
-          models TEXT NOT NULL,
-          updated_at INTEGER NOT NULL
-        );
-      `),
-    ]);
-
-    // Create indexes concurrently
-    await Promise.allSettled([
-      db.execute(`CREATE INDEX IF NOT EXISTS idx_customers_email ON customers(email);`),
-      db.execute(`CREATE INDEX IF NOT EXISTS idx_customers_key ON customers(key);`),
-      db.execute(`CREATE INDEX IF NOT EXISTS idx_customers_bot_id ON customers(bot_id);`),
-      db.execute(`CREATE INDEX IF NOT EXISTS idx_customers_created ON customers(created_at DESC);`),
-      db.execute(`CREATE INDEX IF NOT EXISTS idx_knowledge_customer ON knowledge_documents(customer_key);`),
-      db.execute(`CREATE INDEX IF NOT EXISTS idx_knowledge_created ON knowledge_documents(created_at);`),
-      db.execute(`CREATE INDEX IF NOT EXISTS idx_knowledge_type ON knowledge_documents(type);`),
-      db.execute(`CREATE INDEX IF NOT EXISTS idx_logs_customer ON request_logs(customer_key);`),
-      db.execute(`CREATE INDEX IF NOT EXISTS idx_logs_timestamp ON request_logs(timestamp DESC);`),
-      db.execute(`CREATE INDEX IF NOT EXISTS idx_logs_origin ON request_logs(origin);`),
-      db.execute(`CREATE INDEX IF NOT EXISTS idx_logs_provider ON request_logs(provider);`),
-      db.execute(`CREATE INDEX IF NOT EXISTS idx_logs_status ON request_logs(status);`),
-    ]);
-
-    // Auto-upgrade existing customers to 10,000 monthly limit
-    try {
-      await db.execute(`UPDATE customers SET monthly_limit = 10000 WHERE monthly_limit = 2000 OR monthly_limit IS NULL;`);
-    } catch {}
-
-    initialized = true;
-  })();
-
-  return initPromise;
-};
+async function applySchema(db: DatabaseAdapter): Promise<void> {
+  await Promise.all(SCHEMA_TABLES.map(sql => db.execute(sql)));
+  // allSettled: an index on a column an old database does not have yet must not block startup.
+  await Promise.allSettled(SCHEMA_INDEXES.map(sql => db.execute(sql)));
+}
