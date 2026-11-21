@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, JetBrains_Mono, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -14,6 +14,22 @@ const jetbrains = JetBrains_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+// Console fonts (Graphite+, issue #1). Exposed as CSS variables only; the font-ui / font-ui-mono
+// tokens in globals.css read them. The landing page keeps Plus Jakarta Sans.
+const geist = Geist({
+  variable: "--font-geist",
+  preload: false, // unused on the landing page; loads when a console element uses font-ui
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  preload: false,
+  subsets: ["latin"],
   display: "swap",
 });
 
@@ -93,7 +109,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`dark scroll-smooth ${jakarta.variable} ${jetbrains.variable}`}>
+    <html lang="en" className={`dark scroll-smooth ${jakarta.variable} ${jetbrains.variable} ${geist.variable} ${geistMono.variable}`}>
       <body className="bg-dark-bg text-slate-100 min-h-screen font-sans antialiased selection:bg-red-500 selection:text-white">
         <div className="fixed inset-0 grid-pattern pointer-events-none z-0" />
         <div className="relative z-10 flex flex-col min-h-screen">

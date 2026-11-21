@@ -5,10 +5,7 @@ import { tokenContrastReport } from "../lib/contrast.ts";
 
 const { rows, failures } = tokenContrastReport(readFileSync(new URL("../app/globals.css", import.meta.url), "utf8"));
 const cell = (r, min) => `${r.toFixed(2)}${r < min ? " **FAIL**" : ""}`;
-console.log("| Foreground | Background | Min | Dark A | Light A | Dark B | Light B |\n|---|---|---|---|---|---|---|");
-for (const { fg, bg, min, a, b } of rows) {
-  const bCells = b ? b.map((r) => cell(r, min)) : ["= A", "= A"];
-  console.log(`| ${fg} | ${bg} | ${min}:1 | ${[...a.map((r) => cell(r, min)), ...bCells].join(" | ")} |`);
-}
-console.log(failures.length ? `\n${failures.length} pair(s) below AA` : `\nAll ${rows.length} pairs pass WCAG AA in both themes and both accents.`);
+console.log("| Foreground | Background | Min | Dark | Light |\n|---|---|---|---|---|");
+for (const { fg, bg, min, dark, light } of rows) console.log(`| ${fg} | ${bg} | ${min}:1 | ${cell(dark, min)} | ${cell(light, min)} |`);
+console.log(failures.length ? `\n${failures.length} pair(s) below AA` : `\nAll ${rows.length} pairs pass WCAG AA in both themes.`);
 process.exitCode = failures.length ? 1 : 0;

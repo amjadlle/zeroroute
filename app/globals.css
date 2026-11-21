@@ -1,31 +1,34 @@
 @import "tailwindcss";
 
 /*
- * ZeroRoute design tokens (issue #1). Components use these, never raw hex.
+ * ZeroRoute design tokens (issue #1). Direction: Graphite+ (docs/adr/0001-console-design-direction.md).
+ * Components use these, never raw colour values.
  *
- * Colour (semantic, utilities: bg-*, text-*, border-*, ring-*):
+ * Colour (semantic, utilities: bg-*, text-*, border-*, ring-*), all OKLCH:
  *   bg                    page background
  *   surface               cards and panels
  *   surface-raised        popovers, menus, hovered rows
  *   surface-sunken        inputs, code blocks, wells
  *   border / border-strong  dividers / control outlines (border-strong is >= 3:1 on surfaces)
  *   text / text-muted / text-subtle   primary / secondary / meta text (all >= 4.5:1 on every surface)
- *   accent, accent-hover, accent-fg   the one brand colour; accent-fg is text on an accent fill
+ *   accent, accent-hover, accent-fg   Iris (hue 277); accent-fg is text on an accent fill. Use the accent only
+ *                         for primary actions, the active nav item, focus rings, switches and charts.
  *   success | warning | danger | info  solid (icons, dots, fills), -soft (tinted bg), -fg (text on -soft or surface)
  *   focus-ring            :focus-visible outline
- *   Red is danger only. Use text-white on a bg-danger fill (destructive button).
+ *   Neutrals carry a faint Iris tint (chroma .009). Red is danger only; use text-white on a bg-danger fill.
  *
  * Themes: every colour is light-dark(LIGHT, DARK). The used `color-scheme` picks the value:
  *   dark by default, light when the OS prefers light, and data-theme="dark" | "light" forces one.
- * Accents: A (indigo) is the default; data-accent="b" (teal) is a comparison option until the owner picks.
- *   Put data-theme / data-accent on <html>: Lightning CSS compiles light-dark() to --lightningcss-*
- *   fallbacks that resolve where the token is declared (:root), so a nested wrapper will not re-theme.
+ *   Put data-theme on <html>: Lightning CSS compiles light-dark() to --lightningcss-* fallbacks that
+ *   resolve where the token is declared (:root), so a nested wrapper will not re-theme.
  *
- * Type:    text-meta 12px (minimum), text-body 14px (default UI text), text-body-lg 16px,
- *          text-title 18px, text-heading 24px, text-display 32px.
- * Space:   Tailwind's 4px scale (p-1 = 4px, p-2 = 8px, ...). Control heights: h-control-sm 32px,
- *          h-control-md 36px, h-control-lg 40px.
- * Radius:  rounded-control 8px (buttons, inputs), rounded-card 12px (cards, dialogs), rounded-full (pills).
+ * Fonts:   font-ui (Geist) and font-ui-mono (Geist Mono) for the consoles. The landing page keeps
+ *          font-sans (Plus Jakarta Sans) and font-mono (JetBrains Mono); the console shell (#9) applies font-ui.
+ * Type:    text-meta 12px (minimum), text-body 13.5px (default console text), text-body-lg 15px,
+ *          text-title 17px, text-heading 22px, text-display 28px.
+ * Space:   Tailwind's 4px scale (p-1 = 4px, p-2 = 8px, ...). Control heights: h-control-sm 26px,
+ *          h-control-md 32px (default), h-control-lg 36px.
+ * Radius:  rounded-control 6px (buttons, inputs), rounded-card 10px (cards, dialogs), rounded-full (pills).
  * Shadow:  shadow-raised (menus, popovers), shadow-overlay (dialogs).
  * Motion:  infinite pulses/pings/bounces and the marquee stop under prefers-reduced-motion (see bottom).
  *
@@ -48,66 +51,62 @@
 }
 
 /* `static` keeps every token on :root even when no utility uses it yet (inline styles, /design probes). */
+/* `static` keeps every token on :root even when no utility uses it yet (inline styles, /design probes). */
 @theme static {
-  /*                          light      dark    */
-  --color-bg:             light-dark(#fafafa, #09090b);
-  --color-surface:        light-dark(#ffffff, #111113);
-  --color-surface-raised: light-dark(#ffffff, #1b1b1f);
-  --color-surface-sunken: light-dark(#f2f2f4, #060607);
-  --color-border:         light-dark(#e4e4e7, #27272a);
-  --color-border-strong:  light-dark(#8a8a93, #686871);
-  --color-text:           light-dark(#18181b, #f4f4f5);
-  --color-text-muted:     light-dark(#4f4f57, #b4b4bc);
-  --color-text-subtle:    light-dark(#65656e, #8f8f98);
+  --font-ui: var(--font-geist), "Geist", system-ui, sans-serif;
+  --font-ui-mono: var(--font-geist-mono), "Geist Mono", ui-monospace, monospace;
 
-  --color-accent:       light-dark(#4f46e5, #818cf8);
-  --color-accent-hover: light-dark(#4338ca, #a5b4fc);
-  --color-accent-fg:    light-dark(#ffffff, #0c0c1d);
-  --color-focus-ring:   light-dark(#4f46e5, #818cf8);
+  /*                      light                   dark                  */
+  --color-bg:             light-dark(oklch(.985 .009 277), oklch(.165 .009 277));
+  --color-surface:        light-dark(oklch(1 0 0),         oklch(.198 .009 277));
+  --color-surface-raised: light-dark(oklch(1 0 0),         oklch(.232 .009 277));
+  --color-surface-sunken: light-dark(oklch(.965 .009 277), oklch(.145 .009 277));
+  --color-border:         light-dark(oklch(.912 .009 277), oklch(.28 .009 277));
+  --color-border-strong:  light-dark(oklch(.64 .01 277),   oklch(.53 .01 277));
+  --color-text:           light-dark(oklch(.21 .012 277),  oklch(.965 .005 277));
+  --color-text-muted:     light-dark(oklch(.45 .014 277),  oklch(.75 .01 277));
+  --color-text-subtle:    light-dark(oklch(.52 .012 277),  oklch(.68 .01 277));
 
-  --color-success:      light-dark(#16a34a, #22c55e);
-  --color-success-soft: light-dark(#dcfce7, #0b2616);
-  --color-success-fg:   light-dark(#166534, #4ade80);
-  --color-warning:      light-dark(#d97706, #f59e0b);
-  --color-warning-soft: light-dark(#fef3c7, #2a1c05);
-  --color-warning-fg:   light-dark(#92400e, #fbbf24);
-  --color-danger:       light-dark(#dc2626, #dc2626);
-  --color-danger-soft:  light-dark(#fee2e2, #2d0f10);
-  --color-danger-fg:    light-dark(#b91c1c, #f87171);
-  --color-info:         light-dark(#0284c7, #0ea5e9);
-  --color-info-soft:    light-dark(#e0f2fe, #072235);
-  --color-info-fg:      light-dark(#075985, #38bdf8);
+  --color-accent:       light-dark(oklch(.52 .17 277),  oklch(.76 .17 277));
+  --color-accent-hover: light-dark(oklch(.47 .17 277),  oklch(.81 .17 277));
+  --color-accent-fg:    light-dark(oklch(.99 .005 277), oklch(.19 .04 277));
+  --color-focus-ring:   light-dark(oklch(.52 .17 277),  oklch(.76 .17 277));
+
+  --color-success:      light-dark(oklch(.5 .13 152),  oklch(.79 .15 152));
+  --color-success-soft: light-dark(oklch(.95 .04 152), oklch(.25 .04 152));
+  --color-success-fg:   light-dark(oklch(.45 .12 152), oklch(.79 .15 152));
+  --color-warning:      light-dark(oklch(.6 .14 66),   oklch(.83 .14 80));
+  --color-warning-soft: light-dark(oklch(.96 .05 80),  oklch(.26 .04 80));
+  --color-warning-fg:   light-dark(oklch(.47 .11 66),  oklch(.83 .14 80));
+  --color-danger:       light-dark(oklch(.52 .19 27),  oklch(.56 .2 27));
+  --color-danger-soft:  light-dark(oklch(.95 .03 25),  oklch(.25 .05 25));
+  --color-danger-fg:    light-dark(oklch(.5 .19 27),   oklch(.75 .16 25));
+  --color-info:         light-dark(oklch(.5 .13 240),  oklch(.79 .12 240));
+  --color-info-soft:    light-dark(oklch(.95 .03 240), oklch(.25 .04 240));
+  --color-info-fg:      light-dark(oklch(.47 .13 240), oklch(.79 .12 240));
 
   --text-meta: 0.75rem;
   --text-meta--line-height: 1rem;
-  --text-body: 0.875rem;
-  --text-body--line-height: 1.375rem;
-  --text-body-lg: 1rem;
-  --text-body-lg--line-height: 1.5rem;
-  --text-title: 1.125rem;
-  --text-title--line-height: 1.625rem;
-  --text-heading: 1.5rem;
-  --text-heading--line-height: 2rem;
-  --text-display: 2rem;
-  --text-display--line-height: 2.5rem;
+  --text-body: 0.84375rem;
+  --text-body--line-height: 1.25rem;
+  --text-body-lg: 0.9375rem;
+  --text-body-lg--line-height: 1.375rem;
+  --text-title: 1.0625rem;
+  --text-title--line-height: 1.5rem;
+  --text-heading: 1.375rem;
+  --text-heading--line-height: 1.75rem;
+  --text-display: 1.75rem;
+  --text-display--line-height: 2.125rem;
 
-  --spacing-control-sm: 2rem;
-  --spacing-control-md: 2.25rem;
-  --spacing-control-lg: 2.5rem;
+  --spacing-control-sm: 1.625rem;
+  --spacing-control-md: 2rem;
+  --spacing-control-lg: 2.25rem;
 
-  --radius-control: 0.5rem;
-  --radius-card: 0.75rem;
+  --radius-control: 0.375rem;
+  --radius-card: 0.625rem;
 
-  --shadow-raised: 0 4px 12px -2px rgb(0 0 0 / 0.25), 0 2px 4px -2px rgb(0 0 0 / 0.15);
-  --shadow-overlay: 0 24px 48px -12px rgb(0 0 0 / 0.45);
-}
-
-/* Accent option B (teal), for the owner to compare against A. */
-[data-accent="b"] {
-  --color-accent:       light-dark(#0f766e, #2dd4bf);
-  --color-accent-hover: light-dark(#115e59, #5eead4);
-  --color-accent-fg:    light-dark(#ffffff, #04211f);
-  --color-focus-ring:   light-dark(#0f766e, #2dd4bf);
+  --shadow-raised: 0 4px 12px -2px oklch(.1 .02 277 / .25), 0 2px 4px -2px oklch(.1 .02 277 / .12);
+  --shadow-overlay: 0 18px 48px -12px oklch(.1 .02 277 / .35), 0 2px 6px oklch(.1 .02 277 / .12);
 }
 
 :root { color-scheme: dark; }

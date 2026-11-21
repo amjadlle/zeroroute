@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { CONTRAST_PAIRS, contrastRatio } from "@/lib/contrast";
 
 type Theme = "system" | "dark" | "light";
-type Accent = "a" | "b";
 
 const SWATCHES = [
   ["Neutrals", ["bg", "surface", "surface-raised", "surface-sunken", "border", "border-strong", "text", "text-muted", "text-subtle"]],
@@ -13,11 +12,11 @@ const SWATCHES = [
 ] as const;
 
 const TYPE_SCALE = [
-  ["text-display", "Display 32/40", "text-display font-bold"],
-  ["text-heading", "Heading 24/32", "text-heading font-semibold"],
-  ["text-title", "Title 18/26", "text-title font-semibold"],
-  ["text-body-lg", "Body large 16/24", "text-body-lg"],
-  ["text-body", "Body 14/22 (default UI text)", "text-body"],
+  ["text-display", "Display 28/34", "text-display font-semibold tracking-tight"],
+  ["text-heading", "Heading 22/28", "text-heading font-semibold tracking-tight"],
+  ["text-title", "Title 17/24", "text-title font-semibold"],
+  ["text-body-lg", "Body large 15/22", "text-body-lg"],
+  ["text-body", "Body 13.5/20 (default console text)", "text-body"],
   ["text-meta", "Meta 12/16 (minimum size)", "text-meta text-text-muted"],
 ] as const;
 
@@ -52,23 +51,26 @@ function Segmented<T extends string>({ label, value, options, onChange }: {
 
 export function DesignPreview() {
   const [theme, setTheme] = useState<Theme>("system");
-  const [accent, setAccent] = useState<Accent>("a");
   const pairsRef = useRef<HTMLTableSectionElement>(null);
 
   useEffect(() => {
     const root = document.documentElement;
     if (theme === "system") root.removeAttribute("data-theme");
     else root.setAttribute("data-theme", theme);
-    if (accent === "a") root.removeAttribute("data-accent");
-    else root.setAttribute("data-accent", accent);
 
     // Measure the colours the browser actually resolved, so the ratios always match the live theme.
     const measure = () =>
       pairsRef.current?.querySelectorAll<HTMLElement>("[data-sample]").forEach((el) => {
         const { color, backgroundColor } = getComputedStyle(el);
-        const ratio = contrastRatio(color, backgroundColor);
         const min = Number(el.dataset.min);
         const out = el.closest("tr")!.querySelector("output")!;
+        let ratio: number;
+        try {
+          ratio = contrastRatio(color, backgroundColor);
+        } catch {
+          out.textContent = `n/a (${color})`;
+          return;
+        }
         out.textContent = `${ratio.toFixed(2)} ${ratio >= min ? "pass" : "FAIL"}`;
         out.className = ratio >= min ? "text-success-fg" : "text-danger-fg font-bold";
       });
@@ -78,22 +80,18 @@ export function DesignPreview() {
     return () => {
       media.removeEventListener("change", measure);
       root.removeAttribute("data-theme");
-      root.removeAttribute("data-accent");
     };
-  }, [theme, accent]);
+  }, [theme]);
 
   return (
-    <main className="min-h-screen bg-bg text-text text-body">
+    <main className="min-h-screen bg-bg text-text text-body font-ui">
       <header className="border-b border-border bg-surface">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-title font-semibold">Design tokens</h1>
-            <p className="text-meta text-text-subtle">Dev-only preview. 404 in production.</p>
+            <p className="text-meta text-text-subtle">Graphite+ · Iris accent · Geist. Dev-only preview, 404 in production.</p>
           </div>
-          <div className="flex flex-wrap gap-4">
-            <Segmented label="Theme" value={theme} onChange={setTheme} options={[["system", "System"], ["dark", "Dark"], ["light", "Light"]]} />
-            <Segmented label="Accent" value={accent} onChange={setAccent} options={[["a", "A · Indigo"], ["b", "B · Teal"]]} />
-          </div>
+          <Segmented label="Theme" value={theme} onChange={setTheme} options={[["system", "System"], ["dark", "Dark"], ["light", "Light"]]} />
         </div>
       </header>
 
@@ -142,7 +140,7 @@ export function DesignPreview() {
                     </td>
                     <td className="px-3 py-2"><code className="text-meta">{fg}</code> <span className="text-text-subtle">on</span> <code className="text-meta">{bg}</code></td>
                     <td className="px-3 py-2 text-text-muted">{min}:1</td>
-                    <td className="px-3 py-2 font-mono text-meta"><output /></td>
+                    <td className="px-3 py-2 font-ui-mono text-meta"><output /></td>
                   </tr>
                 ))}
               </tbody>
@@ -168,7 +166,7 @@ export function DesignPreview() {
             <h3 className="text-title font-semibold">Control heights</h3>
             {(["sm", "md", "lg"] as const).map((s) => (
               <div key={s} className={`${{ sm: "h-control-sm", md: "h-control-md", lg: "h-control-lg" }[s]} rounded-control bg-surface-sunken border border-border-strong flex items-center px-3 text-text-muted`}>
-                h-control-{s} · {{ sm: 32, md: 36, lg: 40 }[s]}px
+                h-control-{s} · {{ sm: 26, md: 32, lg: 36 }[s]}px
               </div>
             ))}
           </div>
