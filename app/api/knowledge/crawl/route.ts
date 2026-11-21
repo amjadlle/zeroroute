@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { getDb, initDb } from "@/lib/db";
-import { getCurrentUser, getCustomerByTokenOrKey, resolveAuth } from "@/lib/auth/session";
+import { getCurrentUser, resolveAuth } from "@/lib/auth/session";
 import { crawlSourceUrl } from "@/lib/crawler";
 
 export const dynamic = "force-dynamic";
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
           args: [body.bot_id],
         });
         if (res.rows.length > 0) {
-          targetKey = (res.rows[0] as any).key;
+          targetKey = String(res.rows[0].key);
         }
       }
     }
@@ -50,9 +50,9 @@ export async function POST(req: NextRequest) {
     let crawlResult;
     try {
       crawlResult = await crawlSourceUrl(rawUrl, customTitle);
-    } catch (crawlErr: any) {
+    } catch (crawlErr) {
       return NextResponse.json(
-        { error: crawlErr.message || "Failed to crawl URL. Ensure the page is publicly accessible." },
+        { error: (crawlErr as Error).message || "Failed to crawl URL. Ensure the page is publicly accessible." },
         { status: 422 }
       );
     }
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
 
     let docId: string;
     if (existing.rows && existing.rows.length > 0) {
-      docId = (existing.rows[0] as any).id;
+      docId = String(existing.rows[0].id);
       await db.execute({
         sql: `
           UPDATE knowledge_documents 

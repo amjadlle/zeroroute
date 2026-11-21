@@ -158,7 +158,7 @@ export async function PATCH(request: Request) {
         sql: `SELECT key FROM customers WHERE key = ? OR id = ? LIMIT 1`,
         args: [key || "", id || ""]
       });
-      const oldKey = (custRes.rows[0] as any)?.key;
+      const oldKey = custRes.rows[0]?.key;
       const newKey = `zr_live_${crypto.randomBytes(18).toString("hex")}`;
 
       await db.execute({
@@ -243,8 +243,8 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "Customer not found" }, { status: 404 });
     }
 
-    const targetKey = (custRes.rows[0] as any)?.key;
-    const targetId = (custRes.rows[0] as any)?.id;
+    const targetKey = custRes.rows[0]?.key;
+    const targetId = custRes.rows[0]?.id;
 
     // Purge related request logs and knowledge documents to ensure zero orphaned data
     if (targetKey) {

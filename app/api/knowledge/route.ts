@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser, getCustomerByTokenOrKey, resolveAuth } from "@/lib/auth/session";
+import { getCurrentUser, resolveAuth } from "@/lib/auth/session";
 import { getDb, initDb } from "@/lib/db";
 
-async function resolveTargetKey(req: NextRequest, body?: any): Promise<{ customerKey: string | null; isAdmin: boolean }> {
+async function resolveTargetKey(req: NextRequest, body?: { target_key?: string; bot_id?: string }): Promise<{ customerKey: string | null; isAdmin: boolean }> {
   let customer = await getCurrentUser();
   const authHeader = req.headers.get("authorization") || "";
   const auth = await resolveAuth(authHeader);
@@ -31,7 +31,7 @@ async function resolveTargetKey(req: NextRequest, body?: any): Promise<{ custome
         args: [botId],
       });
       if (res.rows.length > 0) {
-        return { customerKey: (res.rows[0] as any).key, isAdmin: true };
+        return { customerKey: String(res.rows[0].key), isAdmin: true };
       }
     }
   }

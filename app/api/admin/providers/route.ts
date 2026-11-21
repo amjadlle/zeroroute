@@ -39,7 +39,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Invalid payload: providers array expected" }, { status: 400 });
     }
 
-    incomingProviders.forEach((item: any, index: number) => {
+    incomingProviders.forEach((item: { id: string; enabled?: unknown; order?: unknown; models?: unknown; model?: unknown }, index: number) => {
       const existing = runtimeStateMap.get(item.id);
       if (!existing) return;
 

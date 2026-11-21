@@ -1,10 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Zap, MessageSquare, ChevronRight, Sparkles, Check, ShieldCheck } from "lucide-react";
+import { Zap, MessageSquare, ChevronRight, Sparkles, ShieldCheck } from "lucide-react";
 import { APP_VERSION } from "@/lib/version";
 import { PROVIDER_COUNT } from "@/lib/constants";
 import { FREE_REQUESTS, PRO_PRICE, PRO_REQUESTS } from "@/components/landing-facts";
+
+// public/widget.js exposes window.ZeroRoute once it has loaded.
+type ZeroRouteWindow = Window & { ZeroRoute?: { open?: () => void } };
 
 interface HeroProps {
   onOpenCheckout: () => void;
@@ -50,8 +53,8 @@ export function Hero({ onOpenCheckout }: HeroProps) {
           type="button"
           onClick={() => {
             if (typeof window !== "undefined") {
-              if ((window as any).ZeroRoute?.open) {
-                (window as any).ZeroRoute.open();
+              if ((window as ZeroRouteWindow).ZeroRoute?.open) {
+                (window as ZeroRouteWindow).ZeroRoute?.open?.();
               } else {
                 window.dispatchEvent(new CustomEvent("zeroroute:open"));
               }

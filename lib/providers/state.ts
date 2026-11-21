@@ -1,5 +1,5 @@
 import { providers, isProviderConfigured, providerTelemetryMap } from "./providers";
-import type { ProviderRuntimeState } from "./types";
+import type { ProviderRuntimeState, RateLimitTelemetry } from "./types";
 
 export const DEFAULT_PROVIDER_MODELS: Record<string, string[]> = {
   groq: [
@@ -120,7 +120,7 @@ export const getRuntimeProviders = (): ProviderRuntimeState[] =>
 
 export function updateProviderTelemetry(
   providerId: string,
-  telemetry?: any,
+  telemetry?: RateLimitTelemetry,
   latencyMs?: number
 ) {
   const existing = runtimeStateMap.get(providerId);
@@ -162,7 +162,7 @@ export async function loadSavedProviderConfigs(): Promise<void> {
     const res = await db.execute("SELECT * FROM provider_configs");
     configsLoadedAt = Date.now();
     if (res && res.rows && res.rows.length > 0) {
-      res.rows.forEach((row: any) => {
+      res.rows.forEach((row) => {
         const existing = runtimeStateMap.get(row.id as string);
         if (existing) {
           if (row.enabled !== undefined) existing.enabled = Boolean(row.enabled);
@@ -177,7 +177,7 @@ export async function loadSavedProviderConfigs(): Promise<void> {
             try {
               const parsed = typeof modelsVal === "string" ? JSON.parse(modelsVal) : modelsVal;
               if (Array.isArray(parsed) && parsed.length > 0) {
-                existing.models = parsed.map((m: any) => String(m).trim()).filter(Boolean);
+                existing.models = parsed.map((m: unknown) => String(m).trim()).filter(Boolean);
                 if (existing.models.length > 0 && !existing.model) {
                   existing.model = existing.models[0];
                 }
@@ -228,8 +228,8 @@ export async function persistProviderConfigs(items: ProviderRuntimeState[]): Pro
             now
           ]
         });
-      } catch (insertErr: any) {
-        console.warn(`[PersistProviderConfigs Warning for ${item.id}]:`, insertErr.message);
+      } catch (insertErr) {
+        console.warn(`[PersistProviderConfigs Warning for ${item.id}]:`, (insertErr as Error).message);
         try {
           await db.execute(`ALTER TABLE provider_configs ADD COLUMN name TEXT DEFAULT '';`);
           await db.execute(`ALTER TABLE provider_configs ADD COLUMN priority INTEGER DEFAULT 1;`);

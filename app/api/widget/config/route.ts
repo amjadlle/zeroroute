@@ -19,7 +19,7 @@ export async function GET(request: Request) {
       args: [botId]
     });
 
-    const row = res.rows[0] as any;
+    const row = res.rows[0] as Record<string, string | null> | undefined;
     if (!row) {
       if (botId === "demo" || botId === "zeroroute" || botId === "default") {
         return NextResponse.json({

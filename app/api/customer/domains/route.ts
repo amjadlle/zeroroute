@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     const cleanedDomains = Array.from(
       new Set(
         rawDomains
-          .map((d: any) =>
+          .map((d: unknown) =>
             String(d || "")
               .trim()
               .toLowerCase()

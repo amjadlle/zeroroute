@@ -51,9 +51,9 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
     name: "Mistral AI",
     totalCapacity: "$10.00/mo Free Credit (~50M tokens) + Multi-Pool RPMs",
     poolType: "isolated",
-    poolBadge: "🟢 Multi-Bucket Isolated RPMs",
+    poolBadge: "Multi-Bucket Isolated RPMs",
     poolSummary:
-      "Ministral 3B (750 RPM), Codestral (125 RPM), Pixtral (30 RPM), and Nemo (188 RPM) run in distinct speed buckets. $10 free credit resets every 30 days.",
+      "Each model has its own per-minute limit: Ministral 3B 750, Nemo 188, Codestral 125, Pixtral 30 requests. The $10 free credit renews every 30 days.",
     categories: [
       {
         name: "Chat",
@@ -248,9 +248,9 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
     name: "Groq",
     totalCapacity: ">25,000 requests/day",
     poolType: "isolated",
-    poolBadge: "🟢 100% Isolated Model Buckets",
+    poolBadge: "100% Isolated Model Buckets",
     poolSummary:
-      "Every Groq model runs in an independent rate-limit bucket. Consuming quota on one model (e.g. 120B) does NOT drain or affect other models.",
+      "Each Groq model has its own limits, so heavy use of one model (for example the 120B) leaves the others untouched.",
     categories: [
       {
         name: "Chat",
@@ -388,7 +388,7 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
             pool: "Isolated Guard Pool",
             ctx: "512",
             maxOut: "512",
-            kind: "🛡️ Safety Guard",
+            kind: "Safety Guard",
           },
           {
             id: "meta-llama/llama-prompt-guard-2-22m",
@@ -403,7 +403,7 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
             pool: "Isolated Guard Pool",
             ctx: "512",
             maxOut: "512",
-            kind: "🛡️ Safety Guard",
+            kind: "Safety Guard",
           },
           {
             id: "openai/gpt-oss-safeguard-20b",
@@ -440,7 +440,7 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
             isAudio: true,
             ctx: "25MB Audio",
             maxOut: "Audio STT",
-            kind: "🎙️ Audio STT",
+            kind: "Audio STT",
           },
           {
             id: "whisper-large-v3",
@@ -456,7 +456,7 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
             isAudio: true,
             ctx: "25MB Audio",
             maxOut: "Audio STT",
-            kind: "🎙️ Audio STT",
+            kind: "Audio STT",
           },
         ],
       },
@@ -466,9 +466,9 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
     name: "Cloudflare Workers AI",
     totalCapacity: "10,000 Neurons / day (~25k-100k req/day)",
     poolType: "shared",
-    poolBadge: "🟡 Shared 10,000 Neuron Pool",
+    poolBadge: "Shared 10,000 Neuron Pool",
     poolSummary:
-      "All Cloudflare Workers AI models share a single global account allowance of 10,000 Neurons/day. Lightweight models cost ~0.1-0.3 neurons/req, giving up to 100,000 free calls daily. Resets daily at 00:00 UTC.",
+      "All Workers AI models share one daily allowance of 10,000 Neurons. Small models use about 0.1 to 0.3 Neurons per request, so that is up to about 100,000 requests a day. Resets at 00:00 UTC.",
     categories: [
       {
         name: "Chat",
@@ -667,7 +667,7 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
             pool: "Shared Neuron Pool",
             ctx: "1k",
             maxOut: "Translation",
-            kind: "🌐 Translation",
+            kind: "Translation",
           },
           {
             id: "@cf/openai/whisper",
@@ -682,7 +682,7 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
             isAudio: true,
             ctx: "25MB Audio",
             maxOut: "Audio STT",
-            kind: "🎙️ Audio STT",
+            kind: "Audio STT",
           },
         ],
       },
@@ -692,9 +692,9 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
     name: "Cohere",
     totalCapacity: "1,000 Calls / month (40 RPM Throttle)",
     poolType: "shared",
-    poolBadge: "🟡 Shared 1,000 Calls/Month Pool",
+    poolBadge: "Shared 1,000 Calls/Month Pool",
     poolSummary:
-      "All Cohere trial endpoints share a unified monthly allowance of 1,000 API calls and a 40 RPM speed throttle across chat, embed, vision, and rerank.",
+      "All Cohere trial models share 1,000 requests a month and 40 requests a minute, across chat, embed, vision and rerank.",
     categories: [
       {
         name: "Chat and long documents",
@@ -967,9 +967,9 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
     name: "SambaNova Cloud",
     totalCapacity: "Hardware RDU Dedicated Tier-1 Free Allocation",
     poolType: "isolated",
-    poolBadge: "🟢 Dedicated RDU Queue (MiniMax)",
+    poolBadge: "Dedicated RDU Queue (MiniMax)",
     poolSummary:
-      "MiniMax-M2.7 runs on dedicated hardware RDU compute with 100% pass rates (~500ms). High-demand models (70B, 120B, DeepSeek) share an open queue that can throttle during peak hours.",
+      "MiniMax-M2.7 runs on dedicated capacity and usually answers in about 500 ms. The busier models (70B, 120B, DeepSeek) share a queue that can slow down at peak hours.",
     categories: [
       {
         name: "Reliable",
@@ -1088,9 +1088,9 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
     name: "Google Gemini",
     totalCapacity: ">30,000 requests/day (Aggregate Across Model Pools)",
     poolType: "isolated",
-    poolBadge: "🟢 100% Isolated Model Buckets",
+    poolBadge: "100% Isolated Model Buckets",
     poolSummary:
-      "Every Gemini model runs in a separate, dedicated rate-limit bucket. Flash-Lite (500 RPD), Gemma (14,400 RPD), and Frontier Flash (20 RPD) are 100% isolated and never cross-deplete.",
+      "Each Gemini model has its own daily limit: Gemma 14,400, Flash-Lite 500, Flash 20 requests. Using one never reduces another.",
     categories: [
       {
         name: "Fast everyday",
@@ -1339,7 +1339,7 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
             isAudio: true,
             ctx: "20MB Audio",
             maxOut: "Audio STT",
-            kind: "🎙️ Audio STT",
+            kind: "Audio STT",
           },
         ],
       },
@@ -1349,9 +1349,9 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
     name: "OpenRouter",
     totalCapacity: "200 Requests / day (20 RPM Global Free Throttle)",
     poolType: "shared",
-    poolBadge: "🟡 Shared 200 RPD / 20 RPM Pool",
+    poolBadge: "Shared 200 RPD / 20 RPM Pool",
     poolSummary:
-      "All OpenRouter :free models share an account-wide allowance of 200 requests/day and 20 RPM speed throttle. Native 3-model fallback arrays supported.",
+      "All OpenRouter free models share 200 requests a day and 20 requests a minute per account.",
     categories: [
       {
         name: "Chat, reasoning and code",
@@ -1545,7 +1545,7 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
             pool: "Shared Account Pool",
             ctx: "128k",
             maxOut: "4k",
-            kind: "🛡️ Safety Guard",
+            kind: "Safety Guard",
           },
           {
             id: "nvidia/llama-nemotron-embed-vl-1b-v2:free",
@@ -1574,7 +1574,7 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
             isAudio: true,
             ctx: "TTS",
             maxOut: "Audio",
-            kind: "🎙️ Audio STT",
+            kind: "Audio STT",
           },
         ],
       },
@@ -1584,9 +1584,9 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
     name: "NVIDIA NIM",
     totalCapacity: "1,000 Free Credits on Signup",
     poolType: "shared",
-    poolBadge: "🟢 NVIDIA DGX Cloud Accelerators",
+    poolBadge: "NVIDIA DGX Cloud Accelerators",
     poolSummary:
-      "Enterprise containerized microservices running on NVIDIA DGX H100/H200 Tensor Core GPUs. 1,000 trial credits shared across all models.",
+      "Hosted by NVIDIA. All models share 1,000 trial credits.",
     categories: [
       {
         name: "Chat",
@@ -1748,9 +1748,9 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
     name: "Hugging Face Inference",
     totalCapacity: "1,000 req / 5 min (200 RPM, ~288k req/day)",
     poolType: "shared",
-    poolBadge: "🟡 Shared 200 RPM Hub Pool",
+    poolBadge: "Shared 200 RPM Hub Pool",
     poolSummary:
-      "Native serverless inference models share a rolling 200 RPM / 1,000 req per 5 min Hub limit. Extreme throughput for embeddings and classifiers.",
+      "All models share the account limit of 200 requests a minute and 1,000 requests per 5 minutes. Best suited to embeddings and classifiers.",
     categories: [
       {
         name: "Chat",
@@ -1905,9 +1905,9 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
     name: "BazaarLink",
     totalCapacity: "3,700 Points / day (20 RPM Global Limit)",
     poolType: "shared",
-    poolBadge: "🟡 Shared 3,700 Points/Day Pool",
+    poolBadge: "Shared 3,700 Points/Day Pool",
     poolSummary:
-      "All BazaarLink free models share a single global account allowance of 3,700 points/day and 20 RPM limit. Supports built-in multi-model fallback arrays.",
+      "All BazaarLink free models share 3,700 points a day and 20 requests a minute per account.",
     categories: [
       {
         name: "Reasoning and automatic choice",
@@ -1951,9 +1951,9 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
     name: "Cerebras",
     totalCapacity: "Paid / BYOK (Requires Credit Card)",
     poolType: "isolated",
-    poolBadge: "💳 Paid / BYOK Only (No Free Tier)",
+    poolBadge: "Paid / BYOK Only (No Free Tier)",
     poolSummary:
-      "Cerebras does not provide a permanent free tier. Requires adding a verified payment method in cloud.cerebras.ai (returns HTTP 402 otherwise).",
+      "Cerebras has no permanent free tier. Add a payment method at cloud.cerebras.ai, or its requests are refused.",
     categories: [
       {
         name: "Very fast chat",
@@ -1996,9 +1996,9 @@ export const PROVIDER_CATALOGS: Record<string, ProviderCatalog> = {
     name: "IFM AI (MBZUAI)",
     totalCapacity: "50,000,000 Tokens/Day Free · 10,000 RPM · 24M TPM",
     poolType: "isolated",
-    poolBadge: "⚡ Cerebras CS-3 & NVIDIA B200 Superchips",
+    poolBadge: "Cerebras CS-3 & NVIDIA B200 Superchips",
     poolSummary:
-      "MBZUAI frontier foundation models. Powered by Cerebras CS-3 wafer-scale engine (~760 tok/s with chain-of-thought) and AWS NVIDIA Blackwell B200 GPUs. 50M tokens/day free allocation with 3 req/sec burst limit.",
+      "Models from MBZUAI, served on Cerebras and NVIDIA hardware (about 760 tokens a second). Free allowance of 50M tokens a day, up to 3 requests a second.",
     categories: [
       {
         name: "Reasoning",

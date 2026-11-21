@@ -4,6 +4,9 @@ import { Copy, Check, Sparkles, MessageSquare } from "lucide-react";
 import { useCopy } from "@/components/ui/useCopy";
 import { SITE_URL } from "@/lib/constants";
 
+// public/widget.js exposes window.ZeroRoute once it has loaded.
+type ZeroRouteWindow = Window & { ZeroRoute?: { open?: () => void } };
+
 export function ChatWidgetSection() {
   const widgetScript = `<script 
   src="${SITE_URL}/widget.js" 
@@ -84,8 +87,8 @@ export function ChatWidgetSection() {
             type="button"
             onClick={() => {
               if (typeof window !== "undefined") {
-                if ((window as any).ZeroRoute?.open) {
-                  (window as any).ZeroRoute.open();
+                if ((window as ZeroRouteWindow).ZeroRoute?.open) {
+                  (window as ZeroRouteWindow).ZeroRoute?.open?.();
                 } else {
                   window.dispatchEvent(new CustomEvent("zeroroute:open"));
                 }

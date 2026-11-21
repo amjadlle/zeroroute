@@ -29,7 +29,7 @@ async function runFullSuite() {
   let passed = 0;
   let failed = 0;
 
-  function assert(condition: boolean, name: string, detail?: any) {
+  function assert(condition: boolean, name: string, detail?: unknown) {
     if (condition) {
       console.log(`✅ PASS: ${name}`);
       passed++;

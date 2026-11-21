@@ -96,7 +96,7 @@ export async function POST(request: Request) {
       });
 
       const dataStatus = (data.status || "").toLowerCase();
-      const existing = existingRes.rows[0] as any;
+      const existing = existingRes.rows[0] as Record<string, string | null> | undefined;
       const now = Date.now();
 
       // Check event categories accurately

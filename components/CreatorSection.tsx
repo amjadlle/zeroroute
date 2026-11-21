@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 export function CreatorSection() {
   return (
     <section className="max-w-4xl mx-auto pt-4">
@@ -11,6 +9,7 @@ export function CreatorSection() {
         <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6 sm:gap-8">
           {/* Avatar Headshot */}
           <div className="relative shrink-0">
+            {/* eslint-disable-next-line @next/next/no-img-element -- one external avatar; next/image would need a remotePatterns entry for its host */}
             <img
               src="https://doting-octopus-124.convex.cloud/api/storage/730e2173-8a2f-4d38-8976-7624a53bbc88"
               alt="Amjad P A"
