@@ -133,6 +133,13 @@ export const initDb = (): Promise<void> =>
 
 async function applySchema(db: DatabaseAdapter): Promise<void> {
   await Promise.all(SCHEMA_TABLES.map(sql => db.execute(sql)));
+  // Additive columns for databases created before them. SQLite has no ADD COLUMN IF NOT EXISTS: a rerun
+  // fails with "duplicate column", which is ignored, so this stays idempotent.
+  for (const col of ["brand_color TEXT", "logo_url TEXT"]) {
+    try {
+      await db.execute(`ALTER TABLE customers ADD COLUMN ${col};`);
+    } catch {}
+  }
   // allSettled: an index on a column an old database does not have yet must not block startup.
   await Promise.allSettled(SCHEMA_INDEXES.map(sql => db.execute(sql)));
 }
