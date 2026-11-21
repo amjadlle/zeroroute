@@ -1,35 +1,47 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { isMasterAdminKey, getCachedCustomer, setCachedCustomer } from "@/lib/auth/session";
 import { getDb } from "@/lib/db";
-import { isRateLimited } from "@/lib/auth/rate-limit";
+import { isRateLimited, getClientIp } from "@/lib/auth/rate-limit";
 import { getEligibleProviders, TIMEOUT_MS, COOLDOWN_MS } from "@/lib/providers/state";
 import { responseCache } from "@/lib/providers/cache";
 import { buildDynamicSystemPrompt, retrieveKnowledgeContext, getDefaultLandingKnowledge } from "@/lib/providers/rag";
+import { CHAT_LIMITS, chatBodyError, isDemoOrigin, isHostAllowed, isSameOrigin } from "@/lib/providers/gateway";
 import type { ChatRequest, ChatResponse } from "@/lib/providers/types";
 
 export const dynamic = "force-dynamic";
 
-const getCorsHeaders = (origin: string | null) => ({
-  "Access-Control-Allow-Origin": origin || "*",
+// No credentials: cross-origin callers authenticate with a bearer key or bot id, never cookies.
+const corsHdrs = {
+  "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Bot-Id",
-  "Access-Control-Allow-Credentials": "true"
-});
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Bot-Id"
+};
 
-export async function OPTIONS(request: Request) {
-  const origin = request.headers.get("origin");
+// Per-minute limits for the public widget/demo path (bot ids are public).
+const WIDGET_IP_LIMIT = 30;
+const DEMO_IP_LIMIT = 15;
+const WIDGET_BOT_LIMIT = 300;
+
+export async function OPTIONS() {
   return new NextResponse(null, {
     status: 204,
-    headers: getCorsHeaders(origin)
+    headers: corsHdrs
   });
 }
 
 export async function POST(request: Request) {
   const startTime = Date.now();
   const origin = request.headers.get("origin") || request.headers.get("referer") || "Direct API";
-  const corsHdrs = getCorsHeaders(origin);
   const db = getDb();
+
+  if (Number(request.headers.get("content-length") || 0) > CHAT_LIMITS.maxBodyBytes) {
+    return NextResponse.json(
+      { error: { message: "Request body too large" } },
+      { status: 413, headers: corsHdrs }
+    );
+  }
 
   // Extract authentication tokens
   const authHeader = request.headers.get("authorization") || "";
@@ -47,20 +59,33 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!Array.isArray(body.messages) || body.messages.length === 0) {
+  const bodyError = chatBodyError(body || {});
+  if (bodyError) {
     return NextResponse.json(
-      { error: { message: "messages must be a non-empty array" } },
-      { status: 400, headers: corsHdrs }
+      { error: { message: bodyError.message } },
+      { status: bodyError.status, headers: corsHdrs }
     );
   }
+  if (body.max_tokens !== undefined) body.max_tokens = Math.min(body.max_tokens, CHAT_LIMITS.maxTokens);
 
   const rawBotId = xBotId || body.bot_id || (bearerToken.startsWith("bot_") ? bearerToken : undefined);
   let customerKey = bearerToken.startsWith("zr_live_") ? bearerToken : undefined;
 
+  // Ceiling: isRateLimited is an in-memory Map, so these limits are per server instance
+  // (N instances allow N x limit). Upgrade path: move the counters to a shared store
+  // (Redis/Upstash or a DB counter table) keyed the same way.
+  const isWidgetCall = Boolean(rawBotId) && !isMasterKey && !customerKey;
+  if (isWidgetCall && isRateLimited(`widget_ip:${getClientIp(request.headers)}`, rawBotId === "demo" ? DEMO_IP_LIMIT : WIDGET_IP_LIMIT, 60_000)) {
+    return NextResponse.json(
+      { error: { message: "Too many messages. Please wait a minute and try again.", type: "rate_limited" } },
+      { status: 429, headers: { ...corsHdrs, "Retry-After": "60" } }
+    );
+  }
+
   let customer: any = null;
 
-  // Check cookie session fallback if no bearer token provided (e.g. Admin Playground or App Dashboard)
-  if (!bearerToken && !isMasterKey && !rawBotId) {
+  // Cookie session fallback (Admin Playground / App Dashboard): same-origin calls only.
+  if (!bearerToken && !isMasterKey && !rawBotId && isSameOrigin(request.headers.get("origin"), new URL(request.url).host)) {
     try {
       const { getCurrentUser } = await import("@/lib/auth/session");
       const user = await getCurrentUser();
@@ -151,14 +176,7 @@ export async function POST(request: Request) {
 
   // 3. Demo Bot Validation (Strictly locked to official ZeroRoute website)
   if (rawBotId === "demo") {
-    const callerOrigin = (request.headers.get("origin") || request.headers.get("referer") || "").toLowerCase();
-    const isOfficialSite =
-      callerOrigin.includes("zeroroute.mapki.in") ||
-      callerOrigin.includes("mapki.in") ||
-      callerOrigin.includes("localhost") ||
-      callerOrigin.includes("127.0.0.1");
-
-    if (!isOfficialSite && origin === "Direct API") {
+    if (!isDemoOrigin(request.headers.get("origin") || request.headers.get("referer"), process.env.NODE_ENV !== "production")) {
       return NextResponse.json(
         {
           error: {
@@ -171,13 +189,6 @@ export async function POST(request: Request) {
       );
     }
 
-    const ip = request.headers.get("x-forwarded-for") || "demo_user";
-    if (isRateLimited(`demo_chat:${ip}`, 15, 60_000)) {
-      return NextResponse.json(
-        { error: { message: "Demo rate limit reached (15 req/min). Please wait a moment or sign up for ZeroRoute Pro." } },
-        { status: 429, headers: corsHdrs }
-      );
-    }
     body.max_tokens = Math.min(body.max_tokens || 500, 500);
     if (body.messages.filter(m => m.role === "user").some(m => (m.content || "").length > 2000)) {
       return NextResponse.json(
@@ -187,21 +198,22 @@ export async function POST(request: Request) {
     }
   }
 
+  // Per-bot limit, after the bot id is known to exist so unknown ids don't fill the limiter.
+  if (isWidgetCall && isRateLimited(`widget_bot:${rawBotId}`, WIDGET_BOT_LIMIT, 60_000)) {
+    return NextResponse.json(
+      { error: { message: "This assistant is busy right now. Please try again in a minute.", type: "rate_limited" } },
+      { status: 429, headers: { ...corsHdrs, "Retry-After": "60" } }
+    );
+  }
+
   // 4. Domain Whitelisting Validation (for paying customer bots)
   if (customer && customer.allowed_domains) {
     try {
       const allowed = typeof customer.allowed_domains === "string" ? JSON.parse(customer.allowed_domains) : customer.allowed_domains;
       if (Array.isArray(allowed) && allowed.length > 0) {
         const callerOrigin = request.headers.get("origin") || request.headers.get("referer") || "";
-        const cleanOrigin = callerOrigin.toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "").trim();
 
-        const isAllowed = allowed.some((d: string) => {
-          const domainPattern = d.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
-          if (domainPattern === "*") return true;
-          return cleanOrigin === domainPattern || cleanOrigin.endsWith("." + domainPattern);
-        });
-
-        if (!isAllowed) {
+        if (!isHostAllowed(callerOrigin, allowed)) {
           return NextResponse.json(
             {
               error: {
@@ -227,7 +239,14 @@ export async function POST(request: Request) {
       sql: `SELECT status, monthly_requests, monthly_limit, period_start, period_end, created_at FROM customers WHERE key = ? LIMIT 1`,
       args: [customer.key]
     });
-    const liveCust = (liveCustRes.rows[0] as any) || customer;
+    const liveCust = liveCustRes.rows[0] as any;
+    // Never fall back to the cached row: a rotated or deleted key must stop working immediately.
+    if (!liveCust) {
+      return NextResponse.json(
+        { error: { message: "Invalid, expired, or revoked API key.", type: "invalid_key", code: 401 } },
+        { status: 401, headers: corsHdrs }
+      );
+    }
 
     const isPublicWidget = Boolean(rawBotId && !bearerToken);
 
@@ -248,7 +267,6 @@ export async function POST(request: Request) {
 
     // Auto-reset monthly request counter when billing period expires (30 days cycle)
     const periodEnd = Number(liveCust.period_end || 0);
-    let currentUsage = Number(liveCust.monthly_requests || 0);
 
     if (periodEnd > 0 && now > periodEnd) {
       const newPeriodStart = now;
@@ -257,7 +275,6 @@ export async function POST(request: Request) {
         sql: `UPDATE customers SET monthly_requests = 0, period_start = ?, period_end = ?, updated_at = ? WHERE key = ?`,
         args: [newPeriodStart, newPeriodEnd, now, customer.key]
       });
-      currentUsage = 0;
     }
 
     const limit = Number(liveCust.monthly_limit !== undefined ? liveCust.monthly_limit : 500);
@@ -268,7 +285,8 @@ export async function POST(request: Request) {
       args: [now, customer.key, limit]
     });
 
-    if (atomicUpdateRes.rowsAffected === 0 && currentUsage >= limit) {
+    // The conditional UPDATE is the only source of truth: no row updated means no quota left.
+    if (!atomicUpdateRes.rowsAffected) {
       const errorMessage = isPublicWidget
         ? "This assistant has reached its monthly conversation limit and is temporarily unavailable. Please contact the website owner or check back next month."
         : `Monthly request quota of ${limit.toLocaleString()} requests reached (${limit}/${limit} used). Please upgrade to ZeroRoute Pro for 10,000 requests/month.`;

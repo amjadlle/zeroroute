@@ -30,17 +30,9 @@ export function isRateLimited(key: string, limit = 10, windowMs = 60_000): boole
   return false;
 }
 
+// Only trust the header the hosting platform overwrites (Vercel: x-real-ip; Cloudflare: cf-connecting-ip).
+// Any other client-sent header is spoofable. If a proxy appends to a list, its own entry is the last one.
 export function getClientIp(headers: Headers): string {
-  const cfIp = headers.get("cf-connecting-ip");
-  if (cfIp) return cfIp.trim();
-
-  const realIp = headers.get("x-real-ip");
-  if (realIp) return realIp.trim();
-
-  const forwarded = headers.get("x-forwarded-for");
-  if (forwarded) {
-    return forwarded.split(",")[0].trim();
-  }
-
-  return "127.0.0.1";
+  const value = headers.get(process.env.CLIENT_IP_HEADER || "x-real-ip");
+  return value?.split(",").pop()?.trim() || "127.0.0.1";
 }
