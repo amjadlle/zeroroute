@@ -65,7 +65,7 @@ export function NextStep({ topics }: { topics: Topic[] }) {
         </p>
       </div>
       <div className="flex gap-2">
-        <Button href="/app/usage" variant="ghost" size="sm">See questions</Button>
+        <Button href="/app/usage?show=unanswered" variant="ghost" size="sm">See questions</Button>
         <Button href="/app/knowledge" size="sm" leftIcon={<Plus aria-hidden className="size-3.5" />}>Add answer</Button>
       </div>
     </section>
