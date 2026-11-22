@@ -59,7 +59,7 @@ const parseJsonOrError = async (response: Response, name: string) => {
   return response.json() as Promise<any>;
 };
 
-async function* parseSSE(stream: ReadableStream<Uint8Array>): AsyncIterable<string> {
+export async function* parseSSE(stream: ReadableStream<Uint8Array>): AsyncIterable<string> {
   const reader = stream.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
@@ -95,7 +95,7 @@ async function* parseSSE(stream: ReadableStream<Uint8Array>): AsyncIterable<stri
   }
 }
 
-const resolveSafePayload = (model: string, request: ChatRequest, stream = false) => {
+export const resolveSafePayload = (model: string, request: ChatRequest, stream = false) => {
   let maxTokens = request.max_tokens;
   if (model.includes("prompt-guard")) {
     maxTokens = Math.min(maxTokens || 512, 512);

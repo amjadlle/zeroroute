@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { getDb } from "@/lib/db";
+import { classifyDodoEvent, verifyDodoSignature } from "@/lib/dodo";
 
 export const dynamic = "force-dynamic";
 
@@ -32,23 +33,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Webhook timestamp expired" }, { status: 401 });
     }
 
-    const secretKey = webhookSecret.startsWith("whsec_")
-      ? Buffer.from(webhookSecret.slice(6), "base64")
-      : Buffer.from(webhookSecret, "utf-8");
-
-    const toSign = `${webhookId}.${webhookTimestamp}.${rawBody}`;
-    const expectedSig = crypto.createHmac("sha256", secretKey).update(toSign).digest("base64");
-
-    const signatures = webhookSignature.split(" ").map(s => s.replace(/^v\d+,/, "").trim());
-    const isValid = signatures.some(sig => {
-      try {
-        const sigBuf = Buffer.from(sig, "base64");
-        const expBuf = Buffer.from(expectedSig, "base64");
-        return sigBuf.length === expBuf.length && crypto.timingSafeEqual(sigBuf, expBuf);
-      } catch {
-        return false;
-      }
-    });
+    const isValid = verifyDodoSignature(webhookSecret, webhookId, webhookTimestamp, rawBody, webhookSignature);
 
     if (!isValid) {
       console.warn("[DodoWebhook] Invalid signature received");
@@ -99,38 +84,11 @@ export async function POST(request: Request) {
       const existing = existingRes.rows[0] as Record<string, string | null> | undefined;
       const now = Date.now();
 
-      // Check event categories accurately
-      const isCancellation =
-        eventType.includes("subscription.cancelled") ||
-        eventType.includes("subscription.canceled") ||
-        eventType.includes("subscription.expired") ||
-        eventType.includes("payment.cancelled") ||
-        eventType.includes("payment.canceled") ||
-        (eventType.includes("subscription.updated") && (dataStatus === "cancelled" || dataStatus === "canceled" || dataStatus === "expired"));
-
-      const isPaused =
-        eventType.includes("subscription.failed") ||
-        eventType.includes("subscription.past_due") ||
-        eventType.includes("subscription.on_hold") ||
-        eventType.includes("subscription.paused") ||
-        eventType.includes("payment.failed") ||
-        (eventType.includes("subscription.updated") && (dataStatus === "paused" || dataStatus === "on_hold" || dataStatus === "past_due" || dataStatus === "failed"));
-
-      const isRenewal = eventType.includes("subscription.renewed");
-
-      const isActivation =
-        !isCancellation &&
-        !isPaused &&
-        (
-          eventType.includes("payment.succeeded") ||
-          eventType.includes("subscription.active") ||
-          eventType.includes("subscription.created") ||
-          eventType.includes("subscription.unpaused") ||
-          (eventType.includes("subscription.updated") && (dataStatus === "active" || dataStatus === ""))
-        );
+      const action = classifyDodoEvent(eventType, dataStatus);
+      const isRenewal = action === "renewal";
 
       // 1. Cancellation Handling
-      if (isCancellation) {
+      if (action === "cancel") {
         if (existing) {
           await db.execute({
             sql: `UPDATE customers SET status = 'canceled', updated_at = ? WHERE email = ?`,
@@ -152,7 +110,7 @@ export async function POST(request: Request) {
         }
       }
       // 2. Past Due / Paused Handling
-      else if (isPaused) {
+      else if (action === "pause") {
         if (existing) {
           await db.execute({
             sql: `UPDATE customers SET status = 'paused', updated_at = ? WHERE email = ?`,
@@ -162,7 +120,7 @@ export async function POST(request: Request) {
         }
       }
       // 3. Activation & Renewal Handling
-      else if (isActivation || isRenewal) {
+      else if (action === "activation" || isRenewal) {
         const expiresAt = data.next_billing_date ? new Date(data.next_billing_date).getTime() : now + 30 * 24 * 60 * 60 * 1000;
         let activeKey = "";
         let activeBotId = "";

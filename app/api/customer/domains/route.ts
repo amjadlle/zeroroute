@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb, initDb } from "@/lib/db";
+import { cleanDomains, domainLimitError } from "@/lib/providers/gateway";
 import { getCurrentUser, getCustomerByTokenOrKey, invalidateCustomerLookupCache, invalidateSessionCache } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
@@ -21,36 +22,10 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const rawDomains = Array.isArray(body.domains) ? body.domains : [];
-
-    // Clean domains (strip protocol, paths, and lowercase)
-    const cleanedDomains = Array.from(
-      new Set(
-        rawDomains
-          .map((d: unknown) =>
-            String(d || "")
-              .trim()
-              .toLowerCase()
-              .replace(/^https?:\/\//, "")
-              .replace(/\/.*$/, "")
-              .replace(/:\d+$/, "")
-          )
-          .filter((d: string) => Boolean(d) && d.length > 2)
-      )
-    );
-
-    const isPro = Boolean(session.monthly_limit && session.monthly_limit >= 10000);
-    const maxAllowed = isPro ? 3 : 1;
-
-    if (cleanedDomains.length > maxAllowed) {
-      return NextResponse.json(
-        {
-          error: isPro
-            ? `Pro accounts can whitelist up to 3 domains.`
-            : `Free accounts can whitelist 1 website domain. Upgrade to Pro for up to 3 domains.`,
-        },
-        { status: 400 }
-      );
+    const cleanedDomains = cleanDomains(body.domains);
+    const limitError = domainLimitError(cleanedDomains.length, session.monthly_limit);
+    if (limitError) {
+      return NextResponse.json({ error: limitError }, { status: 400 });
     }
 
     await initDb();
