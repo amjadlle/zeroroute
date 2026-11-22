@@ -1,6 +1,6 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { useConfirm, type ConfirmOptions } from "./ConfirmDialog";
 import { UiProviders } from "./UiProviders";
 
@@ -63,5 +63,30 @@ describe("ConfirmDialog / useConfirm", () => {
     expect(results).toEqual([]);
     await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(results).toEqual([false]);
+  });
+
+  it("resolves false on Esc", async () => {
+    const results = setup();
+    await open();
+    await act(async () => { fireEvent(screen.getByRole("dialog"), new Event("cancel", { cancelable: true })); });
+    expect(results).toEqual([false]);
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it("uses default labels and a generic message for a non-Error rejection", async () => {
+    setup({ confirmLabel: undefined, tone: undefined, onConfirm: () => Promise.reject("nope") });
+    await open();
+    expect(screen.getByRole("button", { name: "Cancel" })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Confirm" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Something went wrong. Try again.");
+  });
+
+  it("useConfirm throws without a provider", () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      expect(() => render(<Harness options={{ title: "x" }} onResult={() => {}} />)).toThrow(/needs <UiProviders>/);
+    } finally {
+      error.mockRestore();
+    }
   });
 });
