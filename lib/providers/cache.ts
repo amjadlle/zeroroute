@@ -6,7 +6,7 @@ interface CacheEntry {
   expiresAt: number;
 }
 
-class ResponseCache {
+export class ResponseCache {
   private cache = new Map<string, CacheEntry>();
   private defaultTtlMs = 60 * 1000; // 1 minute default cache
 

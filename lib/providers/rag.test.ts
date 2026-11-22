@@ -1,6 +1,6 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { testDb } from "@/tests/db";
-import { buildDynamicSystemPrompt, getDefaultLandingKnowledge, invalidateDocCache, retrieveKnowledgeContext } from "./rag";
+import { buildDynamicSystemPrompt, expandQuery, getDefaultLandingKnowledge, invalidateDocCache, retrieveKnowledgeContext, stem } from "./rag";
 
 const headings = (prompt: string) => prompt.split("\n").filter((l) => l.startsWith("# "));
 
@@ -129,5 +129,36 @@ describe("retrieveKnowledgeContext", () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+});
+
+describe("stem (#38)", () => {
+  it.each([
+    ["classes", "class"],
+    ["policies", "polici"],
+    ["glass", "glass"],
+    ["Prices", "price"],
+    ["agreed", "agree"],
+    ["shipping", "shipp"],
+    ["booked", "book"],
+    ["relational", "relate"],
+    ["happiness", "happiness"], // "ss" returns first, so the -ness rule never fires
+    ["careful", "care"],
+    ["payment", "pay"],
+    ["quickly", "quick"],
+    ["cat", "cat"],
+  ])("%s -> %s", (word, expected) => {
+    expect(stem(word)).toBe(expected);
+  });
+});
+
+describe("expandQuery (#38)", () => {
+  it("adds synonyms and stems, keeping the original tokens", () => {
+    const out = expandQuery(["price", "plans"]);
+    expect(out).toEqual(expect.arrayContaining(["price", "plans", "cost", "plan"]));
+  });
+
+  it("drops one-letter terms", () => {
+    expect(expandQuery(["a", "xyz"])).toEqual(["xyz"]);
   });
 });

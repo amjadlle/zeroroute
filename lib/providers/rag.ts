@@ -229,7 +229,7 @@ export function invalidateDocCache(customerKey?: string) {
 }
 
 // ── Lightweight stemmer (Porter-style, no deps) ────────────────────────────
-function stem(word: string): string {
+export function stem(word: string): string {
   word = word.toLowerCase();
   // Step 1a
   if (word.endsWith("sses")) return word.slice(0, -2);
@@ -291,7 +291,7 @@ const SYNONYMS: Record<string, string[]> = {
   cancel:   ["refund", "return", "stop", "terminate"],
 };
 
-function expandQuery(tokens: string[]): string[] {
+export function expandQuery(tokens: string[]): string[] {
   const expanded = new Set<string>(tokens);
   for (const token of tokens) {
     const syns = SYNONYMS[token];
