@@ -81,7 +81,12 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
   console.log(`[EMAIL DISPATCH - DEV SIMULATOR]`);
   console.log(`TO: ${to}`);
   console.log(`SUBJECT: ${subject}`);
-  console.log(`BODY PREVIEW:\n${text || html.replace(/<[^>]+>/g, " ").slice(0, 300)}...`);
+  // Bodies can carry account details (the welcome email has the API key), so print them only outside production.
+  if (process.env.NODE_ENV !== "production") {
+    console.log(`BODY PREVIEW:\n${text || html.replace(/<[^>]+>/g, " ").slice(0, 300)}...`);
+  } else {
+    console.error(`[Email] No email service configured; message to ${to} was not delivered.`);
+  }
   console.log(`========================================\n`);
 
   return { success: true, id: "simulated_local" };
