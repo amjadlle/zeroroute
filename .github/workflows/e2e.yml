@@ -1,0 +1,40 @@
+name: E2E
+
+on:
+  pull_request:
+  push:
+    branches: [main, "ci/**"]
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      # Throwaway secrets for this run only; playwright.config.ts passes them to `next start`.
+      - name: Generate test env
+        run: |
+          echo "ADMIN_PASSWORD=$(openssl rand -hex 18)" >> "$GITHUB_ENV"
+          echo "ADMIN_SESSION_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+          echo "ROUTER_API_KEY=$(openssl rand -hex 18)" >> "$GITHUB_ENV"
+      # Builds and starts the app (next build && next start) against a fresh libSQL file in data/.
+      - run: npm run e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
