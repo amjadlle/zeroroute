@@ -1,4 +1,4 @@
-import { Layers, ShieldCheck, Zap, Gauge, Key, Server, MessageSquareText, FileText } from "lucide-react";
+import { Layers, ShieldCheck, Zap, Gauge, MessageSquareText, FileText } from "lucide-react";
 import { PROVIDER_COUNT } from "@/lib/constants";
 import { PRO_REQUESTS } from "@/components/landing-facts";
 

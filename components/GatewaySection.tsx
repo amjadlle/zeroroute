@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { TerminalFailover } from "@/components/TerminalFailover";
-import { Zap, Code2, ArrowRight, ShieldCheck, Cpu } from "lucide-react";
+import { Code2, ArrowRight, ShieldCheck, Cpu } from "lucide-react";
 import { PROVIDER_COUNT, SITE_URL } from "@/lib/constants";
 
 export function GatewaySection() {

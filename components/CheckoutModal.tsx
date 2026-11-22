@@ -46,6 +46,7 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
     } catch (err) {
       console.warn("Checkout session fallback:", err);
     }
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- an API route that redirects to the payment page, not a Next.js page
     window.location.href = "/api/checkout";
   };
 

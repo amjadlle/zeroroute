@@ -215,7 +215,7 @@ The right length is the one that fully answers the question — no more, no less
 }
 
 interface DocCacheEntry {
-  docs: any[];
+  docs: Record<string, unknown>[];
   expiresAt: number;
 }
 // Ceiling: per-instance memory with a 5 minute TTL. invalidateDocCache only clears the instance
@@ -320,7 +320,7 @@ export async function retrieveKnowledgeContext(
   if (!customerKey || !userQuery || !userQuery.trim()) return "";
 
   try {
-    let rows: any[] = [];
+    let rows: Record<string, unknown>[] = [];
     const cached = docCache.get(customerKey);
     if (cached && Date.now() < cached.expiresAt) {
       rows = cached.docs;
@@ -356,7 +356,7 @@ export async function retrieveKnowledgeContext(
       bigrams.push(`${rawTokens[i]} ${rawTokens[i + 1]}`);
     }
 
-    const scoredDocs = rows.map((row: any) => {
+    const scoredDocs = rows.map((row) => {
       const content = String(row.content || "");
       const title = String(row.title || "");
       const docType = String(row.type || "").toLowerCase();

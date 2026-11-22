@@ -29,7 +29,7 @@ async function main() {
     try {
       await db.execute(sql);
       console.log("Executed:", sql);
-    } catch (e: any) {
+    } catch {
       // Ignore if already exists
     }
   }

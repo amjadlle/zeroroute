@@ -13,14 +13,14 @@ export async function GET() {
   try {
     const db = getDb();
     const logsRes = await db.execute({
-      sql: `SELECT id, timestamp, origin, prompt_preview, response_preview, provider, model, latency_ms, status, is_stream, is_cache_hit FROM request_logs WHERE customer_key = ? ORDER BY timestamp DESC LIMIT 50`,
+      sql: `SELECT id, timestamp, origin, prompt_preview, response_preview, latency_ms, status FROM request_logs WHERE customer_key = ? ORDER BY timestamp DESC LIMIT 50`,
       args: [session.key]
     });
 
     const logs = logsRes.rows || [];
     const totalRequests = logs.length;
     const avgLatency = totalRequests > 0
-      ? Math.round(logs.reduce((acc: number, l: any) => acc + (Number(l.latency_ms) || 0), 0) / totalRequests)
+      ? Math.round(logs.reduce((acc, l) => acc + (Number(l.latency_ms) || 0), 0) / totalRequests)
       : 0;
 
     return NextResponse.json({

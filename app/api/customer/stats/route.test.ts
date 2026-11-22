@@ -19,6 +19,7 @@ it("returns only the session owner's logs and their average latency", async () =
   const { stats } = await (await GET()).json();
   expect(stats.logs.map((l: { id: string }) => l.id)).toEqual(["a1", "a2"]);
   expect(stats).toMatchObject({ totalRecentLogs: 2, averageLatencyMs: 200 });
+  expect(Object.keys(stats.logs[0]).sort()).toEqual(["id", "latency_ms", "origin", "prompt_preview", "response_preview", "status", "timestamp"]);
 });
 
 it("reports zero latency when there are no logs", async () => {
