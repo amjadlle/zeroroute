@@ -77,5 +77,6 @@ it("loads insights only once enabled, and retries after a failure", async () => 
   fail = false;
   await userEvent.click(screen.getByRole("button", { name: "Try again" }));
   await waitFor(() => expect(result.current.data?.topics).toEqual(TOPICS));
-  expect(fetch).toHaveBeenCalledWith("/api/customer/insights", expect.anything());
+  const tz = encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  expect(fetch).toHaveBeenCalledWith(`/api/customer/insights?tz=${tz}`, expect.anything());
 });

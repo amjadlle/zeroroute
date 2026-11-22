@@ -7,7 +7,6 @@ import { UNANSWERED_ARGS as REFUSALS, UNANSWERED_SQL as IS_REFUSAL } from "@/lib
 
 export const dynamic = "force-dynamic";
 
-const DAY_MS = 86_400_000;
 const DAYS = 14;
 const TOPICS = 3;
 const TOPIC_SAMPLE = 1000;
@@ -51,29 +50,75 @@ function groupTopics(prompts: string[]) {
   return topics;
 }
 
+/** The tz query param if Intl knows it, else UTC. Untrusted input: Intl throws on unknown zones. */
+function zone(tz: string | null) {
+  if (!tz) return "UTC";
+  try {
+    return new Intl.DateTimeFormat("en-US", { timeZone: tz }).resolvedOptions().timeZone;
+  } catch {
+    return "UTC";
+  }
+}
+
+/**
+ * The UTC instants at which the last DAYS local days in `tz` start, with their YYYY-MM-DD labels,
+ * oldest first. Offsets come from Intl per day, so a DST change inside the window is exact (a fixed
+ * offset from "now" would shift every day before the change by an hour).
+ */
+function localDays(tz: string, now: number) {
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: tz, hourCycle: "h23", year: "numeric", month: "numeric", day: "numeric",
+    hour: "numeric", minute: "numeric", second: "numeric",
+  });
+  const parts = (t: number) =>
+    Object.fromEntries(fmt.formatToParts(t).map((p) => [p.type, Number(p.value)])) as Record<string, number>;
+  // Wall-clock time in tz minus true time = the zone's UTC offset at t.
+  const offset = (t: number) => {
+    const p = parts(t);
+    return Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second) - Math.floor(t / 1000) * 1000;
+  };
+  const today = parts(now);
+  return Array.from({ length: DAYS }, (_, i) => {
+    const wall = Date.UTC(today.year, today.month - 1, today.day - (DAYS - 1) + i); // calendar math only
+    const date = new Date(wall).toISOString().slice(0, 10);
+    // Try the offset either side of a transition; the earliest instant that is on `date` locally is the
+    // day's start. Covers zones that skip midnight (day starts 01:00) and ones that repeat it.
+    const first = wall - offset(wall);
+    const start = [first, wall - offset(first)]
+      .filter((t) => { const p = parts(t); return Date.UTC(p.year, p.month - 1, p.day) === wall; })
+      .reduce((a, b) => Math.min(a, b), first);
+    return { date, start };
+  });
+}
+
 /**
  * Home page insights for the signed-in customer (cookie session only): per-day counts for the last
- * DAYS UTC days, oldest first and zero-filled, plus the top unanswered-question topics in that window.
- * Both queries use idx_logs_customer_time (customer_key, timestamp).
+ * DAYS days in the browser's time zone (`?tz=Europe/London`, UTC when missing or unknown), oldest first
+ * and zero-filled, plus the top unanswered-question topics in that window.
+ * Both queries use idx_logs_customer_time (customer_key, timestamp); days are bucketed in SQL by comparing
+ * the timestamp against each local day's start, so no rows are pulled into JS.
  */
-export async function GET() {
+export async function GET(req: Request) {
   const session = await getCurrentUser();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const firstDay = Math.floor(Date.now() / DAY_MS) - (DAYS - 1);
-  const since = firstDay * DAY_MS;
+  const bounds = localDays(zone(new URL(req.url).searchParams.get("tz")), Date.now());
+  const since = bounds[0].start;
+  // Newest day first, so the first matching start wins; anything older is day 0 (filtered by `since`).
+  const dayIndex = `CASE ${bounds.slice(1).map(() => "WHEN timestamp >= ? THEN ?").reverse().join(" ")} ELSE 0 END`;
+  const dayArgs = bounds.slice(1).map((b, i) => [b.start, i + 1]).reverse().flat();
 
   try {
     const db = getDb();
     const [dailyRes, gapsRes] = await Promise.all([
       db.execute({
-        sql: `SELECT timestamp / ${DAY_MS} AS day, COUNT(*) AS total, SUM(status >= 400) AS failed,
+        sql: `SELECT ${dayIndex} AS day, COUNT(*) AS total, SUM(status >= 400) AS failed,
                 SUM(CASE WHEN ${IS_REFUSAL} THEN 1 ELSE 0 END) AS unanswered,
                 AVG(CASE WHEN status < 400 THEN latency_ms END) AS avg_reply
               FROM request_logs WHERE customer_key = ? AND timestamp >= ? GROUP BY day`,
-        args: [...REFUSALS, session.key, since],
+        args: [...dayArgs, ...REFUSALS, session.key, since],
       }),
       db.execute({
         sql: `SELECT prompt_preview FROM request_logs WHERE customer_key = ? AND timestamp >= ? AND ${IS_REFUSAL}
@@ -84,9 +129,9 @@ export async function GET() {
 
     const byDay = new Map(dailyRes.rows.map((r) => [Number(r.day), r]));
     const days = Array.from({ length: DAYS }, (_, i) => {
-      const r = byDay.get(firstDay + i);
+      const r = byDay.get(i);
       return {
-        date: new Date((firstDay + i) * DAY_MS).toISOString().slice(0, 10),
+        date: bounds[i].date,
         total: Number(r?.total ?? 0),
         failed: Number(r?.failed ?? 0),
         unanswered: Number(r?.unanswered ?? 0),

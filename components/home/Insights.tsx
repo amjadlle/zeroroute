@@ -19,7 +19,7 @@ type State = { data: Insights | null; error: string | null; reload: () => void }
 const times = (n: number) => (n === 1 ? "once" : `${n.toLocaleString()} times`);
 const sum = (days: InsightDay[], f: (d: InsightDay) => number) => days.reduce((s, d) => s + f(d), 0);
 
-/** Loads /api/customer/insights (last 14 days) once `enabled` is true. */
+/** Loads /api/customer/insights (last 14 days, in the browser's time zone) once `enabled` is true. */
 export function useInsights(enabled: boolean): State {
   const [data, setData] = useState<Insights | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +27,9 @@ export function useInsights(enabled: boolean): State {
   const reload = useCallback(async () => {
     setError(null);
     try {
-      const res = await apiFetch<Partial<Insights>>("/api/customer/insights");
+      const res = await apiFetch<Partial<Insights>>(
+        `/api/customer/insights?tz=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)}`,
+      );
       setData({ days: res.days ?? [], topics: res.topics ?? [] });
     } catch (e) {
       setError(e instanceof Error && e.message ? e.message : "Something went wrong.");
