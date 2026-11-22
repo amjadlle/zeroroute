@@ -14,3 +14,19 @@ it("HTML-escapes the name in the welcome email", async () => {
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
 });
+
+it("never prints the email body in production when no email service is set", async () => {
+  vi.stubEnv("RESEND_API_KEY", "");
+  vi.stubEnv("EMAIL_WEBHOOK_URL", "");
+  vi.stubEnv("NODE_ENV", "production");
+  const log = vi.spyOn(console, "log").mockImplementation(() => {});
+  const err = vi.spyOn(console, "error").mockImplementation(() => {});
+
+  await sendWelcomeCredentialsEmail({ email: "a@example.com", name: "A", key: "zr_live_secret123", botId: "b" });
+
+  const printed = [...log.mock.calls, ...err.mock.calls].flat().join("\n");
+  expect(printed).not.toContain("zr_live_secret123");
+  log.mockRestore();
+  err.mockRestore();
+  vi.unstubAllEnvs();
+});
