@@ -303,7 +303,7 @@ export function expandQuery(tokens: string[]): string[] {
 }
 
 // ── Stop words (excluded from scoring to reduce noise) ───────────────────────
-const STOP_WORDS = new Set([
+export const STOP_WORDS = new Set([
   "the","a","an","and","or","but","in","on","at","to","for","of","with",
   "is","are","was","were","be","been","have","has","had","do","does","did",
   "will","would","could","should","may","might","can","shall","that","this",

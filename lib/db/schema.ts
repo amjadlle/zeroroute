@@ -166,6 +166,7 @@ export const SCHEMA_INDEXES = [
   `CREATE INDEX IF NOT EXISTS idx_knowledge_type ON knowledge_documents(type)`,
   `CREATE INDEX IF NOT EXISTS idx_logs_customer ON request_logs(customer_key)`,
   `CREATE INDEX IF NOT EXISTS idx_logs_timestamp ON request_logs(timestamp DESC)`,
+  `CREATE INDEX IF NOT EXISTS idx_logs_customer_time ON request_logs(customer_key, timestamp)`,
   `CREATE INDEX IF NOT EXISTS idx_logs_origin ON request_logs(origin)`,
   `CREATE INDEX IF NOT EXISTS idx_logs_provider ON request_logs(provider)`,
   `CREATE INDEX IF NOT EXISTS idx_logs_status ON request_logs(status)`,

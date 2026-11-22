@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { useToast } from "@/components/ui/Toast";
 import { DomainsCard } from "@/components/home/DomainsCard";
+import { InsightTiles, NeedsAttention, NextStep, useInsights } from "@/components/home/Insights";
 import { KeyCard } from "@/components/home/KeyCard";
 import { PlanCard } from "@/components/home/PlanCard";
 import { RecentQuestions } from "@/components/home/RecentQuestions";
@@ -27,6 +28,8 @@ export default function HomePage() {
   const steps = setupSteps(profile, docs.length);
   const left = steps.filter((s) => !s.done).length;
   const used = profile.monthly_requests || 0;
+  const live = left === 0;
+  const insights = useInsights(live);
 
   const rotateKey = async () => {
     const ok = await confirm({
@@ -59,7 +62,7 @@ export default function HomePage() {
 
   return (
     <>
-      {left > 0 ? (
+      {!live ? (
         <PageHeader
           title="Welcome to ZeroRoute"
           description={`${left} ${left === 1 ? "step" : "steps"} left before your chatbot is live.`}
@@ -77,9 +80,17 @@ export default function HomePage() {
         />
       )}
 
+      {live && (
+        <div className="mb-6 grid gap-6">
+          {insights.data && <NextStep topics={insights.data.topics} />}
+          <InsightTiles {...insights} used={used} limit={monthlyLimit} />
+        </div>
+      )}
+
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="grid content-start gap-6">
-          {left > 0 ? <SetupChecklist steps={steps} /> : <RecentQuestions />}
+          {live ? <RecentQuestions /> : <SetupChecklist steps={steps} />}
+          {live && insights.data && <NeedsAttention data={insights.data} used={used} limit={monthlyLimit} />}
           <DomainsCard domains={profile.allowed_domains || []} isPro={isPro} onSave={saveDomains} />
         </div>
         <aside className="grid content-start gap-6" aria-label="Plan and keys">
