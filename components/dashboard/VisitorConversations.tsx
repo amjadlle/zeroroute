@@ -1,7 +1,7 @@
 "use client";
 
 import { Download, MessageCircleQuestion, RefreshCw } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Alert } from "@/components/ui/Alert";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -10,7 +10,10 @@ import { DataTable, type Column } from "@/components/ui/DataTable";
 import { Drawer } from "@/components/ui/Drawer";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { SearchInput } from "@/components/ui/SearchInput";
+import { Switch } from "@/components/ui/Switch";
+import { useSearchParamValue } from "@/components/ui/useSearchParamValue";
 import { apiFetch } from "@/lib/client/api";
+import { isUnanswered } from "@/lib/unanswered";
 
 export type Conversation = {
   id: string;
@@ -24,6 +27,10 @@ export type Conversation = {
 
 const when = (ts: number) => new Date(ts).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
 const answered = (c: Conversation) => c.status === 200;
+const result = (c: Conversation) =>
+  isUnanswered(c) ? ({ label: "Not answered", tone: "warning" } as const)
+  : answered(c) ? ({ label: "Answered", tone: "success" } as const)
+  : ({ label: "Failed", tone: "danger" } as const);
 
 const COLUMNS: Column<Conversation>[] = [
   { key: "timestamp", header: "Time", sortable: true, cell: (c) => <span className="whitespace-nowrap tabular-nums">{when(c.timestamp)}</span> },
@@ -33,7 +40,7 @@ const COLUMNS: Column<Conversation>[] = [
     key: "status",
     header: "Result",
     sortable: true,
-    cell: (c) => <Badge tone={answered(c) ? "success" : "danger"}>{answered(c) ? "Answered" : "Failed"}</Badge>,
+    cell: (c) => <Badge tone={result(c).tone}>{result(c).label}</Badge>,
   },
   { key: "latency_ms", header: "Reply time", align: "right", sortable: true, cell: (c) => <span className="tabular-nums">{c.latency_ms ?? 0} ms</span> },
 ];
@@ -45,7 +52,7 @@ const csvCell = (v: string) => `"${(/^[=+\-@\t\r]/.test(v) ? `'${v}` : v).replac
 export function conversationsCsv(rows: Conversation[]): string {
   const lines = [["Time", "Website", "Question", "Answer", "Result", "Reply time (ms)"]];
   for (const c of rows) {
-    lines.push([new Date(c.timestamp).toISOString(), c.origin ?? "", c.prompt_preview ?? "", c.response_preview ?? "", answered(c) ? "Answered" : "Failed", String(c.latency_ms ?? "")]);
+    lines.push([new Date(c.timestamp).toISOString(), c.origin ?? "", c.prompt_preview ?? "", c.response_preview ?? "", result(c).label, String(c.latency_ms ?? "")]);
   }
   return lines.map((l) => l.map(csvCell).join(",")).join("\r\n");
 }
@@ -57,7 +64,10 @@ function download(rows: Conversation[]) {
   URL.revokeObjectURL(url);
 }
 
-/** Recent visitor conversations from /api/customer/stats, with search, details and CSV export. */
+/**
+ * Recent visitor conversations from /api/customer/stats, with search, details and CSV export.
+ * `?show=unanswered` in the page URL turns on "Unanswered only" (Home links there); needs a <Suspense> parent.
+ */
 export function VisitorConversations() {
   const [rows, setRows] = useState<Conversation[]>([]);
   const [avgMs, setAvgMs] = useState(0);
@@ -65,23 +75,30 @@ export function VisitorConversations() {
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState<Conversation | null>(null);
+  const [show, setShow] = useSearchParamValue("show", "all");
+  const unansweredOnly = show === "unanswered";
+  const latest = useRef(0);
 
   const load = useCallback(async () => {
+    const call = ++latest.current;
     setLoading(true);
     try {
-      const data = await apiFetch<{ stats?: { logs?: Conversation[]; averageLatencyMs?: number } }>("/api/customer/stats");
+      const data = await apiFetch<{ stats?: { logs?: Conversation[]; averageLatencyMs?: number } }>(
+        `/api/customer/stats${unansweredOnly ? "?unanswered=1" : ""}`,
+      );
+      if (call !== latest.current) return; // a newer load (filter flipped) owns the list
       setRows(data.stats?.logs ?? []);
       setAvgMs(data.stats?.averageLatencyMs ?? 0);
       setError(null);
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      if (call === latest.current) setError(e instanceof Error ? e.message : String(e));
     } finally {
-      setLoading(false);
+      if (call === latest.current) setLoading(false);
     }
-  }, []);
+  }, [unansweredOnly]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data load
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- load on mount and when the filter changes
     load();
   }, [load]);
 
@@ -95,7 +112,7 @@ export function VisitorConversations() {
     <Card>
       <CardHeader
         title="Visitor conversations"
-        description={rows.length ? `Your latest ${rows.length} conversations${avgMs ? `, ${avgMs.toLocaleString()} ms average reply time` : ""}.` : "What visitors asked your chatbot."}
+        description={rows.length ? `Your latest ${rows.length} ${unansweredOnly ? "questions your chatbot couldn't answer" : "conversations"}${avgMs ? `, ${avgMs.toLocaleString()} ms average reply time` : ""}.` : "What visitors asked your chatbot."}
       />
       <CardBody className="grid gap-3">
         {error ? (
@@ -109,6 +126,7 @@ export function VisitorConversations() {
               <div className="w-full sm:w-auto sm:min-w-48 sm:flex-1">
                 <SearchInput aria-label="Search conversations" placeholder="Search conversations" value={query} onChange={(e) => setQuery(e.target.value)} />
               </div>
+              <Switch label="Unanswered only" checked={unansweredOnly} onCheckedChange={(on) => setShow(on ? "unanswered" : "all")} />
               <Button variant="secondary" onClick={load} loading={loading} leftIcon={<RefreshCw aria-hidden className="size-4" />}>
                 Refresh
               </Button>
@@ -124,7 +142,14 @@ export function VisitorConversations() {
               loading={loading && rows.length === 0}
               onRowClick={setOpen}
               empty={
-                rows.length === 0 ? (
+                rows.length === 0 && unansweredOnly ? (
+                  <EmptyState
+                    icon={MessageCircleQuestion}
+                    title="No unanswered questions"
+                    description="Your chatbot answered every recent question it was asked."
+                    action={<Button variant="secondary" onClick={() => setShow("all")}>Show all conversations</Button>}
+                  />
+                ) : rows.length === 0 ? (
                   <EmptyState
                     icon={MessageCircleQuestion}
                     title="No conversations yet"
@@ -151,7 +176,7 @@ export function VisitorConversations() {
               <dd className="whitespace-pre-wrap break-words">{open.response_preview || (answered(open) ? "No answer text" : "The chatbot couldn't answer this one.")}</dd>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Badge tone={answered(open) ? "success" : "danger"}>{answered(open) ? "Answered" : "Failed"}</Badge>
+              <Badge tone={result(open).tone}>{result(open).label}</Badge>
               <Badge>{open.latency_ms ?? 0} ms reply time</Badge>
             </div>
           </dl>

@@ -5,6 +5,7 @@ import { testDb } from "@/tests/db";
 vi.mock("next/headers", async () => (await import("@/tests/cookies")).nextHeaders);
 
 const { GET } = await import("./route");
+const req = (query = "") => new Request(`http://localhost/api/customer/stats${query}`);
 
 beforeEach(async () => {
   const db = await seedCustomers();
@@ -16,7 +17,7 @@ beforeEach(async () => {
 
 it("returns only the session owner's logs and their average latency", async () => {
   loginAs(A);
-  const { stats } = await (await GET()).json();
+  const { stats } = await (await GET(req())).json();
   expect(stats.logs.map((l: { id: string }) => l.id)).toEqual(["a1", "a2"]);
   expect(stats).toMatchObject({ totalRecentLogs: 2, averageLatencyMs: 200 });
   expect(Object.keys(stats.logs[0]).sort()).toEqual(["id", "latency_ms", "origin", "prompt_preview", "response_preview", "status", "timestamp"]);
@@ -25,5 +26,18 @@ it("returns only the session owner's logs and their average latency", async () =
 it("reports zero latency when there are no logs", async () => {
   loginAs(B);
   await (await testDb()).execute("DELETE FROM request_logs");
-  expect((await (await GET()).json()).stats).toMatchObject({ totalRecentLogs: 0, averageLatencyMs: 0 });
+  expect((await (await GET(req())).json()).stats).toMatchObject({ totalRecentLogs: 0, averageLatencyMs: 0 });
+});
+
+it("keeps only questions the chatbot couldn't answer with ?unanswered=1", async () => {
+  const db = await testDb();
+  await db.execute(`INSERT INTO request_logs (id, customer_key, timestamp, prompt_preview, response_preview, provider, model, latency_ms, status) VALUES
+    ('u1', '${A.key}', 10, 'Instalments?', 'I don''t have specific information about that in my knowledge base.', 'groq', 'm', 100, 200),
+    ('u2', '${A.key}', 9, 'Hours?', 'I DON''T HAVE ANY INFORMATION available right now.', 'groq', 'm', 100, 200),
+    ('f1', '${A.key}', 8, 'Broken', 'in my knowledge base', 'groq', 'm', 100, 502),
+    ('u3', '${B.key}', 7, 'Not yours', 'I don''t have specific information about that.', 'groq', 'm', 100, 200)`);
+  loginAs(A);
+  const ids = async (query: string) => (await (await GET(req(query))).json()).stats.logs.map((l: { id: string }) => l.id);
+  expect(await ids("?unanswered=1")).toEqual(["u1", "u2"]);
+  expect(await ids("?unanswered=0")).toEqual(["u1", "u2", "f1", "a1", "a2"]);
 });

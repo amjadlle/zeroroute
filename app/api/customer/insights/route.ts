@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth/session";
 import { STOP_WORDS } from "@/lib/providers/rag";
+// Shared with the Usage page's "Unanswered only" filter so both count the same questions.
+import { UNANSWERED_ARGS as REFUSALS, UNANSWERED_SQL as IS_REFUSAL } from "@/lib/unanswered";
 
 export const dynamic = "force-dynamic";
 
@@ -9,15 +11,6 @@ const DAY_MS = 86_400_000;
 const DAYS = 14;
 const TOPICS = 3;
 const TOPIC_SAMPLE = 1000;
-
-// "Unanswered" = the request succeeded but the reply is the bot's refusal (RAG prompt Rule 2 in
-// lib/providers/rag.ts: "I don't have specific information about that in my knowledge base…", or the
-// no-knowledge "don't have any information" variant). That is a knowledge gap the customer can fix by
-// adding an answer. Failed requests (status >= 400) are an outage, not a gap, so they are counted
-// separately and never become topics. Matching is on response_preview (first 100 chars of the reply);
-// LIKE is ASCII case-insensitive, and the patterns avoid the apostrophe so curly quotes match too.
-const REFUSALS = ["%have specific information%", "%have any information%", "%in my knowledge base%"];
-const IS_REFUSAL = `status < 400 AND (${REFUSALS.map(() => "response_preview LIKE ?").join(" OR ")})`;
 
 // Words that say nothing about the topic of a question, on top of the retrieval stop words.
 const FILLER = new Set(["can", "get", "any", "there", "please", "tell", "know", "want", "need", "like", "much", "many", "also", "just", "hi", "hello", "thanks"]);

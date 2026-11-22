@@ -13,7 +13,7 @@ beforeEach(seedCustomers);
 
 const calls = {
   profile: (bearer?: string) => profile(req("/api/customer/profile", { bearer })),
-  stats: () => stats(),
+  stats: () => stats(req("/api/customer/stats")),
   domains: (bearer?: string) => domains(req("/api/customer/domains", { bearer, body: { domains: ["x.com"] } })),
   regenerate: (bearer?: string) => regenerate(req("/api/customer/key/regenerate", { bearer, method: "POST" })),
   persona: (bearer?: string) => persona(req("/api/customer/persona", { bearer, body: { greeting: "hijack" } })),

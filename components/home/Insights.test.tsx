@@ -21,6 +21,7 @@ it("suggests adding an answer for the most-asked unanswered topic", () => {
   expect(bar).toHaveTextContent("asked about this 11 times in the last 14 days");
   expect(bar).toHaveTextContent("“Can I pay in instalments?”");
   expect(within(bar).getByRole("link", { name: "Add answer" })).toHaveAttribute("href", "/app/knowledge");
+  expect(within(bar).getByRole("link", { name: "See questions" })).toHaveAttribute("href", "/app/usage?show=unanswered");
 });
 
 it("hides the next step when every question was answered", () => {
