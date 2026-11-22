@@ -21,6 +21,7 @@ export type ChatbotSettings = {
 
 export const MAX_SUGGESTED_QUESTIONS = 6;
 /** widget.js's own default colour, shown in the picker when no brand colour is saved. Data, not console styling. */
+// eslint-disable-next-line no-restricted-syntax -- user data (widget brand colour), not console styling
 const WIDGET_DEFAULT_COLOR = "#ef4444";
 
 /** Validation message per appearance field, or undefined when valid. */
