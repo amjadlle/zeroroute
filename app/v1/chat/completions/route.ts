@@ -8,7 +8,8 @@ import { ensureProviderConfigs, getEligibleProviders, TIMEOUT_MS, COOLDOWN_MS } 
 import { responseCache } from "@/lib/providers/cache";
 import { buildDynamicSystemPrompt, retrieveKnowledgeContext, getDefaultLandingKnowledge } from "@/lib/providers/rag";
 import {
-  CHAT_LIMITS, MAX_ATTEMPTS, MAX_WALL_MS, chatBodyError, contentText, isDemoOrigin, isFailoverError, isHostAllowed, isSameOrigin
+  CHAT_LIMITS, attemptTimeoutMs, chatBodyError, contentText, inactiveMessage, isDemoOrigin, isFailoverError, isHostAllowed, isSameOrigin,
+  modelChain, parseAllowedDomains, providerFailure, quotaExceededMessage, quotaLimit, renewedPeriod
 } from "@/lib/providers/gateway";
 import type { ChatRequest, ChatResponse } from "@/lib/providers/types";
 
@@ -211,27 +212,20 @@ export async function POST(request: Request) {
   }
 
   // 4. Domain Whitelisting Validation (widget/bot_id calls only; bearer-key calls come from servers with no Origin)
-  if (isWidgetCall && customer && customer.allowed_domains) {
-    try {
-      const allowed = typeof customer.allowed_domains === "string" ? JSON.parse(customer.allowed_domains) : customer.allowed_domains;
-      if (Array.isArray(allowed) && allowed.length > 0) {
-        const callerOrigin = request.headers.get("origin") || request.headers.get("referer") || "";
-
-        if (!isHostAllowed(callerOrigin, allowed)) {
-          return NextResponse.json(
-            {
-              error: {
-                message: `Domain '${callerOrigin}' is not authorized to use this chatbot. Please add it to your allowed domains in the ZeroRoute Console.`,
-                type: "domain_not_allowed",
-                code: 403
-              }
-            },
-            { status: 403, headers: corsHdrs }
-          );
-        }
-      }
-    } catch {
-      // Ignore domain parsing errors
+  const allowed = isWidgetCall && customer ? parseAllowedDomains(customer.allowed_domains) : [];
+  if (allowed.length > 0) {
+    const callerOrigin = request.headers.get("origin") || request.headers.get("referer") || "";
+    if (!isHostAllowed(callerOrigin, allowed)) {
+      return NextResponse.json(
+        {
+          error: {
+            message: `Domain '${callerOrigin}' is not authorized to use this chatbot. Please add it to your allowed domains in the ZeroRoute Console.`,
+            type: "domain_not_allowed",
+            code: 403
+          }
+        },
+        { status: 403, headers: corsHdrs }
+      );
     }
   }
 
@@ -255,13 +249,10 @@ export async function POST(request: Request) {
     const isPublicWidget = Boolean(rawBotId && !bearerToken);
 
     if (liveCust.status !== "active") {
-      const errorMessage = isPublicWidget
-        ? "This assistant is temporarily unavailable. Please contact the website owner or try again later."
-        : `Your ZeroRoute subscription is currently inactive (${liveCust.status}). Please visit your dashboard to manage billing.`;
       return NextResponse.json(
         {
           error: {
-            message: errorMessage,
+            message: inactiveMessage(liveCust.status, isPublicWidget),
             type: "subscription_inactive"
           }
         },
@@ -270,18 +261,15 @@ export async function POST(request: Request) {
     }
 
     // Auto-reset monthly request counter when billing period expires (30 days cycle)
-    const periodEnd = Number(liveCust.period_end || 0);
-
-    if (periodEnd > 0 && now > periodEnd) {
-      const newPeriodStart = now;
-      const newPeriodEnd = now + 30 * 24 * 60 * 60 * 1000;
+    const period = renewedPeriod(liveCust.period_end, now);
+    if (period) {
       await db.execute({
         sql: `UPDATE customers SET monthly_requests = 0, period_start = ?, period_end = ?, updated_at = ? WHERE key = ?`,
-        args: [newPeriodStart, newPeriodEnd, now, customer.key]
+        args: [period.start, period.end, now, customer.key]
       });
     }
 
-    const limit = Number(liveCust.monthly_limit !== undefined ? liveCust.monthly_limit : 500);
+    const limit = quotaLimit(liveCust.monthly_limit);
 
     // Atomic conditional increment: ensures no race condition can bypass quota
     const atomicUpdateRes = await db.execute({
@@ -291,13 +279,10 @@ export async function POST(request: Request) {
 
     // The conditional UPDATE is the only source of truth: no row updated means no quota left.
     if (!atomicUpdateRes.rowsAffected) {
-      const errorMessage = isPublicWidget
-        ? "This assistant has reached its monthly conversation limit and is temporarily unavailable. Please contact the website owner or check back next month."
-        : `Monthly request quota of ${limit.toLocaleString()} requests reached (${limit}/${limit} used). Please upgrade to ZeroRoute Pro for 10,000 requests/month.`;
       return NextResponse.json(
         {
           error: {
-            message: errorMessage,
+            message: quotaExceededMessage(limit, isPublicWidget),
             type: "quota_exceeded",
             limit,
             current: limit
@@ -397,24 +382,8 @@ export async function POST(request: Request) {
   const requestId = crypto.randomUUID();
   const failures: string[] = [];
 
-  const getModelChain = (stateModels: string[] | undefined, defaultModel: string, targetModel?: string): string[] => {
-    const base = stateModels && stateModels.length > 0 ? [...stateModels] : [defaultModel];
-    if (targetModel && targetModel !== "auto" && targetModel !== "default") {
-      const idx = base.findIndex(m => m.toLowerCase() === targetModel.toLowerCase());
-      if (idx > 0) {
-        const matched = base.splice(idx, 1)[0];
-        return [matched, ...base];
-      }
-    }
-    return base;
-  };
-
-  // Per-attempt timeout, or 0 once the request's attempt/wall-time budget is spent.
   let attempts = 0;
-  const nextAttemptMs = () => {
-    const left = MAX_WALL_MS - (Date.now() - startTime);
-    return attempts < MAX_ATTEMPTS && left > 0 ? Math.min(TIMEOUT_MS, left) : 0;
-  };
+  const nextAttemptMs = () => attemptTimeoutMs(attempts, Date.now() - startTime, TIMEOUT_MS);
   const requestError = (error: any) => {
     console.error(`[Gateway ${requestId}] Upstream rejected the request:`, error.message);
     return NextResponse.json(
@@ -433,7 +402,7 @@ export async function POST(request: Request) {
   // ── Streaming Mode (SSE) ──
   if (body.stream) {
     for (const { state, provider } of candidates) {
-      const modelsToTry = getModelChain(state.models, provider.model, body.model);
+      const modelsToTry = modelChain(state.models, provider.model, body.model);
       let providerSuccess = false;
       let lastErr = "";
 
@@ -536,9 +505,7 @@ export async function POST(request: Request) {
       }
 
       if (!providerSuccess && lastErr) {
-        state.consecutiveFailures = (state.consecutiveFailures || 0) + 1;
-        state.cooldownUntil = Date.now() + COOLDOWN_MS;
-        state.lastError = lastErr;
+        Object.assign(state, providerFailure(state.consecutiveFailures, lastErr, Date.now(), COOLDOWN_MS));
       }
     }
 
@@ -570,7 +537,7 @@ export async function POST(request: Request) {
 
   // ── Non-Streaming Mode (JSON) ──
   for (const { state, provider } of candidates) {
-    const modelsToTry = getModelChain(state.models, provider.model, body.model);
+    const modelsToTry = modelChain(state.models, provider.model, body.model);
     let providerSuccess = false;
     let lastErr = "";
 
@@ -625,9 +592,7 @@ export async function POST(request: Request) {
     }
 
     if (!providerSuccess && lastErr) {
-      state.consecutiveFailures = (state.consecutiveFailures || 0) + 1;
-      state.cooldownUntil = Date.now() + COOLDOWN_MS;
-      state.lastError = lastErr;
+      Object.assign(state, providerFailure(state.consecutiveFailures, lastErr, Date.now(), COOLDOWN_MS));
     }
   }
 

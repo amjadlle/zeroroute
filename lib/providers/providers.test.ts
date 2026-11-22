@@ -1,6 +1,6 @@
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ChatRequest, ChatStreamChunk } from "./types";
-import { extractRateLimits, getProviderApiKey, isProviderConfigured, providers, providerTelemetryMap, UpstreamError } from "./providers";
+import { extractRateLimits, getProviderApiKey, isProviderConfigured, parseSSE, providers, providerTelemetryMap, resolveSafePayload, UpstreamError } from "./providers";
 
 const fetchMock = vi.fn();
 const provider = (id: string) => providers.find((p) => p.id === id)!;
@@ -259,5 +259,35 @@ describe("extractRateLimits", () => {
     });
     expect(extractRateLimits(new Response(null))).toBeUndefined();
     expect(extractRateLimits(undefined)).toBeUndefined();
+  });
+});
+
+describe("parseSSE (#38)", () => {
+  async function lines(pieces: string[]) {
+    const out: string[] = [];
+    for await (const d of parseSSE(sse(pieces).body!)) out.push(d);
+    return out;
+  }
+
+  it("yields data payloads split across chunks and skips [DONE], comments and blanks", async () => {
+    expect(await lines(["data: {\"a\"", ":1}\n\n: ping\n", "event: x\ndata:\n", "data: [DONE]\n\n"])).toEqual(['{"a":1}']);
+  });
+
+  it("flushes a final line with no trailing newline", async () => {
+    expect(await lines(["data: one\n", "data: two"])).toEqual(["one", "two"]);
+  });
+});
+
+describe("resolveSafePayload (#38)", () => {
+  it("builds the payload with default temperature and optional fields", () => {
+    expect(resolveSafePayload("m", req())).toEqual({ model: "m", messages: req().messages, temperature: 0.3 });
+    expect(resolveSafePayload("m", req({ max_tokens: 50, temperature: 0 }), true)).toMatchObject({ max_tokens: 50, temperature: 0, stream: true });
+  });
+
+  it("caps max_tokens for models with small output limits", () => {
+    expect(resolveSafePayload("llama-prompt-guard-2", req()).max_tokens).toBe(512);
+    expect(resolveSafePayload("llama-prompt-guard-2", req({ max_tokens: 100 })).max_tokens).toBe(100);
+    expect(resolveSafePayload("qwen3.6-27b", req({ max_tokens: 2000 })).max_tokens).toBe(900);
+    expect(resolveSafePayload("qwen3.6-27b", req({ max_tokens: 100 })).max_tokens).toBe(100);
   });
 });
