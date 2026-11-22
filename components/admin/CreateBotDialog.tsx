@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { SecretField } from "@/components/ui/SecretField";
 
+// eslint-disable-next-line no-restricted-syntax -- user data (widget brand colour), not console styling
 const DEFAULT_COLOR = "#ef4444"; // widget.js default, so an untouched picker changes nothing
 const HEX = /^#[0-9a-f]{6}$/i;
 

@@ -39,6 +39,7 @@ const geistMono = localFont({
 });
 
 export const viewport: Viewport = {
+  // eslint-disable-next-line no-restricted-syntax -- browser UI colour must be a literal; equals --color-landing-bg
   themeColor: "#050608",
   width: "device-width",
   initialScale: 1,
