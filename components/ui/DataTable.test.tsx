@@ -55,4 +55,33 @@ describe("DataTable", () => {
     await userEvent.keyboard("{Enter}");
     expect(onRowClick).toHaveBeenCalledWith(rows[0]);
   });
+
+  it("activates a row with Space or a click, but not from a control inside it", async () => {
+    const onRowClick = vi.fn();
+    const withAction: Column<Row>[] = [...columns, { key: "act", header: "Action", cell: () => <button>Retry</button> }];
+    render(<DataTable columns={withAction} rows={rows} getRowId={(r) => r.id} onRowClick={onRowClick} />);
+    bodyRows()[1].focus();
+    await userEvent.keyboard(" ");
+    expect(onRowClick).toHaveBeenLastCalledWith(rows[1]);
+    await userEvent.click(within(bodyRows()[2]).getByText("Gamma"));
+    expect(onRowClick).toHaveBeenLastCalledWith(rows[2]);
+    await userEvent.click(within(bodyRows()[0]).getByRole("button", { name: "Retry" }));
+    expect(onRowClick).toHaveBeenCalledTimes(2);
+  });
+
+  it("rows are not focusable without onRowClick, and the default empty state shows", () => {
+    const { unmount } = render(<DataTable columns={columns} rows={rows} getRowId={(r) => r.id} />);
+    expect(bodyRows()[0]).not.toHaveAttribute("tabindex");
+    unmount();
+    render(<DataTable columns={columns} rows={[]} getRowId={(r) => r.id} />);
+    expect(screen.getByText("Nothing here yet")).toBeInTheDocument();
+  });
+
+  it("sorts empty values last", async () => {
+    type Opt = { id: string; name?: string };
+    const data: Opt[] = [{ id: "1" }, { id: "2", name: "b" }, { id: "3" }, { id: "4", name: "a" }];
+    render(<DataTable columns={[{ key: "name", header: "Name", sortable: true }]} rows={data} getRowId={(r) => r.id} />);
+    await userEvent.click(screen.getByRole("button", { name: /Name/ }));
+    expect(firstCells()).toEqual(["Namea", "Nameb", "Name", "Name"]);
+  });
 });
