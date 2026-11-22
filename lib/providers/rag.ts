@@ -234,6 +234,8 @@ export function stem(word: string): string {
   // Step 1a
   if (word.endsWith("sses")) return word.slice(0, -2);
   if (word.endsWith("ies")) return word.slice(0, -2);
+  // -ness must run before the "ss" early return, or it never fires (#106)
+  if (word.endsWith("ness")) return word.slice(0, -4);
   if (word.endsWith("ss")) return word;
   if (word.endsWith("s") && word.length > 4) return word.slice(0, -1);
   // Step 1b
@@ -245,7 +247,6 @@ export function stem(word: string): string {
   if (word.endsWith("ation")) return word.slice(0, -5) + "ate";
   if (word.endsWith("izer")) return word.slice(0, -1);
   if (word.endsWith("iser")) return word.slice(0, -1);
-  if (word.endsWith("ness")) return word.slice(0, -4);
   if (word.endsWith("ment")) return word.slice(0, -4);
   if (word.endsWith("ful")) return word.slice(0, -3);
   if (word.endsWith("ly") && word.length > 4) return word.slice(0, -2);

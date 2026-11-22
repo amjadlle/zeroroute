@@ -21,6 +21,7 @@ it("suggests adding an answer for the most-asked unanswered topic", () => {
   expect(bar).toHaveTextContent("asked about this 11 times in the last 14 days");
   expect(bar).toHaveTextContent("“Can I pay in instalments?”");
   expect(within(bar).getByRole("link", { name: "Add answer" })).toHaveAttribute("href", "/app/knowledge");
+  expect(within(bar).getByRole("link", { name: "See questions" })).toHaveAttribute("href", "/app/usage?show=unanswered");
 });
 
 it("hides the next step when every question was answered", () => {
@@ -76,5 +77,6 @@ it("loads insights only once enabled, and retries after a failure", async () => 
   fail = false;
   await userEvent.click(screen.getByRole("button", { name: "Try again" }));
   await waitFor(() => expect(result.current.data?.topics).toEqual(TOPICS));
-  expect(fetch).toHaveBeenCalledWith("/api/customer/insights", expect.anything());
+  const tz = encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  expect(fetch).toHaveBeenCalledWith(`/api/customer/insights?tz=${tz}`, expect.anything());
 });

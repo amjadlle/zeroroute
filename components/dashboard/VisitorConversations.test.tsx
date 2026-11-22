@@ -3,6 +3,13 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, expect, it, vi } from "vitest";
 import { conversationsCsv, VisitorConversations, type Conversation } from "./VisitorConversations";
 
+const nav = vi.hoisted(() => ({ search: "", replace: vi.fn() }));
+vi.mock("next/navigation", () => ({
+  useSearchParams: () => new URLSearchParams(nav.search),
+  useRouter: () => ({ replace: nav.replace }),
+  usePathname: () => "/app/usage",
+}));
+
 const ROWS: Conversation[] = [
   { id: "r1", timestamp: Date.UTC(2026, 10, 20, 9), origin: "shop.example.com", prompt_preview: "Do you ship abroad?", response_preview: "Yes, to 30 countries.", latency_ms: 420, status: 200 },
   { id: "r2", timestamp: Date.UTC(2026, 10, 20, 10), origin: "blog.example.com", prompt_preview: "Refund policy?", response_preview: null, latency_ms: 90, status: 500 },
@@ -11,7 +18,11 @@ const ROWS: Conversation[] = [
 const ok = (logs: Conversation[]) => () => Response.json({ stats: { logs, averageLatencyMs: 255 } });
 const stubStats = (reply: () => Response) => vi.stubGlobal("fetch", vi.fn(async () => reply()));
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.unstubAllGlobals();
+  nav.search = "";
+  nav.replace.mockClear();
+});
 
 it("lists conversations, filters them and opens the full text", async () => {
   stubStats(ok(ROWS));
@@ -65,4 +76,40 @@ it("quotes CSV cells and stops visitor text running as a spreadsheet formula", (
   const row = csv.split("\r\n")[1];
   expect(row).toContain(`"'=HYPERLINK(""evil"")"`);
   expect(row).toContain(`"Say ""hi"", then go"`);
+});
+
+const REFUSAL: Conversation = { id: "r3", timestamp: Date.UTC(2026, 10, 20, 11), prompt_preview: "Can I pay in instalments?", response_preview: "I don't have specific information about that in my knowledge base.", latency_ms: 300, status: 200 };
+
+it("opens pre-filtered from ?show=unanswered and asks the server for unanswered questions only", async () => {
+  nav.search = "show=unanswered";
+  const fetch = vi.fn(async () => Response.json({ stats: { logs: [REFUSAL], averageLatencyMs: 300 } }));
+  vi.stubGlobal("fetch", fetch);
+  render(<VisitorConversations />);
+  const table = await screen.findByRole("table", { name: "Visitor conversations" });
+  expect(await within(table).findByText("Not answered")).toBeInTheDocument();
+  expect(String((fetch.mock.calls[0] as unknown[])[0])).toBe("/api/customer/stats?unanswered=1");
+  expect(screen.getByText(/latest 1 questions your chatbot couldn't answer/)).toBeInTheDocument();
+  const toggle = screen.getByRole("switch", { name: "Unanswered only" });
+  expect(toggle).toBeChecked();
+  await userEvent.click(toggle);
+  expect(nav.replace).toHaveBeenLastCalledWith("/app/usage", { scroll: false });
+});
+
+it("turns the filter on from the switch and says so when nothing is unanswered", async () => {
+  stubStats(ok(ROWS));
+  const { rerender } = render(<VisitorConversations />);
+  await screen.findByText("Do you ship abroad?");
+  await userEvent.click(screen.getByRole("switch", { name: "Unanswered only" }));
+  expect(nav.replace).toHaveBeenLastCalledWith("/app/usage?show=unanswered", { scroll: false });
+
+  nav.search = "show=unanswered";
+  stubStats(ok([]));
+  rerender(<VisitorConversations />);
+  expect(await screen.findByText("No unanswered questions")).toBeInTheDocument();
+  await userEvent.click(screen.getByRole("button", { name: "Show all conversations" }));
+  expect(nav.replace).toHaveBeenLastCalledWith("/app/usage", { scroll: false });
+});
+
+it("labels refusals as not answered in the CSV", () => {
+  expect(conversationsCsv([REFUSAL]).split("\r\n")[1]).toContain('"Not answered","300"');
 });
