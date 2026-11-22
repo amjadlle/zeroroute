@@ -142,7 +142,7 @@ describe("stem (#38)", () => {
     ["shipping", "shipp"],
     ["booked", "book"],
     ["relational", "relate"],
-    ["happiness", "happiness"], // "ss" returns first, so the -ness rule never fires
+    ["kindness", "kind"],
     ["careful", "care"],
     ["payment", "pay"],
     ["quickly", "quick"],
