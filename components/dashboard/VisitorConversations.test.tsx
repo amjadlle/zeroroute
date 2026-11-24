@@ -1,7 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, it, vi } from "vitest";
-import { conversationsCsv, VisitorConversations, type Conversation } from "./VisitorConversations";
+import { conversationsCsv, downloadConversations, VisitorConversations, type Conversation } from "./VisitorConversations";
 
 const nav = vi.hoisted(() => ({ search: "", replace: vi.fn() }));
 vi.mock("next/navigation", () => ({
@@ -40,10 +40,11 @@ it("lists conversations, filters them and opens the full text", async () => {
 
 it("shows a real empty state with a way forward", async () => {
   stubStats(ok([]));
-  render(<VisitorConversations />);
+  const onShownChange = vi.fn();
+  render(<VisitorConversations onShownChange={onShownChange} />);
   expect(await screen.findByText("No conversations yet")).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "Install your chatbot" })).toHaveAttribute("href", "/app/install");
-  expect(screen.getByRole("button", { name: /Export CSV/ })).toBeDisabled();
+  expect(onShownChange).toHaveBeenLastCalledWith([]);
 });
 
 it("shows load errors with a retry instead of an empty list", async () => {
@@ -57,15 +58,20 @@ it("shows load errors with a retry instead of an empty list", async () => {
   expect(await screen.findByText("Do you ship abroad?")).toBeInTheDocument();
 });
 
-it("exports the shown conversations as a CSV file", async () => {
+it("reports the searched rows for export and saves them as a CSV file", async () => {
   stubStats(ok(ROWS));
+  const onShownChange = vi.fn();
+  render(<VisitorConversations onShownChange={onShownChange} />);
+  await screen.findByText("Do you ship abroad?");
+  expect(onShownChange).toHaveBeenLastCalledWith(ROWS);
+  await userEvent.type(screen.getByRole("searchbox", { name: "Search conversations" }), "ship");
+  expect(onShownChange).toHaveBeenLastCalledWith([ROWS[0]]);
+
   const blobs: Blob[] = [];
   vi.spyOn(URL, "createObjectURL").mockImplementation((b) => (blobs.push(b as Blob), "blob:x"));
   vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
   const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
-  render(<VisitorConversations />);
-  await screen.findByText("Do you ship abroad?");
-  await userEvent.click(screen.getByRole("button", { name: /Export CSV/ }));
+  downloadConversations([ROWS[0]]);
   expect((click.mock.contexts[0] as HTMLAnchorElement).download).toMatch(/^visitor-conversations-.*\.csv$/);
   expect(blobs).toHaveLength(1);
   expect(await blobs[0].text()).toContain('"Do you ship abroad?","Yes, to 30 countries.","Answered","420"');
@@ -80,36 +86,53 @@ it("quotes CSV cells and stops visitor text running as a spreadsheet formula", (
 
 const REFUSAL: Conversation = { id: "r3", timestamp: Date.UTC(2026, 10, 20, 11), prompt_preview: "Can I pay in instalments?", response_preview: "I don't have specific information about that in my knowledge base.", latency_ms: 300, status: 200 };
 
-it("opens pre-filtered from ?show=unanswered and asks the server for unanswered questions only", async () => {
+it("opens pre-filtered from ?show=unanswered (Home links there) and asks the server for those only", async () => {
   nav.search = "show=unanswered";
   const fetch = vi.fn(async () => Response.json({ stats: { logs: [REFUSAL], averageLatencyMs: 300 } }));
   vi.stubGlobal("fetch", fetch);
   render(<VisitorConversations />);
   const table = await screen.findByRole("table", { name: "Visitor conversations" });
   expect(await within(table).findByText("Not answered")).toBeInTheDocument();
-  expect(String((fetch.mock.calls[0] as unknown[])[0])).toBe("/api/customer/stats?unanswered=1");
+  expect(String((fetch.mock.calls[0] as unknown[])[0])).toBe("/api/customer/stats?show=unanswered");
   expect(screen.getByText(/latest 1 questions your chatbot couldn't answer/)).toBeInTheDocument();
-  const toggle = screen.getByRole("switch", { name: "Unanswered only" });
-  expect(toggle).toBeChecked();
-  await userEvent.click(toggle);
+  expect(screen.getByRole("radio", { name: "Not answered" })).toBeChecked();
+  await userEvent.click(screen.getByRole("radio", { name: "All" }));
   expect(nav.replace).toHaveBeenLastCalledWith("/app/usage", { scroll: false });
 });
 
-it("turns the filter on from the switch and says so when nothing is unanswered", async () => {
+it("filters by result from the segmented control and says so when a filter is empty", async () => {
   stubStats(ok(ROWS));
   const { rerender } = render(<VisitorConversations />);
   await screen.findByText("Do you ship abroad?");
-  await userEvent.click(screen.getByRole("switch", { name: "Unanswered only" }));
-  expect(nav.replace).toHaveBeenLastCalledWith("/app/usage?show=unanswered", { scroll: false });
+  const group = screen.getByRole("radiogroup", { name: "Show" });
+  expect(within(group).getAllByRole("radio").map((r) => r.textContent)).toEqual(["All", "Answered", "Not answered", "Failed"]);
+  await userEvent.click(within(group).getByRole("radio", { name: "Failed" }));
+  expect(nav.replace).toHaveBeenLastCalledWith("/app/usage?show=failed", { scroll: false });
 
-  nav.search = "show=unanswered";
-  stubStats(ok([]));
+  nav.search = "show=failed";
+  const fetch = vi.fn(async () => ok([])());
+  vi.stubGlobal("fetch", fetch);
   rerender(<VisitorConversations />);
-  expect(await screen.findByText("No unanswered questions")).toBeInTheDocument();
+  expect(await screen.findByText("No failed requests")).toBeInTheDocument();
+  expect(String((fetch.mock.calls[0] as unknown[])[0])).toBe("/api/customer/stats?show=failed");
   await userEvent.click(screen.getByRole("button", { name: "Show all conversations" }));
   expect(nav.replace).toHaveBeenLastCalledWith("/app/usage", { scroll: false });
 });
 
 it("labels refusals as not answered in the CSV", () => {
   expect(conversationsCsv([REFUSAL]).split("\r\n")[1]).toContain('"Not answered","300"');
+});
+
+it("ignores an unknown ?show= value and shows everything", async () => {
+  nav.search = "show=bogus";
+  const fetch = vi.fn(async () => ok(ROWS)());
+  vi.stubGlobal("fetch", fetch);
+  render(<VisitorConversations />);
+  await screen.findByText("Do you ship abroad?");
+  expect(String((fetch.mock.calls[0] as unknown[])[0])).toBe("/api/customer/stats");
+  expect(screen.getByRole("radio", { name: "All" })).toBeChecked();
+});
+
+it("counts any successful reply as answered, not only status 200", () => {
+  expect(conversationsCsv([{ ...ROWS[0], status: 201 }]).split("\r\n")[1]).toContain('"Answered"');
 });

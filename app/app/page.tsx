@@ -10,7 +10,7 @@ import { DomainsCard } from "@/components/home/DomainsCard";
 import { InsightTiles, NeedsAttention, NextStep, useInsights } from "@/components/home/Insights";
 import { KeyCard } from "@/components/home/KeyCard";
 import { PlanCard } from "@/components/home/PlanCard";
-import { RecentQuestions } from "@/components/home/RecentQuestions";
+import { RecentConversations } from "@/components/home/RecentConversations";
 import { SetupChecklist, setupSteps } from "@/components/home/SetupChecklist";
 import { UsageCard } from "@/components/home/UsageCard";
 import { apiFetch } from "@/lib/client/api";
@@ -89,11 +89,11 @@ export default function HomePage() {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="grid content-start gap-6">
-          {live ? <RecentQuestions /> : <SetupChecklist steps={steps} />}
-          {live && insights.data && <NeedsAttention data={insights.data} used={used} limit={monthlyLimit} />}
+          {live ? <RecentConversations /> : <SetupChecklist steps={steps} />}
           <DomainsCard domains={profile.allowed_domains || []} isPro={isPro} onSave={saveDomains} />
         </div>
-        <aside className="grid content-start gap-6" aria-label="Plan and keys">
+        <aside className="grid content-start gap-6" aria-label="Alerts, plan and keys">
+          {live && insights.data && <NeedsAttention data={insights.data} used={used} limit={monthlyLimit} />}
           <UsageCard used={used} limit={monthlyLimit} />
           <PlanCard
             isPro={isPro}

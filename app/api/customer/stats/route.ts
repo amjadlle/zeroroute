@@ -5,7 +5,15 @@ import { UNANSWERED_ARGS, UNANSWERED_SQL } from "@/lib/unanswered";
 
 export const dynamic = "force-dynamic";
 
-/** The signed-in customer's latest 50 logs; `?unanswered=1` keeps only questions the bot couldn't answer. */
+// The Usage page's filter. "answered" is the complement of "unanswered" among successful requests;
+// COALESCE because a NULL response_preview makes the LIKE test NULL, and NOT NULL would drop the row.
+const FILTERS = new Map<string, { sql: string; args: string[] }>(Object.entries({
+  answered: { sql: `status < 400 AND NOT COALESCE((${UNANSWERED_SQL}), 0)`, args: UNANSWERED_ARGS },
+  unanswered: { sql: UNANSWERED_SQL, args: UNANSWERED_ARGS },
+  failed: { sql: "status >= 400", args: [] },
+}));
+
+/** The signed-in customer's latest 50 logs; `?show=answered|unanswered|failed` keeps only that kind. */
 export async function GET(req: Request) {
   const session = await getCurrentUser();
   if (!session) {
@@ -13,11 +21,11 @@ export async function GET(req: Request) {
   }
 
   try {
-    const unanswered = new URL(req.url).searchParams.get("unanswered") === "1";
+    const filter = FILTERS.get(new URL(req.url).searchParams.get("show") ?? "");
     const db = getDb();
     const logsRes = await db.execute({
-      sql: `SELECT id, timestamp, origin, prompt_preview, response_preview, latency_ms, status FROM request_logs WHERE customer_key = ?${unanswered ? ` AND ${UNANSWERED_SQL}` : ""} ORDER BY timestamp DESC LIMIT 50`,
-      args: [session.key, ...(unanswered ? UNANSWERED_ARGS : [])]
+      sql: `SELECT id, timestamp, origin, prompt_preview, response_preview, latency_ms, status FROM request_logs WHERE customer_key = ?${filter ? ` AND ${filter.sql}` : ""} ORDER BY timestamp DESC LIMIT 50`,
+      args: [session.key, ...(filter?.args ?? [])]
     });
 
     const logs = logsRes.rows || [];
