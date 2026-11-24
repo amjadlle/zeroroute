@@ -11,7 +11,7 @@
  *   surface-sunken        inputs, code blocks, wells
  *   border / border-strong  dividers / control outlines (border-strong is >= 3:1 on surfaces)
  *   text / text-muted / text-subtle   primary / secondary / meta text (all >= 4.5:1 on every surface)
- *   accent, accent-hover, accent-fg   Iris (hue 277); accent-fg is text on an accent fill. Use the accent only
+ *   accent, accent-hover, accent-fg   Ember, the logo red-orange (hue 44-52; orange enough to read apart from danger red, hue 27); accent-fg is text on an accent fill. Use the accent only
  *                         for primary actions, the active nav item, focus rings, switches and charts.
  *   success | warning | danger | info  solid (icons, dots, fills), -soft (tinted bg), -fg (text on -soft or surface)
  *   focus-ring            :focus-visible outline
@@ -117,11 +117,11 @@
   --color-text-muted:     light-dark(oklch(.45 .014 277),  oklch(.75 .01 277));
   --color-text-subtle:    light-dark(oklch(.52 .012 277),  oklch(.68 .01 277));
 
-  --color-accent:       light-dark(oklch(.52 .17 277),  oklch(.76 .17 277));
-  --color-accent-hover: light-dark(oklch(.47 .17 277),  oklch(.81 .17 277));
-  --color-accent-fg:    light-dark(oklch(.99 .005 277), oklch(.19 .04 277));
-  --color-accent-soft:  light-dark(oklch(.95 .04 277),  oklch(.27 .06 277));
-  --color-focus-ring:   light-dark(oklch(.52 .17 277),  oklch(.76 .17 277));
+  --color-accent:       light-dark(oklch(.55 .16 44),   oklch(.73 .16 48));
+  --color-accent-hover: light-dark(oklch(.5 .16 42),    oklch(.78 .14 52));
+  --color-accent-fg:    light-dark(oklch(.99 .005 45),  oklch(.19 .04 45));
+  --color-accent-soft:  light-dark(oklch(.96 .03 55),   oklch(.27 .06 45));
+  --color-focus-ring:   light-dark(oklch(.55 .16 44),   oklch(.73 .16 48));
 
   --color-success:      light-dark(oklch(.5 .13 152),  oklch(.79 .15 152));
   --color-success-soft: light-dark(oklch(.95 .04 152), oklch(.25 .04 152));

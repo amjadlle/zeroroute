@@ -64,7 +64,7 @@ describe("ConsoleShell", () => {
     renderShell({ consoleSwitch: true });
     const sw = screen.getByRole("navigation", { name: "Switch console" });
     expect(within(sw).getByRole("link", { name: "Admin console" })).toHaveAttribute("aria-current", "true");
-    expect(within(sw).getByRole("link", { name: "User console" })).toHaveAttribute("href", "/app");
+    expect(within(sw).getByRole("link", { name: "Customer console" })).toHaveAttribute("href", "/app");
   });
 
   it("opens the mobile menu drawer with the same nav", async () => {
