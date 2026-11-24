@@ -17,8 +17,11 @@ import { isPaidPlan, PLAN_LIMITS } from "@/lib/constants";
 const SUPPORT_EMAIL = "mapkisolutions@gmail.com";
 const SETUP_CALL_URL = "https://cal.com/mapki/zeroroute-setup";
 const CHECKOUT_PARAMS = ["session_id", "id", "subscription_id", "payment_id"];
-// Waits between checks while the payment webhook creates the account (~30s in total).
-export const PENDING_BACKOFF_MS = [1000, 2000, 4000, 8000, 15000];
+// Waits between checks while the payment webhook creates the account (~30s in total). The webhook usually
+// lands a second or two after the redirect, so early checks are close together: starting at 1s then 2s meant
+// a webhook at ~1.5s was only seen at the 3s check (plus a payment-provider lookup per check), about 4s of spinner.
+// Ceiling: still polling; a push (webhook -> page) would remove the wait entirely.
+export const PENDING_BACKOFF_MS = [500, 500, 750, 1000, 1500, 2000, 4000, 8000, 12000];
 
 type CheckoutStatus = { success?: boolean; paid?: boolean; pending?: boolean; claimed?: boolean };
 type Profile = { status?: string; monthly_limit?: number };

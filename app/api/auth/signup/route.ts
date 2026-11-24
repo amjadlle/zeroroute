@@ -124,7 +124,8 @@ export async function POST(req: NextRequest) {
       message: "Account created successfully!",
       token: sessionToken,
       role: "customer",
-      redirect: "/app",
+      // New accounts start in the setup wizard; it ends with a link to the console.
+      redirect: "/onboarding",
       customer: {
         id,
         key: apiKey,

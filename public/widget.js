@@ -19,12 +19,13 @@
   var customGreeting = scriptTag ? scriptTag.getAttribute("data-greeting") : null;
   var customPromptsRaw = scriptTag ? scriptTag.getAttribute("data-prompts") : null;
   var attrColor = scriptTag ? scriptTag.getAttribute("data-color") : null;
-  var customColor = attrColor || "#ef4444";
+  var DEFAULT_COLOR = "#ef4444"; // same as DEFAULT_BRAND_COLOR in lib/brand.ts
+  var customColor = attrColor || DEFAULT_COLOR;
   var customLinkColor = scriptTag ? scriptTag.getAttribute("data-link-color") : null;
   var customLogo = scriptTag ? scriptTag.getAttribute("data-logo") : null;
 
   function adjustHex(hex, percent) {
-    if (!hex || typeof hex !== "string") return "#ef4444";
+    if (!hex || typeof hex !== "string") return DEFAULT_COLOR;
     var clean = hex.replace("#", "").trim();
     if (clean.length === 3) clean = clean[0] + clean[0] + clean[1] + clean[1] + clean[2] + clean[2];
     if (clean.length !== 6) return hex;

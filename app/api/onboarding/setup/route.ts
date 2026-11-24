@@ -3,6 +3,7 @@ import { getDb, initDb } from "@/lib/db";
 import { getCurrentUser, getCustomerByTokenOrKey } from "@/lib/auth/session";
 import { generateSalt, hashPassword } from "@/lib/auth/password";
 import { MIN_PASSWORD_LENGTH } from "@/lib/constants";
+import { cleanDomains, domainLimitError } from "@/lib/providers/gateway";
 
 export async function POST(req: NextRequest) {
   try {
@@ -49,6 +50,16 @@ export async function POST(req: NextRequest) {
     const prompts = Array.isArray(body.prompts) ? JSON.stringify(body.prompts.slice(0, 10).map((p: unknown) => String(p).slice(0, 200))) : (typeof body.prompts === "string" ? body.prompts.slice(0, 2000) : activeCust.prompts || "[]");
     const persona = (body.persona ? String(body.persona).trim() : activeCust.persona || "").slice(0, 10000);
 
+    // The website also becomes an allowed domain, cleaned and capped exactly like /api/customer/domains.
+    // Over the plan's limit (e.g. a free plan that already allows another site) the list is left as it was.
+    // An unreadable stored list is kept untouched rather than overwritten.
+    let allowedDomainsJson = activeCust.allowed_domains || "[]";
+    try {
+      const current = cleanDomains(JSON.parse(allowedDomainsJson));
+      const withWebsite = body.website ? cleanDomains([...current, body.website]) : current;
+      if (!domainLimitError(withWebsite.length, activeCust.monthly_limit)) allowedDomainsJson = JSON.stringify(withWebsite);
+    } catch { /* keep as stored */ }
+
     const now = Date.now();
 
     // Update password if provided
@@ -80,6 +91,7 @@ export async function POST(req: NextRequest) {
           greeting = ?,
           prompts = ?,
           persona = ?,
+          allowed_domains = ?,
           password_hash = ?,
           password_salt = ?,
           session_token = ?,
@@ -96,6 +108,7 @@ export async function POST(req: NextRequest) {
         greeting,
         prompts,
         persona,
+        allowedDomainsJson,
         passwordHash,
         passwordSalt,
         sessionToken,

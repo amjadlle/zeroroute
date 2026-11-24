@@ -49,6 +49,16 @@ it("polls with backoff while the webhook is pending, then shows the paid state",
   expect(fetchMock).toHaveBeenCalledTimes(3);
 });
 
+it("shows the paid state within about 2s when the webhook lands 1.5s after the redirect", async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: true });
+  nav.query = "session_id=cs_1";
+  const start = Date.now();
+  stubApi({ checkout: () => (Date.now() - start < 1500 ? json({ success: false, paid: true, pending: true }, 202) : json({ success: true })) });
+  render(<Welcome />);
+  await act(() => vi.advanceTimersByTimeAsync(2000));
+  expect(screen.getByText("Payment confirmed")).toBeInTheDocument();
+});
+
 it("shows a calm processing state when the webhook never arrives, and can check again", async () => {
   vi.useFakeTimers({ shouldAdvanceTime: true });
   nav.query = "session_id=cs_1";
