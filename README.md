@@ -130,8 +130,8 @@ Fill in `.env.local`:
 APP_URL=http://localhost:3000
 ADMIN_EMAIL=mapkisolutions@gmail.com
 ADMIN_PASSWORD=your_secure_password
-ADMIN_KEY=zr_admin_master_secret
-ROUTER_API_KEY=zr_admin_master_secret
+ADMIN_SESSION_SECRET=at_least_32_random_characters
+ROUTER_API_KEY=a_different_random_key
 
 # (Optional) Cloud Provider API Keys
 GROQ_API_KEY=gsk_...

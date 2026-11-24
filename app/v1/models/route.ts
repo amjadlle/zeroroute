@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : authHeader.trim();
 
   // If a router/admin key is configured, enforce valid credentials or valid subscriber key
-  const routerKey = process.env.ROUTER_API_KEY || process.env.ADMIN_KEY;
+  const routerKey = process.env.ROUTER_API_KEY;
   if (routerKey && token) {
     const isMaster = isMasterAdminKey(token);
     let isCustomer = false;
