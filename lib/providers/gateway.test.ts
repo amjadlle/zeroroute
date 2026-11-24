@@ -41,11 +41,32 @@ describe("isHostAllowed", () => {
 });
 
 describe("isSameOrigin", () => {
+  // The server binds as localhost, so request.url says localhost whatever address the browser used.
+  const req = (headers: Record<string, string>) => new Request("http://localhost:3000/v1/chat/completions", { headers });
+
   it("allows no Origin or a matching host only", () => {
-    expect(isSameOrigin(null, "zeroroute.mapki.in")).toBe(true);
-    expect(isSameOrigin("https://zeroroute.mapki.in", "zeroroute.mapki.in")).toBe(true);
-    expect(isSameOrigin("https://blog.mapki.in", "zeroroute.mapki.in")).toBe(false);
-    expect(isSameOrigin("null", "zeroroute.mapki.in")).toBe(false);
+    expect(isSameOrigin(req({ host: "zeroroute.mapki.in" }))).toBe(true);
+    expect(isSameOrigin(req({ host: "zeroroute.mapki.in", origin: "https://zeroroute.mapki.in" }))).toBe(true);
+    expect(isSameOrigin(req({ host: "zeroroute.mapki.in", origin: "https://blog.mapki.in" }))).toBe(false);
+    expect(isSameOrigin(req({ host: "zeroroute.mapki.in", origin: "null" }))).toBe(false);
+  });
+
+  it("compares with the Host the browser used, not the server's bind name", () => {
+    expect(isSameOrigin(req({ host: "127.0.0.1:3000", origin: "http://127.0.0.1:3000" }))).toBe(true);
+    expect(isSameOrigin(req({ host: "127.0.0.1:3000", origin: "http://localhost:3000" }))).toBe(false);
+    expect(isSameOrigin(req({ host: "Zeroroute.Mapki.in", origin: "https://zeroroute.mapki.in" }))).toBe(true);
+  });
+
+  it("prefers the proxy's x-forwarded-host over the internal Host", () => {
+    const behindProxy = { host: "internal.vercel.app", "x-forwarded-host": "zeroroute.mapki.in, internal.vercel.app" };
+    expect(isSameOrigin(req({ ...behindProxy, origin: "https://zeroroute.mapki.in" }))).toBe(true);
+    expect(isSameOrigin(req({ ...behindProxy, origin: "https://internal.vercel.app" }))).toBe(false);
+    expect(isSameOrigin(req({ ...behindProxy, origin: "https://evil.example" }))).toBe(false);
+  });
+
+  it("falls back to the request URL host when no Host header is present", () => {
+    expect(isSameOrigin(req({ origin: "http://localhost:3000" }))).toBe(true);
+    expect(isSameOrigin(req({ origin: "https://evil.example" }))).toBe(false);
   });
 });
 

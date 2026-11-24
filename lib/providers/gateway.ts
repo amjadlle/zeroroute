@@ -38,9 +38,17 @@ export function isHostAllowed(originOrReferer: string | null, allowed: string[])
   });
 }
 
-/** Cookie auth is only for same-origin calls (no Origin header, or Origin host equals our host). */
-export function isSameOrigin(origin: string | null, host: string): boolean {
-  return !origin || parseUrl(origin)?.host === host;
+/**
+ * Cookie auth is only for same-origin calls: no Origin header, or the Origin host equals the host the browser
+ * asked for (x-forwarded-host behind a proxy, else Host), the same rule Next.js uses for Server Actions.
+ * request.url is only a fallback: its host is the server's bind name (e.g. localhost), not the one in the address bar.
+ */
+export function isSameOrigin(request: Request): boolean {
+  const h = request.headers;
+  const origin = h.get("origin");
+  if (!origin) return true;
+  const host = h.get("x-forwarded-host")?.split(",")[0].trim() || h.get("host") || new URL(request.url).host;
+  return parseUrl(origin)?.host === host.toLowerCase();
 }
 
 const ROLES = ["system", "user", "assistant", "tool"];

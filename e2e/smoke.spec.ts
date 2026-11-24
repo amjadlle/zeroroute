@@ -63,11 +63,11 @@ test("customer: sign up, console pages, theme, no admin, sign out", async ({ pag
   // Onboarding counts on Home: the name is set and the website is an allowed domain.
   await expect(page.getByText("Name your chatbot (done)")).toBeAttached();
   await expect(page.getByText("Put it on your website (done)")).toBeAttached();
-  await expect(page.getByRole("navigation", { name: "User console", exact: true })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Customer console", exact: true })).toBeVisible();
   await expect(h1(page)).toHaveText(/^(Welcome to ZeroRoute|Home)$/);
   await expect(page.getByRole("navigation", { name: "Switch console" })).toHaveCount(0);
 
-  await visitAll(page, "User console", CUSTOMER_PAGES);
+  await visitAll(page, "Customer console", CUSTOMER_PAGES);
 
   // System -> Light -> Dark, and the choice survives a reload.
   const html = page.locator("html");

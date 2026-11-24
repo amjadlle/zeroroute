@@ -124,6 +124,8 @@ export function AddKnowledgeDialog({ open, onClose, targetKey, onAdded }: AddKno
     <Modal
       open={open}
       onClose={close}
+      // Each source type has a different height; a centred dialog would jump on every switch, so pin its top.
+      className="mt-[10dvh] mb-auto"
       title="Add knowledge"
       description="The chatbot answers questions from what you add."
       footer={
