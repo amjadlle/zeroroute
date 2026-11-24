@@ -6,20 +6,25 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Field } from "@/components/ui/Field";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { Select } from "@/components/ui/Select";
-import { KnowledgeList, type KnowledgeSource } from "@/components/shared/knowledge/KnowledgeList";
+import { AddKnowledgeButton, KnowledgeList, type KnowledgeListProps, type KnowledgeSource } from "@/components/shared/knowledge/KnowledgeList";
 import type { CustomerAdminItem } from "@/components/admin/AdminCustomersTab";
 import { LoadError, useAdminData } from "@/components/admin/useAdminData";
 
 export default function AdminKnowledgePage() {
   const { data, error, reload } = useAdminData<{ customers?: CustomerAdminItem[] }>("/api/admin/customers");
   const [picked, setPicked] = useState<string>();
+  const [adding, setAdding] = useState(false);
   const customers = data?.customers ?? [];
   // Derived, not set in an effect: the list never loads for an empty key first.
   const selected = customers.some((c) => c.key === picked) ? picked : customers[0]?.key;
 
   return (
     <>
-      <PageHeader title="Knowledge" description="What each customer's chatbot answers from. Pick a customer, then add or remove sources." />
+      <PageHeader
+        title="Knowledge"
+        description="What each customer's chatbot answers from. Pick a customer, then add or remove sources."
+        actions={selected && <AddKnowledgeButton onClick={() => setAdding(true)} />}
+      />
       {error && <LoadError what="customers" error={error} onRetry={reload} />}
       {!data ? (
         !error && <PageLoader label="Loading customers" />
@@ -37,14 +42,14 @@ export default function AdminKnowledgePage() {
             </Select>
           </Field>
           {/* Keyed by customer: switching remounts, so a slow reply for the previous customer can't show up here. */}
-          <CustomerSources key={selected} targetKey={selected} />
+          <CustomerSources key={selected} targetKey={selected} adding={adding} onAddingChange={setAdding} />
         </>
       )}
     </>
   );
 }
 
-function CustomerSources({ targetKey }: { targetKey: string }) {
+function CustomerSources({ targetKey, ...add }: { targetKey: string } & Pick<KnowledgeListProps, "adding" | "onAddingChange">) {
   const { data, error, reload } = useAdminData<{ documents?: KnowledgeSource[] }>(
     `/api/knowledge?target_key=${encodeURIComponent(targetKey)}`,
   );
@@ -55,6 +60,7 @@ function CustomerSources({ targetKey }: { targetKey: string }) {
       onRetry={reload}
       targetKey={targetKey}
       onChange={reload}
+      {...add}
     />
   );
 }
