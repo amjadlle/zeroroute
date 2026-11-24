@@ -11,9 +11,11 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/login",
 }));
 
-const location = { href: "" };
+// Starts as a real URL because next/image resolves src against location.href.
+const START = "http://localhost/login";
+const location = { href: START };
 beforeEach(() => {
-  location.href = "";
+  location.href = START;
   vi.stubGlobal("location", location);
 });
 afterEach(() => vi.unstubAllGlobals());
@@ -54,7 +56,7 @@ it("shows the server error in an alert", async () => {
   render(<LoginPage />);
   await signIn();
   expect(await screen.findByRole("alert")).toHaveTextContent("Invalid email or password.");
-  expect(location.href).toBe("");
+  expect(location.href).toBe(START);
 });
 
 it("?tab=signup shows the signup form with the server's password rule", () => {
