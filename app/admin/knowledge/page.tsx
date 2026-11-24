@@ -27,7 +27,7 @@ export default function AdminKnowledgePage() {
         <EmptyState title="No customers yet" description="Knowledge belongs to a customer's chatbot. Add a customer first." />
       ) : (
         <>
-          <Field label="Customer" className="mb-4 max-w-sm">
+          <Field label="Customer" className="mb-4 max-w-xl">
             <Select value={selected} onChange={(e) => setPicked(e.target.value)}>
               {customers.map((c) => (
                 <option key={c.key} value={c.key}>
