@@ -19,13 +19,13 @@ it("rounds the axis up to a value with a whole-number middle line", () => {
 it("draws one bar per day, scaled to the axis, with the last 7 days highlighted", () => {
   const { container } = render(<QuestionsChart data={{ days, topics: [] }} error={null} reload={() => {}} />);
   const chart = screen.getByRole("img");
-  expect(chart).toHaveAccessibleName(/111 in total\. The busiest day was 18 Nov with 30\./);
+  expect(chart).toHaveAccessibleName(/111 in total\. The busiest day was (18 Nov|Nov 18) with 30\./);
   const bars = [...container.querySelectorAll<HTMLElement>("[style*='height']")];
   expect(bars).toHaveLength(14);
   expect(bars[10].style.height).toBe("75%"); // 30 of 40
   expect(bars.filter((b) => b.classList.contains("bg-accent"))).toHaveLength(7);
   expect(bars[0]).toHaveClass("bg-accent/35");
-  expect(screen.getByText("21 Nov")).toBeInTheDocument(); // today is always labelled
+  expect(screen.getByText(/^(21 Nov|Nov 21)$/)).toBeInTheDocument(); // today is always labelled; day/month order follows the runner's locale
 });
 
 it("says when there were no questions, and offers a retry after an error", async () => {
