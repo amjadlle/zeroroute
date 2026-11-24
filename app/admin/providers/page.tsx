@@ -45,7 +45,7 @@ export default function AdminProvidersPage() {
         actions={
           data && (
             <Button variant="secondary" size="sm" loading={benchmarking} onClick={runBenchmark} leftIcon={<Zap className="size-3.5" aria-hidden />}>
-              Speed test all
+              Test all
             </Button>
           )
         }
