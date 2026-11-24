@@ -1,5 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { isBrandColor, parseAppearance } from "./brand";
+import { readFileSync } from "node:fs";
+import { BRAND_COLOR_PRESETS, DEFAULT_BRAND_COLOR, isBrandColor, parseAppearance } from "./brand";
+
+describe("brand colour defaults", () => {
+  it("matches the widget's own default", () => {
+    expect(readFileSync("public/widget.js", "utf8")).toContain(`var DEFAULT_COLOR = "${DEFAULT_BRAND_COLOR}";`);
+  });
+
+  it("offers only valid, distinct presets", () => {
+    const all = [DEFAULT_BRAND_COLOR, ...BRAND_COLOR_PRESETS.map((p) => p.value)];
+    expect(all.every(isBrandColor)).toBe(true);
+    expect(new Set(all).size).toBe(all.length);
+  });
+});
 
 describe("parseAppearance", () => {
   it("accepts and normalises a hex brand colour", () => {
