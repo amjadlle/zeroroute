@@ -35,3 +35,23 @@ it("filters to one customer's requests when customer_key is given", async () => 
   const res = await GET(new Request("http://localhost/api/admin/logs?customer_key=other"));
   expect((await res.json()).logs.map((l: { id: string }) => l.id)).toEqual(["b"]);
 });
+
+it("buckets the last 14 days into rolling 24-hour trends, oldest first", async () => {
+  const db = await testDb();
+  const now = Date.now();
+  const at = (id: string, hoursAgo: number, status: number, latency: number, cacheHit = 0) =>
+    db.execute({
+      sql: `INSERT INTO request_logs (id, customer_key, timestamp, provider, model, latency_ms, status, is_cache_hit) VALUES (?, 'k', ?, 'groq', 'm', ?, ?, ?)`,
+      args: [id, now - hoursAgo * 3_600_000, latency, status, cacheHit],
+    });
+  await at("a", 1, 200, 100, 1);
+  await at("b", 2, 500, 300);
+  await at("c", 30, 200, 50);
+  await at("d", 24 * 20, 200, 999); // older than the window
+
+  const { daily } = await metrics();
+  expect(daily).toHaveLength(14);
+  expect(daily[13]).toEqual({ total: 2, ok: 1, cacheHits: 1, avgLatencyMs: 200 });
+  expect(daily[12]).toEqual({ total: 1, ok: 1, cacheHits: 0, avgLatencyMs: 50 });
+  expect(daily.slice(0, 12).every((d: { total: number }) => d.total === 0)).toBe(true);
+});

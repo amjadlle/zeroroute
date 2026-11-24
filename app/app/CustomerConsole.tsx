@@ -114,11 +114,6 @@ export function CustomerConsole({ children }: { children: ReactNode }) {
         { href: "/app/chatbot", label: "Chatbot", icon: <Bot className={icon} /> },
         { href: "/app/knowledge", label: "Knowledge", icon: <BookOpen className={icon} />, count: profile ? docs.length : undefined },
         { href: "/app/install", label: "Install", icon: <Code2 className={icon} /> },
-      ],
-    },
-    {
-      label: "Account",
-      items: [
         { href: "/app/usage", label: "Usage", icon: <BarChart3 className={icon} /> },
         { href: "/app/billing", label: "Billing", icon: <CreditCard className={icon} /> },
       ],
@@ -151,11 +146,10 @@ export function CustomerConsole({ children }: { children: ReactNode }) {
 
   return (
     <ConsoleShell
-      consoleLabel="User console"
+      consoleLabel="Customer"
       nav={nav}
       account={{
         name: profile?.name || profile?.company || "Your account",
-        email: profile?.email ?? "",
         plan: profile ? `${isPro ? PLAN_LABELS.pro : PLAN_LABELS.free} plan` : "",
       }}
       consoleSwitch={Boolean(profile?.is_admin)}

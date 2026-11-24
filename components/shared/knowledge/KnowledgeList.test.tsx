@@ -1,9 +1,10 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useState } from "react";
 import { afterEach, expect, it, vi } from "vitest";
 import { UiProviders } from "@/components/ui/UiProviders";
 import { fileProblem, MAX_FILE_BYTES } from "./AddKnowledgeDialog";
-import { KnowledgeList, type KnowledgeSource } from "./KnowledgeList";
+import { AddKnowledgeButton, KnowledgeList, timeAgo, type KnowledgeListProps, type KnowledgeSource } from "./KnowledgeList";
 
 const SOURCE: KnowledgeSource = {
   id: "d1", title: "Pricing", type: "web_website", content: "…", char_count: 1234, source_url: "https://example.com/pricing", created_at: 0,
@@ -19,12 +20,25 @@ function stubFetch(reply: (url: string) => Reply = () => ({})) {
   return fetch;
 }
 
-function setup(props: Partial<Parameters<typeof KnowledgeList>[0]> = {}) {
+type Props = Omit<KnowledgeListProps, "adding" | "onAddingChange">;
+
+/** Like the pages: the header button and the list share the dialog's open state. */
+function Page(props: Props) {
+  const [adding, setAdding] = useState(false);
+  return (
+    <>
+      <AddKnowledgeButton onClick={() => setAdding(true)} />
+      <KnowledgeList {...props} adding={adding} onAddingChange={setAdding} />
+    </>
+  );
+}
+
+function setup(props: Partial<Props> = {}) {
   const onChange = vi.fn(async () => {});
   const onRetry = vi.fn();
   render(
     <UiProviders>
-      <KnowledgeList sources={[SOURCE]} onRetry={onRetry} onChange={onChange} {...props} />
+      <Page sources={[SOURCE]} onRetry={onRetry} onChange={onChange} {...props} />
     </UiProviders>,
   );
   return { onChange, onRetry };
@@ -51,11 +65,32 @@ it("shows a load error with a retry instead of an empty list", async () => {
   expect(onRetry).toHaveBeenCalled();
 });
 
-it("labels sources with glossary names", () => {
-  setup();
+it("labels sources with glossary names and says when each was last updated", () => {
+  setup({ sources: [{ ...SOURCE, created_at: Date.now() - 2 * 864e5 }] });
   const row = screen.getByRole("row", { name: /Pricing/ });
   expect(within(row).getByText("Website")).toBeInTheDocument();
   expect(within(row).getByText("1,234 characters")).toBeInTheDocument();
+  expect(within(row).getByText("2 days ago")).toBeInTheDocument();
+});
+
+it("words times relative to now", () => {
+  const now = Date.UTC(2026, 10, 25, 12);
+  const ago = (ms: number) => timeAgo(now - ms, now);
+  expect(ago(20_000)).toBe("Just now");
+  expect(ago(5 * 6e4)).toBe("5 minutes ago");
+  expect(ago(3 * 36e5)).toBe("3 hours ago");
+  expect(ago(864e5)).toBe("yesterday");
+  expect(ago(2 * 864e5)).toBe("2 days ago");
+  expect(ago(14 * 864e5)).toBe("2 weeks ago");
+  expect(ago(400 * 864e5)).toBe("last year");
+});
+
+it("opens the add dialog from the empty list as well as the header", async () => {
+  setup({ sources: [] });
+  const buttons = screen.getAllByRole("button", { name: "Add knowledge" });
+  expect(buttons).toHaveLength(2);
+  await userEvent.click(buttons[1]);
+  expect(screen.getByRole("dialog", { name: "Add knowledge" })).toHaveAttribute("open");
 });
 
 it("asks before deleting, and keeps the dialog open with the error when it fails", async () => {

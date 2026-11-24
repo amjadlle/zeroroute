@@ -21,11 +21,11 @@ const NAV: NavGroup[] = [
   },
 ];
 
-const ACCOUNT = { name: "ZeroRoute admin", email: "admin@example.com", plan: "Admin" };
+const ACCOUNT = { name: "ZeroRoute admin", plan: "Admin" };
 
 function renderShell(props: Partial<Parameters<typeof ConsoleShell>[0]> = {}) {
   return render(
-    <ConsoleShell consoleLabel="Admin console" nav={NAV} account={ACCOUNT} {...props}>
+    <ConsoleShell consoleLabel="Admin" nav={NAV} account={ACCOUNT} {...props}>
       <input aria-label="Page field" />
     </ConsoleShell>,
   );
@@ -45,7 +45,16 @@ describe("ConsoleShell", () => {
     const sidebar = screen.getByRole("navigation", { name: "Admin console" });
     expect(within(sidebar).getByRole("link", { name: "Request log" })).toHaveAttribute("aria-current", "page");
     expect(within(sidebar).getByRole("link", { name: "Overview" })).not.toHaveAttribute("aria-current");
-    expect(within(screen.getByRole("navigation", { name: "Breadcrumb" })).getByText("Request log")).toBeInTheDocument();
+    const crumbs = within(screen.getByRole("navigation", { name: "Breadcrumb" }));
+    expect(crumbs.getByRole("link", { name: "Admin" })).toHaveAttribute("href", "/admin");
+    expect(crumbs.getByText("Request log")).toBeInTheDocument();
+  });
+
+  it("links Docs in a new tab from the top bar", () => {
+    renderShell();
+    const docs = screen.getByRole("link", { name: /^Docs/ });
+    expect(docs).toHaveAttribute("target", "_blank");
+    expect(docs.getAttribute("rel")).toContain("noopener");
   });
 
   it("shows the console switch only for admins", () => {
@@ -98,8 +107,10 @@ describe("CommandPalette (through the shell)", () => {
 
     await user.click(screen.getByRole("main"));
     await user.keyboard("{Control>}k{/Control}");
-    expect(screen.getByRole("dialog", { name: "Search or jump to" })).toBeInTheDocument();
+    const dialog = screen.getByRole("dialog", { name: "Search or jump to" });
     expect(screen.getByRole("combobox")).toHaveFocus();
+    // Opens straight on the field: no visible title bar or close button.
+    expect(within(dialog).queryByRole("button", { name: "Close" })).toBeNull();
   });
 
   it("opens from the search button and navigates with arrows + Enter", async () => {

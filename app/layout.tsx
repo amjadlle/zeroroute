@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import localFont from "next/font/local";
 import "./globals.css";
 import { PROVIDER_COUNT } from "@/lib/constants";
@@ -116,14 +115,8 @@ export default function RootLayout({
 }) {
   return (
     // suppressHydrationWarning: ConsoleShell's inline theme script sets data-theme on <html> before hydration (#9).
-    <html lang="en" suppressHydrationWarning className={`dark scroll-smooth ${jakarta.variable} ${jetbrains.variable} ${geist.variable} ${geistMono.variable}`}>
-      <body className="bg-dark-bg text-slate-100 min-h-screen font-sans antialiased selection:bg-red-500 selection:text-white">
-        <div className="fixed inset-0 grid-pattern pointer-events-none z-0" />
-        <div className="relative z-10 flex flex-col min-h-screen">
-          {children}
-        </div>
-        <Script src="/widget.js" data-bot-id="demo" strategy="afterInteractive" />
-      </body>
+    <html lang="en" suppressHydrationWarning className={`scroll-smooth ${jakarta.variable} ${jetbrains.variable} ${geist.variable} ${geistMono.variable}`}>
+      <body className="min-h-screen font-sans antialiased">{children}</body>
     </html>
   );
 }

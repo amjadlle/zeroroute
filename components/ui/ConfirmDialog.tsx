@@ -48,7 +48,6 @@ export function ConfirmDialog({ open, onClose, title, body, confirmLabel = "Conf
     <Modal
       open={open}
       onClose={close}
-      size="sm"
       title={title}
       description={body}
       footer={

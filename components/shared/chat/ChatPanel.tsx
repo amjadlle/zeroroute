@@ -1,35 +1,40 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { RotateCcw, Send, Square } from "lucide-react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Bot, RotateCcw, Send, Square } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { prefersWhiteText } from "@/lib/contrast";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
-import { Card, CardHeader } from "@/components/ui/Card";
+import { Card } from "@/components/ui/Card";
 import { CopyButton } from "@/components/ui/CopyButton";
 import { Input } from "@/components/ui/Input";
 import { Markdown } from "@/components/ui/Markdown";
 import { Spinner } from "@/components/ui/Spinner";
+import { StatusDot } from "@/components/ui/StatusDot";
 import type { ChatStream } from "./useChatStream";
 
 type ChatPanelProps = {
   chat: ChatStream;
   title: ReactNode;
+  /** Status line under the title, e.g. "Test mode · not counted in usage". */
   description?: ReactNode;
+  /** The customer's brand colour (validated hex, user data) for the avatar and visitor bubbles; the accent otherwise. */
+  brandColor?: string;
+  /** The customer's logo URL, shown in the avatar instead of the bot icon. */
+  logo?: string;
   /** Shown as the first chatbot message; display only, never sent to the model. */
   greeting?: string;
   /** Clickable starter questions, shown until the first message. */
   suggestions?: string[];
   placeholder?: string;
   className?: string;
-  /** E.g. the brand colour as a border on the Chatbot page preview (user data, not console styling). */
-  style?: CSSProperties;
 };
 
 const bubble = "max-w-[85%] rounded-card px-3 py-2 text-body";
 
 /** Message list and composer for a useChatStream conversation. Answers render through the safe Markdown component. */
-export function ChatPanel({ chat, title, description, greeting, suggestions = [], placeholder = "Type a message", className, style }: ChatPanelProps) {
+export function ChatPanel({ chat, title, description, brandColor, logo, greeting, suggestions = [], placeholder = "Type a message", className }: ChatPanelProps) {
   const { messages, streaming, error, send, retry, stop, reset } = chat;
   const [input, setInput] = useState("");
   const logRef = useRef<HTMLDivElement>(null);
@@ -45,36 +50,50 @@ export function ChatPanel({ chat, title, description, greeting, suggestions = []
     setInput("");
   };
   const lastIndex = messages.length - 1;
+  // Brand fill with black or white text, whichever reads better; the accent pair when there is no brand colour.
+  const fill = brandColor
+    ? { className: prefersWhiteText(brandColor) ? "text-white" : "text-black", style: { backgroundColor: brandColor } }
+    : { className: "bg-accent text-accent-fg" };
+  const botBubble = cn(bubble, "rounded-bl-sm bg-surface-sunken");
 
   return (
     // Fixed height so the composer stays in view; dvh keeps it inside small phone screens.
-    <Card style={style} className={cn("flex h-[36rem] max-h-[85dvh] min-h-80 flex-col overflow-hidden", className)}>
-      <CardHeader
-        title={title}
-        description={description}
-        actions={
-          <Button variant="ghost" size="sm" leftIcon={<RotateCcw aria-hidden className="size-3.5" />} onClick={reset} disabled={!messages.length && !error}>
-            New chat
-          </Button>
-        }
-      />
+    <Card className={cn("flex h-[36rem] max-h-[85dvh] min-h-80 flex-col overflow-hidden", className)}>
+      <div className="flex items-center gap-2.5 border-b border-border px-4.5 py-3.5">
+        <span aria-hidden style={fill.style} className={cn("grid size-8 shrink-0 place-items-center overflow-hidden rounded-card", fill.className)}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- customer's own image host, not in next.config */}
+          {logo ? <img src={logo} alt="" className="size-full bg-surface object-contain" /> : <Bot className="size-4" />}
+        </span>
+        <div className="min-w-0 flex-1">
+          <h2 className="truncate text-body font-semibold">{title}</h2>
+          {description && (
+            <p className="flex items-center gap-1.5 text-meta text-text-muted">
+              <StatusDot tone="success" />
+              {description}
+            </p>
+          )}
+        </div>
+        <Button variant="ghost" size="sm" leftIcon={<RotateCcw aria-hidden className="size-3.5" />} onClick={reset} disabled={!messages.length && !error}>
+          New chat
+        </Button>
+      </div>
       <div ref={logRef} role="log" aria-label="Conversation" aria-busy={streaming} className="flex-1 space-y-4 overflow-y-auto p-4">
         {!greeting && !messages.length && !error && !suggestions.length && (
           <p className="py-8 text-center text-body text-text-muted">Send a message to start.</p>
         )}
         {greeting && (
-          <div className={cn(bubble, "bg-surface-sunken")}>
+          <div className={botBubble}>
             <Markdown>{greeting}</Markdown>
           </div>
         )}
         {messages.map((m, i) =>
           m.role === "user" ? (
-            <div key={i} className={cn(bubble, "ml-auto w-fit whitespace-pre-wrap break-words bg-accent-soft text-text")}>
+            <div key={i} style={fill.style} className={cn(bubble, "ml-auto w-fit whitespace-pre-wrap break-words rounded-br-sm", fill.className)}>
               {m.content}
             </div>
           ) : (
             <div key={i} className="grid justify-items-start gap-1">
-              <div className={cn(bubble, "bg-surface-sunken")}>
+              <div className={botBubble}>
                 {m.content ? <Markdown>{m.content}</Markdown> : <Spinner size="sm" label="Waiting for the reply" className="text-text-muted" />}
               </div>
               {/* Always visible (not hover-only) so the actions work on touch screens. */}

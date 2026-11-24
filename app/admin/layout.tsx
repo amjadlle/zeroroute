@@ -14,5 +14,5 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   const user = await getCurrentUser();
   if (user?.id !== "admin_master") redirect("/login?redirect=/admin");
 
-  return <AdminShell account={{ name: user.name || "Admin", email: user.email, plan: "Admin" }}>{children}</AdminShell>;
+  return <AdminShell account={{ name: user.name || "Admin", plan: "Admin" }}>{children}</AdminShell>;
 }

@@ -1,6 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import { contrastRatio, parseColor, tokenContrastReport } from "./contrast";
+import { contrastRatio, parseColor, prefersWhiteText, tokenContrastReport } from "./contrast";
+
+describe("prefersWhiteText", () => {
+  it("picks whichever of white or black contrasts more", () => {
+    for (const bg of ["#4f46e5", "#000", "#dc2626", "#0d9488", "#fde047", "#fff", "#38bdf8", "#777", "#767676"]) {
+      expect(prefersWhiteText(bg)).toBe(contrastRatio("#fff", bg) >= contrastRatio("#000", bg));
+    }
+    expect(prefersWhiteText("#4f46e5")).toBe(true);
+    expect(prefersWhiteText("#fde047")).toBe(false);
+  });
+});
 
 describe("contrastRatio", () => {
   it("matches the WCAG reference values", () => {

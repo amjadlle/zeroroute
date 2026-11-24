@@ -46,6 +46,11 @@ export function contrastRatio(fg: string, bg: string): number {
   return (hi + 0.05) / (lo + 0.05);
 }
 
+/** True when white text reads better than black on this fill (the two contrasts cross at luminance ≈ 0.179). */
+export function prefersWhiteText(bg: string): boolean {
+  return luminance(bg) <= 0.179;
+}
+
 // Token pairs that must pass WCAG AA: [foreground, background, minimum ratio].
 // 4.5 = normal text, 3 = UI boundaries and focus indicators. "white" means #ffffff.
 export const CONTRAST_PAIRS: ReadonlyArray<readonly [string, string, number]> = [

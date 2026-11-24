@@ -39,7 +39,8 @@ export function CommandPalette({ open, onOpenChange, pages, actions = [] }: Comm
   }, []);
 
   return (
-    <Modal open={open} onClose={() => onOpenChange(false)} title="Search or jump to" className="max-w-xl">
+    // Opens straight on the search field, a little above centre (Graphite+ prototype).
+    <Modal open={open} onClose={() => onOpenChange(false)} title="Search or jump to" hideHeader className="mt-[12vh] max-w-140">
       {/* Mounted only while open, so every open starts with an empty query. */}
       {open && <PaletteBody pages={pages} actions={actions} close={() => onOpenChange(false)} />}
     </Modal>

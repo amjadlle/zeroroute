@@ -51,11 +51,11 @@ test("customer: sign up, console pages, theme, no admin, sign out", async ({ pag
   await page.locator("form").getByRole("button", { name: "Create account" }).click();
 
   await expect(page).toHaveURL("/app");
-  await expect(page.getByRole("navigation", { name: "User console", exact: true })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Customer console", exact: true })).toBeVisible();
   await expect(h1(page)).toHaveText(/^(Welcome to ZeroRoute|Home)$/);
   await expect(page.getByRole("navigation", { name: "Switch console" })).toHaveCount(0);
 
-  await visitAll(page, "User console", CUSTOMER_PAGES);
+  await visitAll(page, "Customer console", CUSTOMER_PAGES);
 
   // System -> Light -> Dark, and the choice survives a reload.
   const html = page.locator("html");

@@ -59,19 +59,15 @@ export default function ChatbotPage() {
         </Card>
         <ChatPanel
           chat={chat}
-          title={
-            <span className="flex items-center gap-2">
-              {/* eslint-disable-next-line @next/next/no-img-element -- customer's own image host, not in next.config */}
-              {logo && <img src={logo} alt="" className="size-6 rounded-control object-contain" />}
-              {settings.bot_title || "Your chatbot"}
-            </span>
-          }
-          description={dirty ? "Save your changes to test new instructions." : "Answers use your saved settings and knowledge."}
+          title={settings.bot_title || "Your chatbot"}
+          // Test chats use the customer's own quota (the route counts every cookie-session call), so say so.
+          description={dirty ? "Save your changes to test new instructions." : "Test mode · uses your monthly messages"}
+          brandColor={color}
+          logo={logo}
           greeting={settings.greeting}
           suggestions={prompts}
           placeholder="Ask what a visitor would ask"
-          className={color ? "border-t-4 lg:sticky lg:top-6" : "lg:sticky lg:top-6"}
-          style={color ? { borderTopColor: color } : undefined}
+          className="lg:sticky lg:top-6"
         />
       </div>
     </>
