@@ -65,3 +65,22 @@ it("rejects a too-short password instead of ignoring it", async () => {
   loginAs(A);
   expect((await setup({ password: "123" })).status).toBe(400);
 });
+
+const domains = async (id: string) => JSON.parse(String((await row(id)).allowed_domains));
+
+it("adds the website to allowed domains, cleaned the same way as the Install page", async () => {
+  loginAs(A);
+  expect((await setup({ company: "Ann Co", website: "https://Shop.Example.com/about" })).status).toBe(200);
+  expect(await domains(A.id)).toEqual(["shop.example.com"]);
+  // Saving again does not duplicate it.
+  await setup({ company: "Ann Co", website: "shop.example.com" });
+  expect(await domains(A.id)).toEqual(["shop.example.com"]);
+});
+
+it("leaves allowed domains alone when the website would go over the plan's limit", async () => {
+  loginAs(A); // free plan: one domain
+  await (await testDb()).execute({ sql: "UPDATE customers SET allowed_domains = ? WHERE id = ?", args: ['["first.example"]', A.id] });
+  expect((await setup({ company: "Ann Co", website: "second.example" })).status).toBe(200);
+  expect(await domains(A.id)).toEqual(["first.example"]);
+  expect((await row(A.id)).website).toBe("second.example");
+});

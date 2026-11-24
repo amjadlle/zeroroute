@@ -11,6 +11,7 @@ import { Card, CardBody } from "@/components/ui/Card";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { UiProviders } from "@/components/ui/UiProviders";
 import type { CustomerProfile } from "@/app/app/CustomerConsole";
+import { DEFAULT_BOT_NAME } from "@/components/home/SetupChecklist";
 import type { KnowledgeSource } from "@/components/shared/knowledge/KnowledgeList";
 import { apiFetch, ApiError } from "@/lib/client/api";
 import { AccountStep, type AccountValues } from "./AccountStep";
@@ -26,6 +27,9 @@ const STEPS = [
   { label: "Knowledge", title: "Knowledge", description: "The chatbot answers questions from what you add here." },
   { label: "Finish", title: "You're all set", description: "Your settings are saved. Here's how to put the chatbot live." },
 ] as const;
+
+// The name given at signup, unless it is only the stand-in the server fills in (email prefix or "Subscriber").
+const signupName = (c: CustomerProfile) => (c.name && c.name !== c.email.split("@")[0] && c.name !== "Subscriber" ? c.name : "");
 
 const message = (e: unknown) => (e instanceof Error && e.message ? e.message : "Something went wrong.");
 
@@ -49,7 +53,7 @@ export function OnboardingWizard() {
       const { customer: c } = await apiFetch<{ customer?: CustomerProfile }>("/api/customer/profile");
       if (!c) throw new Error("Your account details came back empty.");
       setProfile(c);
-      setAccount({ company: c.company ?? "", website: c.website ?? "", password: "" });
+      setAccount({ company: c.company || signupName(c), website: c.website ?? "", password: "" });
       setChatbot({ bot_title: c.bot_title, greeting: c.greeting, persona: c.persona, prompts: c.prompts ?? [], brand_color: c.brand_color ?? "", logo_url: c.logo_url ?? "" });
     } catch (e) {
       if (!(e instanceof ApiError && e.status === 401)) setLoadError(message(e));
@@ -93,6 +97,8 @@ export function OnboardingWizard() {
     });
     if (!ok) return;
     setAccount((a) => ({ ...a, company, password: "" }));
+    // Suggest the company as the chatbot's name instead of our placeholder; saving it marks "Name your chatbot" done on Home.
+    setChatbot((c) => (!c.bot_title.trim() || c.bot_title === DEFAULT_BOT_NAME ? { ...c, bot_title: company } : c));
     go(1);
   };
 

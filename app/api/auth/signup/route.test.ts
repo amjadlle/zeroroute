@@ -18,3 +18,13 @@ it("rejects signup with the admin email", async () => {
   const { rows } = await db.execute("SELECT id FROM customers WHERE email = 'owner@example.com'");
   expect(rows).toHaveLength(0);
 });
+
+it("sends a new account to the setup wizard", async () => {
+  await testDb();
+  const res = await POST(new NextRequest("http://localhost/api/auth/signup", {
+    method: "POST",
+    body: JSON.stringify({ name: "Ann", email: `new-${Date.now()}@example.com`, password: "secret123" }),
+  }));
+  expect(res.status).toBe(200);
+  expect((await res.json()).redirect).toBe("/onboarding");
+});

@@ -39,7 +39,7 @@ export function AccountStep({ value, onChange, onSubmit, saving, actions }: Acco
       <Field label="Company or project name" required error={touched ? errors.company : undefined}>
         <Input value={value.company} onChange={(e) => set({ company: e.target.value })} maxLength={100} autoComplete="organization" placeholder="Acme Cloud" />
       </Field>
-      <Field label="Website" hint="Optional. Where your chatbot will live.">
+      <Field label="Website" hint="Optional. Your chatbot will be allowed to run on this site.">
         <Input value={value.website} onChange={(e) => set({ website: e.target.value })} maxLength={255} inputMode="url" autoComplete="url" placeholder="https://example.com" />
       </Field>
       <Field
