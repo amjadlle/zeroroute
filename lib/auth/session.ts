@@ -12,10 +12,8 @@ export const ADMIN_EMAILS = [
 export function isMasterAdminKey(token: string): boolean {
   if (!token || typeof token !== "string") return false;
   const clean = token.trim();
-  const adminKey = process.env.ADMIN_KEY;
   const routerKey = process.env.ROUTER_API_KEY;
 
-  if (adminKey && clean === adminKey.trim()) return true;
   if (routerKey && clean === routerKey.trim()) return true;
 
   return false;
@@ -93,7 +91,7 @@ export async function getCurrentUser(): Promise<Customer | null> {
   if (await verifyAdminSession(sessionToken)) {
     return {
       id: "admin_master",
-      key: process.env.ROUTER_API_KEY || process.env.ADMIN_KEY || "zr_admin_master",
+      key: process.env.ROUTER_API_KEY || "zr_admin_master",
       email: process.env.ADMIN_EMAIL || "mapkisolutions@gmail.com",
       name: "ZeroRoute Admin",
       company: "ZeroRoute Master",

@@ -74,8 +74,8 @@ describe("bearer lookup", () => {
 });
 
 describe("isMasterAdminKey", () => {
-  it("matches ADMIN_KEY or ROUTER_API_KEY, ignoring surrounding whitespace", () => {
-    expect(isMasterAdminKey("zr_admin_test_key")).toBe(true);
+  it("matches ROUTER_API_KEY only (ADMIN_KEY is ignored), ignoring surrounding whitespace", () => {
+    expect(isMasterAdminKey("zr_admin_test_key")).toBe(false);
     expect(isMasterAdminKey("  zr_live_test_router_key\t")).toBe(true);
   });
 
