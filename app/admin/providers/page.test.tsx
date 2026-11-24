@@ -34,12 +34,13 @@ const row = (name: string) => screen.getByRole("heading", { name }).closest("li"
 
 afterEach(() => vi.unstubAllGlobals());
 
-it("shows read-only key status with the env var to set, and no API keys form", async () => {
+it("shows one status per provider with the env var to set, and no API keys form", async () => {
   stubApi();
   renderPage();
   await screen.findByRole("heading", { name: "Groq" });
 
-  expect(within(row("Groq")).getByText("Key set")).toBeInTheDocument();
+  expect(within(row("Groq")).getByText("Ready")).toBeInTheDocument();
+  expect(within(row("Groq")).queryByText("Key missing")).toBeNull();
   expect(within(row("Gemini")).getByText("Key missing")).toBeInTheDocument();
   expect(within(row("Gemini")).getByText("GEMINI_API_KEY")).toBeInTheDocument();
   expect(screen.queryByRole("button", { name: /api keys/i })).toBeNull();
@@ -101,4 +102,16 @@ it("model names in the fallback list are buttons that open the model list", asyn
   await userEvent.click(within(row("Groq")).getByRole("button", { name: "b" }));
 
   expect(screen.getByRole("dialog", { name: "Groq models" })).toBeInTheDocument();
+});
+
+it("shows every model as a chip and the last reply time", async () => {
+  stubApi();
+  renderPage();
+  await screen.findByRole("heading", { name: "Groq" });
+
+  const models = within(row("Groq")).getByRole("list", { name: "Groq models" });
+  expect(within(models).getAllByRole("listitem").map((li) => li.textContent)).toEqual(["a", "b"]);
+  expect(within(row("Groq")).getByText("300 ms")).toBeInTheDocument();
+  expect(within(row("Gemini")).getByText("300 ms")).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Test all" })).toBeInTheDocument();
 });

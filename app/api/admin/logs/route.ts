@@ -4,6 +4,10 @@ import { getDb } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
+const DAY_MS = 86_400_000;
+/** Rolling 24-hour buckets behind the Overview trends: the last 7 days plus the 7 before, to compare. */
+const TREND_DAYS = 14;
+
 export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization") || "";
   const auth = await resolveAuth(authHeader);
@@ -58,7 +62,8 @@ export async function GET(request: Request) {
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
     // 2. Fetch Filtered Logs + Aggregation Metrics concurrently in a single batch
-    const [logsResult, statsResult, originsResult, providersResult] = await Promise.all([
+    const now = Date.now();
+    const [logsResult, statsResult, originsResult, providersResult, dailyResult] = await Promise.all([
       db.execute({
         sql: `
           SELECT 
@@ -93,7 +98,21 @@ export async function GET(request: Request) {
         FROM request_logs 
         GROUP BY provider 
         ORDER BY count DESC
-      `)
+      `),
+      // Bucket 0 is the last 24 hours. Uses idx_logs_timestamp; rows never leave SQL.
+      db.execute({
+        sql: `
+          SELECT CAST((? - timestamp) / ${DAY_MS} AS INTEGER) AS ago,
+            COUNT(*) AS total,
+            SUM(CASE WHEN status >= 200 AND status < 300 THEN 1 ELSE 0 END) AS ok,
+            SUM(CASE WHEN is_cache_hit = 1 THEN 1 ELSE 0 END) AS cache_hits,
+            AVG(latency_ms) AS avg_latency
+          FROM request_logs
+          WHERE timestamp > ? AND timestamp <= ?
+          GROUP BY ago
+        `,
+        args: [now, now - TREND_DAYS * DAY_MS, now],
+      }),
     ]);
 
     const logs = logsResult.rows || [];
@@ -103,6 +122,18 @@ export async function GET(request: Request) {
     const successCount = Number(stats.success_count || 0);
     const successRate = totalRequests > 0 ? Math.round((successCount / totalRequests) * 100) : 100;
     const cacheHits = Number(stats.cache_hits || 0);
+
+    const byAgo = new Map(dailyResult.rows.map((r) => [Number(r.ago), r]));
+    // Oldest first, zero-filled.
+    const daily = Array.from({ length: TREND_DAYS }, (_, i) => {
+      const r = byAgo.get(TREND_DAYS - 1 - i);
+      return {
+        total: Number(r?.total ?? 0),
+        ok: Number(r?.ok ?? 0),
+        cacheHits: Number(r?.cache_hits ?? 0),
+        avgLatencyMs: Math.round(Number(r?.avg_latency ?? 0)),
+      };
+    });
 
     return NextResponse.json({
       success: true,
@@ -115,6 +146,7 @@ export async function GET(request: Request) {
         cacheHits,
         cacheSavings: `$${(cacheHits * 0.0002).toFixed(4)}`,
         cacheHitRatio: totalRequests > 0 ? Math.round((cacheHits / totalRequests) * 100) : 0,
+        daily,
       },
       facets: {
         origins: originsResult.rows || [],
