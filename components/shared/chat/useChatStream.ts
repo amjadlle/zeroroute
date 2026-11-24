@@ -48,15 +48,29 @@ export async function readSse(body: ReadableStream<Uint8Array>, onChunk: (chunk:
   }
 }
 
+/** Errors carrying copy that is safe to show. Anything else (raw API text, parse errors) gets the generic line. */
+class ChatError extends Error {}
+
+const FAILED = "Something went wrong on our side. Try again in a moment.";
+const STATUS_COPY: Record<number, string> = {
+  400: "That message couldn't be sent. Try a shorter message.",
+  401: "You've been signed out. Refresh the page and sign in again.",
+  402: "Your plan isn't active, so the chatbot can't answer right now.",
+  403: "You've been signed out. Refresh the page and sign in again.",
+  413: "That message couldn't be sent. Try a shorter message.",
+  429: "Too many messages at once. Wait a minute and try again.",
+};
+
+/** Plain copy for a failed response. The API's own message is written for developers, so it is never shown here. */
 async function errorMessage(res: Response): Promise<string> {
+  let type: unknown;
   try {
-    const data = await res.json();
-    if (typeof data?.error?.message === "string") return data.error.message;
-    if (typeof data?.error === "string") return data.error;
+    type = (await res.json())?.error?.type;
   } catch {
     // not JSON
   }
-  return `The request failed (HTTP ${res.status}).`;
+  if (type === "quota_exceeded") return "You've used all your messages for this month.";
+  return STATUS_COPY[res.status] ?? FAILED;
 }
 
 type Options = {
@@ -106,9 +120,9 @@ export function useChatStream({ headers, model = "default", system, stream = tru
           }),
           signal: ctrl.signal,
         });
-        if (!res.ok) throw new Error(await errorMessage(res));
+        if (!res.ok) throw new ChatError(await errorMessage(res));
         const take = (c: Chunk) => {
-          if (c.error) throw new Error(c.error.message || "The reply was interrupted.");
+          if (c.error) throw new ChatError("The reply was interrupted. Try again.");
           provider = c.provider ?? provider;
           replyModel = c.model ?? replyModel;
           const text = c.choices?.[0]?.delta?.content ?? c.choices?.[0]?.message?.content;
@@ -119,11 +133,11 @@ export function useChatStream({ headers, model = "default", system, stream = tru
         };
         if (res.body && (res.headers.get("content-type") ?? "").includes("text/event-stream")) await readSse(res.body, take);
         else take(await res.json());
-        if (!reply.trim()) throw new Error("The chatbot sent back an empty reply.");
+        if (!reply.trim()) throw new ChatError("The chatbot sent back an empty reply. Try again.");
         setMeta({ provider, model: replyModel, latencyMs: Date.now() - started });
       } catch (e) {
         if (ctrl.signal.aborted) return; // stopped by the user or replaced by a newer send: keep what arrived
-        setError(e instanceof Error && e.name !== "TypeError" ? e.message : "Couldn't reach the server. Check your connection and try again.");
+        setError(e instanceof ChatError ? e.message : e instanceof TypeError ? "Couldn't reach the server. Check your connection and try again." : FAILED);
         // Drop an empty reply bubble; keep a partial one so the user sees what arrived before the failure.
         if (!reply) setMessages((prev) => prev.slice(0, -1));
       } finally {
