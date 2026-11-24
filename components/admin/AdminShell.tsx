@@ -21,7 +21,7 @@ const ADMIN_NAV: NavGroup[] = [
   },
 ];
 
-// User console pages (issue #20), so Ctrl K can jump there without the console switch.
+// Customer console pages (issue #20), so Ctrl K can jump there without the console switch.
 const USER_PAGES = [
   { href: "/app", label: "Home", icon: <House className={icon} /> },
   { href: "/app/chatbot", label: "Chatbot", icon: <Bot className={icon} /> },
@@ -39,7 +39,7 @@ export function AdminShell({ account, children }: { account: ShellAccount; child
       nav={ADMIN_NAV}
       account={account}
       consoleSwitch
-      paletteActions={USER_PAGES.map((p) => ({ label: `User console: ${p.label}`, icon: p.icon, run: () => router.push(p.href) }))}
+      paletteActions={USER_PAGES.map((p) => ({ label: `Customer console: ${p.label}`, icon: p.icon, run: () => router.push(p.href) }))}
     >
       {children}
     </ConsoleShell>

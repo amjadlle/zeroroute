@@ -74,7 +74,7 @@ export default function ShellSection() {
           label="Console"
           value={which}
           onValueChange={setWhich}
-          options={[{ value: "app", label: "User console" }, { value: "admin", label: "Admin console (admin user)" }]}
+          options={[{ value: "app", label: "Customer console" }, { value: "admin", label: "Admin console (admin user)" }]}
         />
         <Badge tone="warning">Demo: contained preview, not mounted on /app or /admin</Badge>
       </div>

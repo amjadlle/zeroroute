@@ -27,3 +27,7 @@ Tokens live in `app/globals.css`; `/design` (dev-only) previews them.
 - The landing page keeps its own fonts and the legacy `dark-*` / `brand-*` aliases until M5 moves it onto these tokens.
 - The console shell (#9) applies `font-ui`; components (#3–#9) use the compact control heights and radii instead of picking their own.
 - To change the accent later, edit the four accent tokens and re-run the contrast test.
+
+## Amendment (2026-11-25): Ember accent
+
+The owner chose to match the console accent to the logo (`public/logo.png`). The accent is now **Ember**: light `oklch(.55 .16 44)` (white text 5.0:1), dark `oklch(.73 .16 48)` (dark text 7.4:1), hover ∓.05 L, soft `oklch(.96 .03 55)` / `oklch(.27 .06 45)`. It sits at hue 44-52, orange enough to stay apart from danger red (hue 27). Neutrals keep their faint cool tint, so the accent reads against grey instead of blending into warm surfaces. Brand colours customers pick for their own widget are unaffected.

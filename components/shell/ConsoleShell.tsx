@@ -25,7 +25,7 @@ export type ConsoleShellProps = {
   consoleLabel: string;
   nav: readonly NavGroup[];
   account: ShellAccount;
-  /** True for admins only: shows the User console / Admin console switch. */
+  /** True for admins only: shows the Customer console / Admin console switch. */
   consoleSwitch?: boolean;
   /** Top-bar buttons for the current page. */
   actions?: ReactNode;
@@ -37,7 +37,7 @@ export type ConsoleShellProps = {
 };
 
 const CONSOLES = [
-  { href: "/app", label: "User console" },
+  { href: "/app", label: "Customer console" },
   { href: "/admin", label: "Admin console" },
 ] as const;
 

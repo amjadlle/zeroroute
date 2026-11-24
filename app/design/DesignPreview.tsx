@@ -90,7 +90,7 @@ export function DesignPreview() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-title font-semibold">Design tokens</h1>
-            <p className="text-meta text-text-subtle">Graphite+ · Iris accent · Geist. Dev-only preview, 404 in production.</p>
+            <p className="text-meta text-text-subtle">Graphite+ · Ember accent · Geist. Dev-only preview, 404 in production.</p>
           </div>
           <Segmented label="Theme" value={theme} onChange={setTheme} options={[["system", "System"], ["dark", "Dark"], ["light", "Light"]]} />
         </div>
