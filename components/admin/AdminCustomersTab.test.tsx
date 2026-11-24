@@ -2,7 +2,9 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, it, vi } from "vitest";
 import { UiProviders } from "@/components/ui/UiProviders";
+import { buildEmbedSnippet } from "@/lib/embedSnippet";
 import { AdminCustomersTab, type CustomerAdminItem } from "./AdminCustomersTab";
+import { usageTone } from "./CustomerDetailDrawer";
 
 const customer: CustomerAdminItem = {
   id: "cust_1",
@@ -43,26 +45,56 @@ function setup(customers = [customer]) {
   return { onRefresh, onViewCustomerLogs };
 }
 
-const manage = () => userEvent.click(screen.getByRole("button", { name: "Manage Ana's Shop" }));
+const manage = () => userEvent.click(screen.getByRole("row", { name: /Ana's Shop/ }));
 
 afterEach(() => vi.unstubAllGlobals());
 
-it("lists customers with plan, usage and status", () => {
+it("lists customers with initials, plan, usage and status", () => {
   setup();
   const row = screen.getByRole("row", { name: /Ana's Shop/ });
+  expect(row).toHaveTextContent("AS");
   expect(row).toHaveTextContent("Pro");
   expect(row).toHaveTextContent("9,500 of 10,000");
   expect(row).toHaveTextContent("Active");
   expect(within(row).getByRole("meter")).toHaveAttribute("aria-valuetext", "9,500 of 10,000");
+  expect(screen.getByText("1 customer · 1 on Pro")).toBeInTheDocument();
 });
 
-it("opens the drawer with a masked key, an escaped snippet and the logs hand-off", async () => {
+it("counts customers in plain English while searching", async () => {
+  setup([customer, { ...customer, id: "cust_2", company: "Bo's Books", email: "bo@example.com", monthly_limit: 500 }]);
+  expect(screen.getByText("2 customers · 1 on Pro")).toBeInTheDocument();
+  await userEvent.type(screen.getByRole("searchbox", { name: "Search customers" }), "bo@");
+  expect(screen.getByText("1 of 2 customers")).toBeInTheDocument();
+});
+
+it("acts on a customer from the row without opening the drawer", async () => {
+  const calls = stubFetch();
+  const { onRefresh, onViewCustomerLogs } = setup();
+  await userEvent.click(screen.getByRole("button", { name: "View request log for Ana's Shop" }));
+  expect(onViewCustomerLogs).toHaveBeenCalledWith(customer.key);
+  await userEvent.click(screen.getByRole("button", { name: "Pause Ana's Shop" }));
+  await userEvent.click(within(screen.getByRole("dialog", { name: "Pause Ana's Shop?" })).getByRole("button", { name: "Pause" }));
+  expect(calls).toEqual([{ url: "/api/admin/customers", method: "PATCH", body: { id: "cust_1", status: "paused" } }]);
+  expect(onRefresh).toHaveBeenCalled();
+  expect(screen.queryByRole("dialog", { name: "Ana's Shop" })).toBeNull();
+});
+
+it("colours usage by how close the customer is to their limit", () => {
+  expect(usageTone(0, 500)).toBe("accent");
+  expect(usageTone(84, 100)).toBe("accent");
+  expect(usageTone(85, 100)).toBe("warning");
+  expect(usageTone(100, 100)).toBe("danger");
+  expect(usageTone(5, 0)).toBe("accent");
+});
+
+it("opens the drawer with a masked key, the Install page snippet and the logs hand-off", async () => {
   const { onViewCustomerLogs } = setup();
   await manage();
   const drawer = screen.getByRole("dialog", { name: "Ana's Shop" });
   expect(drawer).not.toHaveTextContent(customer.key);
-  expect(drawer).toHaveTextContent('data-title="Ana&#39;s &quot;Shop&quot; bot"');
-  expect(drawer).toHaveTextContent('data-prompts="Hours?"');
+  expect(within(drawer).getByText(/data-bot-id/).textContent).toBe(buildEmbedSnippet({ botId: "bot_1" }));
+  expect(drawer).not.toHaveTextContent(/not saved/);
+  expect(within(drawer).getByRole("button", { name: "Copy Bot ID" })).toBeInTheDocument();
   await userEvent.click(within(drawer).getByRole("button", { name: "View request log" }));
   expect(onViewCustomerLogs).toHaveBeenCalledWith(customer.key);
 });
