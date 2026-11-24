@@ -2,11 +2,12 @@
 
 import type { ReactNode } from "react";
 import { Pause, Play, RotateCw, ScrollText, Trash2 } from "lucide-react";
-import { buildEmbedSnippet, parsePrompts } from "@/lib/embedSnippet";
+import { buildEmbedSnippet } from "@/lib/embedSnippet";
 import { PLAN_LABELS, PLAN_LIMITS, UNLIMITED_MONTHLY_REQUESTS } from "@/lib/constants";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { CodeBlock } from "@/components/ui/CodeBlock";
+import { CopyButton } from "@/components/ui/CopyButton";
 import { Drawer } from "@/components/ui/Drawer";
 import { Meter } from "@/components/ui/Meter";
 import { SecretField } from "@/components/ui/SecretField";
@@ -51,10 +52,20 @@ export function StatusBadge({ status }: { status: string }) {
   return <Badge tone={s.tone} dot>{s.label}</Badge>;
 }
 
+export function PlanBadge({ customer: c }: { customer: CustomerAdminItem }) {
+  const plan = planLabel(c);
+  return <Badge tone={plan === PLAN_LABELS.free ? "neutral" : "accent"}>{plan}</Badge>;
+}
+
+/** Warning once a customer is near their monthly limit, danger once they hit it. */
+export function usageTone(used: number, limit: number) {
+  const pct = limit > 0 ? (used / limit) * 100 : 0;
+  return pct >= 100 ? "danger" : pct >= 85 ? "warning" : "accent";
+}
+
 export function UsageMeter({ customer: c }: { customer: CustomerAdminItem }) {
   const used = c.monthly_requests.toLocaleString();
   if (isUnlimited(c)) return <span className="text-text-muted">{used} (no limit)</span>;
-  const pct = c.monthly_limit > 0 ? (c.monthly_requests / c.monthly_limit) * 100 : 0;
   const text = `${used} of ${c.monthly_limit.toLocaleString()}`;
   return (
     <span className="grid min-w-32 gap-1">
@@ -62,7 +73,7 @@ export function UsageMeter({ customer: c }: { customer: CustomerAdminItem }) {
       <Meter
         value={c.monthly_requests}
         max={c.monthly_limit}
-        tone={pct >= 90 ? "danger" : pct >= 70 ? "warning" : "accent"}
+        tone={usageTone(c.monthly_requests, c.monthly_limit)}
         label={`Requests this month for ${c.email}`}
         valueText={text}
       />
@@ -128,11 +139,24 @@ export function CustomerDetailDrawer({ customer: c, onClose, onViewLogs, onRotat
         <div className="grid gap-5">
           <dl className="grid gap-3 sm:grid-cols-2">
             {row("Status", <StatusBadge status={c.status} />)}
-            {row("Plan", planLabel(c))}
-            {row("Bot ID", c.bot_id ? <code className="font-ui-mono">{c.bot_id}</code> : "None")}
+            {row("Plan", <PlanBadge customer={c} />)}
             {row("Created", new Date(c.created_at).toLocaleDateString())}
             {row("Allowed domains", domainsOf(c.allowed_domains))}
             {row("Requests this month", <UsageMeter customer={c} />)}
+            <div className="grid gap-1 sm:col-span-2">
+              <dt className="text-meta text-text-muted">Bot ID</dt>
+              <dd className="flex min-w-0 items-center gap-1">
+                {c.bot_id ? (
+                  <>
+                    {/* Never wrap an ID mid-string; truncate on very narrow screens and keep the copy button. */}
+                    <code className="truncate font-ui-mono" title={c.bot_id}>{c.bot_id}</code>
+                    <CopyButton value={c.bot_id} label="Copy Bot ID" />
+                  </>
+                ) : (
+                  "None"
+                )}
+              </dd>
+            </div>
           </dl>
 
           <div className="grid gap-1.5">
@@ -149,11 +173,9 @@ export function CustomerDetailDrawer({ customer: c, onClose, onViewLogs, onRotat
           {c.bot_id && (
             <div className="grid gap-1.5">
               <p className="font-medium">Embed snippet</p>
-              <CodeBlock
-                language="html"
-                code={buildEmbedSnippet({ botId: c.bot_id, title: c.bot_title, greeting: c.greeting, prompts: parsePrompts(c.prompts) })}
-              />
-              <p className="text-meta text-text-muted">Brand colour and logo are not saved, so this snippet uses the defaults.</p>
+              {/* Same snippet as the customer's Install page: the widget loads name, colour, logo and greeting from their settings. */}
+              <CodeBlock language="html" code={buildEmbedSnippet({ botId: c.bot_id })} />
+              <p className="text-meta text-text-muted">The same snippet the customer sees on their Install page. Their chatbot settings load automatically.</p>
             </div>
           )}
         </div>
