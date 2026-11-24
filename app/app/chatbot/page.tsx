@@ -1,10 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { PageHeader } from "@/components/shell/PageHeader";
+import { Button } from "@/components/ui/Button";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { useToast } from "@/components/ui/Toast";
 import { appearanceErrors, ChatbotSettingsForm, type ChatbotSettings } from "@/components/dashboard/ChatbotSettingsForm";
+import { linkClass } from "@/components/install/SnippetCard";
 import { ChatPanel } from "@/components/shared/chat/ChatPanel";
 import { useChatStream } from "@/components/shared/chat/useChatStream";
 import { apiFetch } from "@/lib/client/api";
@@ -49,12 +52,28 @@ export default function ChatbotPage() {
 
   return (
     <>
-      <PageHeader title="Chatbot" description="Choose how your chatbot looks and talks, then try it out." />
-      <div className="grid items-start gap-6 lg:grid-cols-2">
+      <PageHeader title="Chatbot" description="How your chatbot looks and talks. Try it out in the test chat." />
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(17.5rem,1fr)]">
         <Card>
-          <CardHeader title="Chatbot settings" description="Visitors see these on your website." />
+          <CardHeader title="Settings" description="Visitors see these on your website." />
           <CardBody>
-            <ChatbotSettingsForm value={settings} onChange={setSettings} onSubmit={save} saving={saving} />
+            <ChatbotSettingsForm
+              value={settings}
+              onChange={setSettings}
+              onSubmit={save}
+              saving={saving}
+              actions={
+                dirty && (
+                  <Button variant="ghost" onClick={() => setSettings(saved)} disabled={saving}>
+                    Discard changes
+                  </Button>
+                )
+              }
+            />
+            <p className="mt-4 text-meta text-text-muted">
+              To choose which websites can show your chatbot, set your{" "}
+              <Link href="/app" className={linkClass}>allowed domains</Link> on Home.
+            </p>
           </CardBody>
         </Card>
         <ChatPanel
