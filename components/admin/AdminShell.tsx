@@ -35,7 +35,7 @@ export function AdminShell({ account, children }: { account: ShellAccount; child
   const router = useRouter();
   return (
     <ConsoleShell
-      consoleLabel="Admin console"
+      consoleLabel="Admin"
       nav={ADMIN_NAV}
       account={account}
       consoleSwitch

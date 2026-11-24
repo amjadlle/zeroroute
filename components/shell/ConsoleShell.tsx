@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { ChevronRight, LogOut, Menu, Search } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { apiFetch, ApiError } from "@/lib/client/api";
+import { Button } from "@/components/ui/Button";
 import { Drawer } from "@/components/ui/Drawer";
 import { IconButton } from "@/components/ui/IconButton";
 import { UiProviders } from "@/components/ui/UiProviders";
@@ -17,10 +18,10 @@ import { ThemeScript, ThemeToggle } from "./ThemeToggle";
 /** `icon` is an element (e.g. `<House />`), not a component, so a Server Component layout can pass nav. */
 export type NavItem = { href: string; label: string; icon: ReactNode; count?: number };
 export type NavGroup = { label?: string; items: readonly NavItem[] };
-export type ShellAccount = { name: string; email: string; plan: string };
+export type ShellAccount = { name: string; plan: string };
 
 export type ConsoleShellProps = {
-  /** First breadcrumb and the sidebar nav's name, e.g. "Admin console" or "User console". */
+  /** First breadcrumb, e.g. "Admin" or "Customer"; the sidebar nav is named "<label> console". */
   consoleLabel: string;
   nav: readonly NavGroup[];
   account: ShellAccount;
@@ -39,6 +40,8 @@ const CONSOLES = [
   { href: "/app", label: "User console" },
   { href: "/admin", label: "Admin console" },
 ] as const;
+
+const DOCS_URL = "https://github.com/amjadlle/zeroroute#readme";
 
 const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus-ring";
 
@@ -91,9 +94,9 @@ function Shell({ consoleLabel, nav, account, consoleSwitch, actions, paletteActi
       >
         <Search aria-hidden className="size-4 shrink-0" />
         <span className="flex-1 truncate">Search or jump to…</span>
-        <kbd className="rounded-sm border border-border bg-surface-sunken px-1 font-ui text-meta text-text-muted">Ctrl K</kbd>
+        <kbd className="rounded-sm border border-border bg-surface-sunken px-1 font-ui text-meta text-text-muted pointer-coarse:hidden">Ctrl K</kbd>
       </button>
-      <NavGroups label={consoleLabel} groups={nav} active={active} />
+      <NavGroups label={`${consoleLabel} console`} groups={nav} active={active} />
     </>
   );
 
@@ -154,9 +157,12 @@ function Shell({ consoleLabel, nav, account, consoleSwitch, actions, paletteActi
             aria-keyshortcuts="Control+K Meta+K"
             className="min-[820px]:hidden"
           />
+          <Button href={DOCS_URL} target="_blank" rel="noopener noreferrer" variant="ghost" size="sm">
+            Docs<span className="sr-only"> (opens in a new tab)</span>
+          </Button>
           <ThemeToggle />
         </header>
-        <main id="main" tabIndex={-1} className="flex-1 px-4 py-6 outline-none sm:px-6 lg:px-8">
+        <main id="main" tabIndex={-1} className="mx-auto w-full max-w-295 flex-1 px-4 py-6 outline-none sm:px-6 lg:px-8">
           {children}
         </main>
       </div>
@@ -258,14 +264,13 @@ function AccountBlock({ account }: { account: ShellAccount }) {
   };
 
   return (
-    <div className="mt-auto flex items-center gap-2.5 rounded-card border border-border bg-surface p-2">
-      <span aria-hidden className="grid size-8 shrink-0 place-items-center rounded-full bg-accent-soft text-meta font-bold text-accent">
+    <div className="mt-auto flex items-center gap-2.5 p-2">
+      <span aria-hidden className="grid size-7.5 shrink-0 place-items-center rounded-full bg-accent-soft text-meta font-bold text-accent">
         {initials || "?"}
       </span>
       <div className="min-w-0 flex-1">
         <p className="truncate font-semibold leading-tight">{account.name}</p>
-        <p className="truncate text-meta text-text-subtle">{account.email}</p>
-        <p className="text-meta text-text-muted">{account.plan}</p>
+        <p className="truncate text-meta text-text-subtle">{account.plan}</p>
       </div>
       <IconButton label="Sign out" icon={<LogOut className="size-4" aria-hidden />} onClick={signOut} disabled={busy} />
     </div>
