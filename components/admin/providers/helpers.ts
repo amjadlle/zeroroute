@@ -72,7 +72,7 @@ export const recommendedChain = (results: Record<string, TestResult>, known: Set
 
 export function providerStatus(p: ProviderItem, now = Date.now()): { tone: Tone; label: string } {
   if (!p.enabled) return { tone: "neutral", label: "Off" };
-  if (!p.configured) return { tone: "warning", label: "Not ready" };
+  if (!p.configured) return { tone: "warning", label: "Key missing" };
   if (p.cooldownUntil > now) return { tone: "warning", label: "Paused after errors" };
   if (p.consecutiveFailures > 0) return { tone: "danger", label: "Failing" };
   return { tone: "success", label: "Ready" };

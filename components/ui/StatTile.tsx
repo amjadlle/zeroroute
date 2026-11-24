@@ -27,12 +27,12 @@ export function StatTile({ label, value, hint, delta, deltaTone = "positive", tr
         {Icon && <Icon aria-hidden className="size-3.5" />}
         {label}
       </span>
-      <div className="flex items-baseline justify-between gap-2">
-        <span className="text-heading font-semibold tracking-tight tabular-nums">{value}</span>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-2">
+        <span className="whitespace-nowrap text-heading font-semibold tracking-tight tabular-nums">{value}</span>
         {delta && (
           <span
             className={cn(
-              "inline-flex items-center gap-1 text-meta font-semibold tabular-nums",
+              "inline-flex items-center gap-1 whitespace-nowrap text-meta font-semibold tabular-nums",
               deltaTone === "positive" ? "text-success-fg" : "text-danger-fg",
             )}
           >

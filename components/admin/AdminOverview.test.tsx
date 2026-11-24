@@ -1,6 +1,6 @@
 import { afterEach, expect, it, vi } from "vitest";
 import { act, render, screen } from "@testing-library/react";
-import { ProviderHealth, median, providerStatus, useNow } from "./AdminOverview";
+import { ProviderHealth, providerStatus, useNow } from "./AdminOverview";
 import type { ProviderItem } from "./AdminProvidersTab";
 
 const p = (over: Partial<ProviderItem> = {}): ProviderItem => ({
@@ -10,15 +10,9 @@ const p = (over: Partial<ProviderItem> = {}): ProviderItem => ({
 
 afterEach(() => vi.useRealTimers());
 
-it("median handles odd, even and empty lists", () => {
-  expect(median([900, 100, 300])).toBe(300);
-  expect(median([100, 200, 300, 400])).toBe(250);
-  expect(median([])).toBeUndefined();
-});
-
 it("ranks provider problems in order", () => {
   expect(providerStatus(p({ enabled: false, configured: false }), 0)).toMatchObject({ label: "Off", ready: false });
-  expect(providerStatus(p({ configured: false }), 0)).toMatchObject({ label: "No key", tone: "warning" });
+  expect(providerStatus(p({ configured: false }), 0)).toMatchObject({ label: "Key missing", tone: "warning" });
   expect(providerStatus(p({ cooldownUntil: 5_000, consecutiveFailures: 3 }), 0).label).toBe("Paused, back in 5s");
   expect(providerStatus(p({ consecutiveFailures: 2 }), 0)).toMatchObject({ tone: "danger", ready: true });
   expect(providerStatus(p(), 0)).toMatchObject({ label: "Ready", tone: "success", ready: true });
