@@ -90,7 +90,7 @@ export async function POST(request: Request) {
   let customer: any = null;
 
   // Cookie session fallback (Admin Playground / App Dashboard): same-origin calls only.
-  if (!bearerToken && !isMasterKey && !rawBotId && isSameOrigin(request.headers.get("origin"), new URL(request.url).host)) {
+  if (!bearerToken && !isMasterKey && !rawBotId && isSameOrigin(request)) {
     try {
       const { getCurrentUser } = await import("@/lib/auth/session");
       const user = await getCurrentUser();

@@ -66,6 +66,13 @@ describe("CORS and cookie auth", () => {
     expect((await chat({ origin: "https://evil.example" })).status).toBe(401);
     expect((await chat({ origin: "http://localhost" })).status).toBe(200);
   });
+
+  it("accepts the cookie session when the page is opened at another address of this server", async () => {
+    const c = await addCustomer();
+    session.user = { id: "u1", key: c.key };
+    expect((await chat({ host: "127.0.0.1:3000", origin: "http://127.0.0.1:3000" })).status).toBe(200);
+    expect((await chat({ host: "127.0.0.1:3000", origin: "https://evil.example" })).status).toBe(401);
+  });
 });
 
 describe("demo bot", () => {

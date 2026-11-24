@@ -54,7 +54,7 @@ export function AdminPlaygroundTab({ providers }: { providers: ProviderItem[] })
           )}
         </CardBody>
       </Card>
-      <ChatPanel chat={chat} title="Conversation" description="Messages go through the gateway like a real request." placeholder="Ask anything to test routing" />
+      <ChatPanel chat={chat} title="Conversation" description="Test mode · not counted in usage" placeholder="Ask anything to test routing" />
     </div>
   );
 }
