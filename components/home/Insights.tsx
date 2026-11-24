@@ -78,7 +78,43 @@ function replyTime(ms: number) {
 
 type TilesProps = State & { used: number; limit: number };
 
-/** Four KPI tiles over the last 14 days, each with a daily sparkline. */
+const WEEK = 7;
+const answeredIn = (d: InsightDay) => d.total - d.failed - d.unanswered;
+
+/** Totals for a run of days. `rate` and `avgReply` are null when there were no (successful) questions. */
+function totals(days: InsightDay[]) {
+  const total = sum(days, (d) => d.total);
+  const answered = sum(days, answeredIn);
+  const ok = sum(days, (d) => d.total - d.failed);
+  return {
+    total,
+    answered,
+    rate: total > 0 ? answered / total : null,
+    avgReply: ok > 0 ? sum(days, (d) => d.avgReplyMs * (d.total - d.failed)) / ok : null,
+  };
+}
+
+/** Change text with a real minus sign; null when it rounds to no change (an arrow would mislead). */
+function change(diff: number, format: (abs: number) => string) {
+  const abs = format(Math.abs(diff));
+  if (!/[1-9]/.test(abs)) return null;
+  return `${diff > 0 ? "+" : "−"}${abs}`;
+}
+
+/** Delta props for StatTile, comparing the last 7 days with the 7 before. */
+function delta(text: string | null, diff: number, lowerIsBetter = false) {
+  if (!text) return {};
+  return {
+    delta: <>{text}<span className="sr-only"> compared with the 7 days before</span></>,
+    deltaTone: (diff > 0) !== lowerIsBetter ? ("positive" as const) : ("negative" as const),
+    deltaDirection: diff > 0 ? ("up" as const) : ("down" as const),
+  };
+}
+
+/**
+ * Four KPI tiles: the last 7 days, each with a change against the 7 days before (when both weeks have
+ * data) and a 14-day sparkline. The fourth tile is the plan's monthly request count.
+ */
 export function InsightTiles({ data, error, reload, used, limit }: TilesProps) {
   if (error) {
     return (
@@ -99,28 +135,38 @@ export function InsightTiles({ data, error, reload, used, limit }: TilesProps) {
   }
 
   const { days } = data;
-  const total = sum(days, (d) => d.total);
-  const answered = sum(days, (d) => d.total - d.failed - d.unanswered);
-  const ok = sum(days, (d) => d.total - d.failed);
-  const avgReply = ok > 0 ? sum(days, (d) => d.avgReplyMs * (d.total - d.failed)) / ok : 0;
+  const now = totals(days.slice(-WEEK));
+  const before = totals(days.slice(-2 * WEEK, -WEEK));
   // Days without traffic are left out of the rate and reply trends instead of showing as dips to zero.
   const active = days.filter((d) => d.total > 0);
   const unlimited = limit >= UNLIMITED_MONTHLY_REQUESTS;
 
+  const questionsDiff = before.total > 0 ? ((now.total - before.total) / before.total) * 100 : 0;
+  const rateDiff = now.rate !== null && before.rate !== null ? (now.rate - before.rate) * 100 : 0;
+  const replyDiff = now.avgReply !== null && before.avgReply !== null ? now.avgReply - before.avgReply : 0;
+
   return (
-    <section aria-label="Last 14 days" className={grid}>
-      <StatTile label="Questions" value={total.toLocaleString()} hint="Last 14 days" trend={days.map((d) => d.total)} />
+    <section aria-label="Last 7 days" className={grid}>
+      <StatTile
+        label="Questions"
+        value={now.total.toLocaleString()}
+        hint="Last 7 days"
+        trend={days.map((d) => d.total)}
+        {...delta(change(questionsDiff, (n) => `${Math.round(n)}%`), questionsDiff)}
+      />
       <StatTile
         label="Answered"
-        value={total > 0 ? `${Math.round((answered / total) * 100)}%` : "—"}
-        hint={total > 0 ? `${answered.toLocaleString()} of ${total.toLocaleString()}` : "No questions yet"}
-        trend={active.length ? active.map((d) => (d.total - d.failed - d.unanswered) / d.total) : undefined}
+        value={now.rate !== null ? `${Math.round(now.rate * 100)}%` : "—"}
+        hint={now.rate !== null ? `${now.answered.toLocaleString()} of ${now.total.toLocaleString()}` : "No questions in the last 7 days"}
+        trend={active.length ? active.map((d) => answeredIn(d) / d.total) : undefined}
+        {...delta(change(rateDiff, (n) => `${Math.round(n)} pts`), rateDiff)}
       />
       <StatTile
         label="Average reply"
-        value={ok > 0 ? replyTime(avgReply) : "—"}
+        value={now.avgReply !== null ? replyTime(now.avgReply) : "—"}
         hint="Lower is better"
         trend={active.length ? active.map((d) => d.avgReplyMs) : undefined}
+        {...delta(change(replyDiff, replyTime), replyDiff, true)}
       />
       <StatTile
         label="Requests this month"
@@ -156,7 +202,7 @@ export function NeedsAttention({ data, used, limit }: { data: Insights; used: nu
       badge: <Badge tone="danger">{failed.toLocaleString()}</Badge>,
       title: failed === 1 ? "Request that failed" : "Requests that failed",
       detail: "Visitors got an error instead of a reply in the last 14 days.",
-      action: <Button href="/app/usage" variant="secondary" size="sm">View</Button>,
+      action: <Button href="/app/usage?show=failed" variant="secondary" size="sm">View</Button>,
     });
   }
   if (pct >= 80) {
@@ -187,7 +233,7 @@ export function NeedsAttention({ data, used, limit }: { data: Insights; used: nu
               {it.badge}
               <div className="min-w-0 flex-1 basis-40">
                 <p className="text-body font-medium">{it.title}</p>
-                <p className="truncate text-meta text-text-muted">{it.detail}</p>
+                <p className="line-clamp-2 text-meta text-text-muted">{it.detail}</p>
               </div>
               {it.action}
             </li>

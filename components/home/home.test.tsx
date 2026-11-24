@@ -1,7 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, it, vi } from "vitest";
-import { RecentQuestions } from "./RecentQuestions";
+import { RecentConversations } from "./RecentConversations";
 import { SetupChecklist, setupSteps } from "./SetupChecklist";
 import { UsageCard } from "./UsageCard";
 
@@ -36,7 +36,7 @@ it("tells a failed load apart from no questions yet", async () => {
   vi.stubGlobal("fetch", vi.fn(async () => fail
     ? new Response(JSON.stringify({ error: "Failed to fetch stats" }), { status: 500 })
     : new Response(JSON.stringify({ stats: { logs: [] } }))));
-  render(<RecentQuestions />);
+  render(<RecentConversations />);
   expect(await screen.findByRole("alert")).toHaveTextContent("Failed to fetch stats");
   expect(screen.queryByText("No questions yet")).not.toBeInTheDocument();
 
@@ -45,11 +45,18 @@ it("tells a failed load apart from no questions yet", async () => {
   expect(await screen.findByText("No questions yet")).toBeInTheDocument();
 });
 
-it("lists the latest visitor questions", async () => {
+it("lists the latest conversations with how each one went", async () => {
   vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({
-    stats: { logs: [{ id: "1", timestamp: 0, origin: "https://shop.example.com", prompt_preview: "Do you ship abroad?", status: 200 }] },
+    stats: { logs: [
+      { id: "1", timestamp: 0, origin: "https://shop.example.com", prompt_preview: "Do you ship abroad?", response_preview: "Yes.", status: 200 },
+      { id: "2", timestamp: 0, prompt_preview: "Instalments?", response_preview: "I don't have specific information about that.", status: 200 },
+      { id: "3", timestamp: 0, prompt_preview: "Hours?", status: 502 },
+    ] },
   }))));
-  render(<RecentQuestions />);
-  expect(await screen.findByText("Do you ship abroad?")).toBeInTheDocument();
-  expect(screen.getByText(/shop\.example\.com/)).toBeInTheDocument();
+  render(<RecentConversations />);
+  const table = await screen.findByRole("table", { name: "Recent conversations" });
+  const rows = within(table).getAllByRole("row").slice(1);
+  expect(rows.map((r) => within(r).getAllByRole("cell")[1].textContent)).toEqual(["ResultAnswered", "ResultNot answered", "ResultFailed"]);
+  expect(rows[0]).toHaveTextContent("shop.example.com");
+  expect(rows[1]).toHaveTextContent("Direct");
 });

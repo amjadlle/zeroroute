@@ -29,15 +29,20 @@ it("reports zero latency when there are no logs", async () => {
   expect((await (await GET(req())).json()).stats).toMatchObject({ totalRecentLogs: 0, averageLatencyMs: 0 });
 });
 
-it("keeps only questions the chatbot couldn't answer with ?unanswered=1", async () => {
+it("filters by result with ?show=answered|unanswered|failed", async () => {
   const db = await testDb();
   await db.execute(`INSERT INTO request_logs (id, customer_key, timestamp, prompt_preview, response_preview, provider, model, latency_ms, status) VALUES
     ('u1', '${A.key}', 10, 'Instalments?', 'I don''t have specific information about that in my knowledge base.', 'groq', 'm', 100, 200),
     ('u2', '${A.key}', 9, 'Hours?', 'I DON''T HAVE ANY INFORMATION available right now.', 'groq', 'm', 100, 200),
     ('f1', '${A.key}', 8, 'Broken', 'in my knowledge base', 'groq', 'm', 100, 502),
-    ('u3', '${B.key}', 7, 'Not yours', 'I don''t have specific information about that.', 'groq', 'm', 100, 200)`);
+    ('u3', '${B.key}', 7, 'Not yours', 'I don''t have specific information about that.', 'groq', 'm', 100, 200),
+    ('f2', '${A.key}', 6, 'Down', NULL, 'groq', 'm', 100, 500)`);
   loginAs(A);
   const ids = async (query: string) => (await (await GET(req(query))).json()).stats.logs.map((l: { id: string }) => l.id);
-  expect(await ids("?unanswered=1")).toEqual(["u1", "u2"]);
-  expect(await ids("?unanswered=0")).toEqual(["u1", "u2", "f1", "a1", "a2"]);
+  expect(await ids("?show=unanswered")).toEqual(["u1", "u2"]);
+  // a1/a2 have no reply text saved: still answered, not dropped by the NULL LIKE.
+  expect(await ids("?show=answered")).toEqual(["a1", "a2"]);
+  expect(await ids("?show=failed")).toEqual(["f1", "f2"]);
+  expect(await ids("?show=all")).toEqual(["u1", "u2", "f1", "f2", "a1", "a2"]);
+  expect(await ids("?show=nonsense")).toEqual(["u1", "u2", "f1", "f2", "a1", "a2"]);
 });

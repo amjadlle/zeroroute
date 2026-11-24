@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth/session";
 import { STOP_WORDS } from "@/lib/providers/rag";
-// Shared with the Usage page's "Unanswered only" filter so both count the same questions.
+// Shared with the Usage page's "Not answered" filter so both count the same questions.
 import { UNANSWERED_ARGS as REFUSALS, UNANSWERED_SQL as IS_REFUSAL } from "@/lib/unanswered";
 
 export const dynamic = "force-dynamic";

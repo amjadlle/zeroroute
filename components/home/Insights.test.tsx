@@ -29,20 +29,44 @@ it("hides the next step when every question was answered", () => {
   expect(container).toBeEmptyDOMElement();
 });
 
-it("shows 14-day totals, answer rate, weighted reply time and monthly requests", () => {
+it("shows 7-day totals, answer rate, weighted reply time and monthly requests", () => {
   render(<InsightTiles data={{ days: DAYS, topics: [] }} error={null} reload={noop} used={6420} limit={10000} />);
-  const tiles = screen.getByRole("region", { name: "Last 14 days" });
+  const tiles = screen.getByRole("region", { name: "Last 7 days" });
   expect(tiles).toHaveTextContent("Questions20");
   expect(tiles).toHaveTextContent("Answered85%17 of 20");
   // (800 × 9 + 1500 × 10) / 19 ≈ 1168 ms
   expect(tiles).toHaveTextContent("Average reply1.2 s");
   expect(tiles).toHaveTextContent("Requests this month6,420of 10,000 on your plan");
   expect(tiles.querySelectorAll("svg path.stroke-accent")).toHaveLength(4);
+  // The week before had no questions, so there is nothing to compare with.
+  expect(tiles).not.toHaveTextContent("compared with");
+});
+
+it("compares the last 7 days with the 7 before, with lower reply time as good news", () => {
+  // Week 1: 10 questions/day for 2 days, all answered, 1 s. Week 2: 25 questions, 20 answered, 0.5 s.
+  const days = [...Array.from({ length: 5 }, () => day(0)), day(10, 0, 0, 1000), day(10, 0, 0, 1000),
+    ...Array.from({ length: 6 }, () => day(0)), day(25, 0, 5, 500)];
+  render(<InsightTiles data={{ days, topics: [] }} error={null} reload={noop} used={45} limit={500} />);
+  const [questions, answered, reply, requests] = within(screen.getByRole("region", { name: "Last 7 days" }))
+    .getAllByText(/compared with the 7 days before/).map((n) => n.parentElement!);
+  expect(questions).toHaveTextContent("+25%");
+  expect(questions).toHaveClass("text-success-fg");
+  expect(answered).toHaveTextContent("−20 pts");
+  expect(answered).toHaveClass("text-danger-fg");
+  expect(reply).toHaveTextContent("−500 ms");
+  expect(reply).toHaveClass("text-success-fg");
+  expect(requests).toBeUndefined();
+});
+
+it("leaves out a change that rounds to nothing", () => {
+  const days = [...Array.from({ length: 6 }, () => day(0)), day(1000, 0, 0, 800), ...Array.from({ length: 6 }, () => day(0)), day(1002, 0, 0, 800)];
+  render(<InsightTiles data={{ days, topics: [] }} error={null} reload={noop} used={0} limit={500} />);
+  expect(screen.queryByText(/compared with/)).not.toBeInTheDocument();
 });
 
 it("shows dashes rather than 0% before the first question", () => {
   render(<InsightTiles data={{ days: [day(0)], topics: [] }} error={null} reload={noop} used={0} limit={500} />);
-  expect(screen.getByText("No questions yet")).toBeInTheDocument();
+  expect(screen.getByText("No questions in the last 7 days")).toBeInTheDocument();
   expect(screen.getAllByText("—")).toHaveLength(2);
 });
 
@@ -53,6 +77,7 @@ it("lists knowledge gaps, failures and a nearly used-up plan", () => {
   expect(items[0]).toHaveTextContent("2Questions your chatbot couldn't answerinstalments, travel");
   expect(items[1]).toHaveTextContent("1Request that failed");
   expect(items[2]).toHaveTextContent("90%You've used most of this month's requests");
+  expect(within(items[1]).getByRole("link", { name: "View" })).toHaveAttribute("href", "/app/usage?show=failed");
   expect(within(items[2]).getByRole("link", { name: "Compare plans" })).toHaveAttribute("href", "/app/billing");
 });
 

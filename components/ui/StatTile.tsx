@@ -10,8 +10,10 @@ type StatTileProps = {
   hint?: ReactNode;
   /** Change text, e.g. "+6%" or "−48 ms". */
   delta?: ReactNode;
-  /** Whether the change is good news; drives colour and arrow. Lower latency is "positive". */
+  /** Whether the change is good news; drives the colour. Lower latency is "positive". */
   deltaTone?: "positive" | "negative";
+  /** Which way the value moved; drives the arrow. Defaults to up for good news, down for bad. */
+  deltaDirection?: "up" | "down";
   /** Recent values for the inline sparkline. */
   trend?: number[];
   icon?: LucideIcon;
@@ -19,8 +21,8 @@ type StatTileProps = {
 };
 
 /** KPI tile: label, big tabular value, optional delta, hint and sparkline. */
-export function StatTile({ label, value, hint, delta, deltaTone = "positive", trend, icon: Icon, className }: StatTileProps) {
-  const Arrow = deltaTone === "positive" ? TrendingUp : TrendingDown;
+export function StatTile({ label, value, hint, delta, deltaTone = "positive", deltaDirection, trend, icon: Icon, className }: StatTileProps) {
+  const Arrow = (deltaDirection ?? (deltaTone === "positive" ? "up" : "down")) === "up" ? TrendingUp : TrendingDown;
   return (
     <Card className={cn("grid gap-1 px-4 py-3.5", className)}>
       <span className="flex items-center gap-1.5 text-meta font-medium text-text-muted">

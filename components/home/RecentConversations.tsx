@@ -6,24 +6,31 @@ import { Alert } from "@/components/ui/Alert";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardHeader } from "@/components/ui/Card";
+import { DataTable, type Column } from "@/components/ui/DataTable";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { conversationResult, type Conversation } from "@/components/dashboard/VisitorConversations";
 import { apiFetch } from "@/lib/client/api";
 
-type LogItem = { id: string; timestamp: number; origin?: string; prompt_preview?: string; status?: number };
-
-const SHOWN = 5;
+const SHOWN = 6;
 const when = new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" });
 
-/** The latest visitor questions from /api/customer/stats. A failed load says so instead of looking empty. */
-export function RecentQuestions() {
-  const [logs, setLogs] = useState<LogItem[] | null>(null);
+const COLUMNS: Column<Conversation>[] = [
+  { key: "prompt_preview", header: "Question", cell: (c) => <span className="line-clamp-2">{c.prompt_preview || "No question text"}</span> },
+  { key: "status", header: "Result", cell: (c) => <Badge tone={conversationResult(c).tone}>{conversationResult(c).label}</Badge> },
+  { key: "origin", header: "Website", cell: (c) => <span className="break-all text-text-muted">{c.origin || "Direct"}</span> },
+  { key: "timestamp", header: "When", align: "right", cell: (c) => <span className="whitespace-nowrap text-text-muted tabular-nums">{when.format(c.timestamp)}</span> },
+];
+
+/** The latest visitor conversations from /api/customer/stats. A failed load says so instead of looking empty. */
+export function RecentConversations() {
+  const [logs, setLogs] = useState<Conversation[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setError(null);
     try {
-      const data = await apiFetch<{ stats?: { logs?: LogItem[] } }>("/api/customer/stats");
+      const data = await apiFetch<{ stats?: { logs?: Conversation[] } }>("/api/customer/stats");
       setLogs(data.stats?.logs ?? []);
     } catch (e) {
       setError(e instanceof Error && e.message ? e.message : "Something went wrong.");
@@ -38,7 +45,7 @@ export function RecentQuestions() {
   let body;
   if (error) {
     body = (
-      <Alert tone="danger" title="Couldn't load recent questions" className="m-4.5">
+      <Alert tone="danger" title="Couldn't load recent conversations" className="m-4.5">
         <p>{error}</p>
         <Button variant="secondary" size="sm" className="mt-2" onClick={load}>Try again</Button>
       </Alert>
@@ -46,7 +53,7 @@ export function RecentQuestions() {
   } else if (!logs) {
     body = (
       <div className="grid gap-2 p-4.5" aria-busy="true">
-        <span className="sr-only">Loading recent questions</span>
+        <span className="sr-only">Loading recent conversations</span>
         {[0, 1, 2].map((i) => <Skeleton key={i} className="h-10" />)}
       </div>
     );
@@ -60,28 +67,13 @@ export function RecentQuestions() {
       />
     );
   } else {
-    body = (
-      <ul className="divide-y divide-border">
-        {logs.slice(0, SHOWN).map((l) => (
-          <li key={l.id} className="flex items-center gap-3 px-4.5 py-3">
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-body">{l.prompt_preview || "(no text)"}</p>
-              <p className="truncate text-meta text-text-muted">
-                {when.format(l.timestamp)}
-                {l.origin ? ` · ${l.origin}` : ""}
-              </p>
-            </div>
-            {l.status !== undefined && l.status >= 400 && <Badge tone="danger">Failed</Badge>}
-          </li>
-        ))}
-      </ul>
-    );
+    body = <DataTable label="Recent conversations" columns={COLUMNS} rows={logs.slice(0, SHOWN)} getRowId={(c) => c.id} className="max-sm:p-3" />;
   }
 
   return (
     <Card>
       <CardHeader
-        title="Recent questions"
+        title="Recent conversations"
         actions={
           <Button href="/app/usage" variant="ghost" size="sm" rightIcon={<ChevronRight aria-hidden className="size-3.5" />}>
             View all

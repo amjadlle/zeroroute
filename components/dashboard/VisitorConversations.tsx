@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, MessageCircleQuestion, RefreshCw } from "lucide-react";
+import { MessageCircleQuestion, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Alert } from "@/components/ui/Alert";
 import { Badge } from "@/components/ui/Badge";
@@ -10,7 +10,7 @@ import { DataTable, type Column } from "@/components/ui/DataTable";
 import { Drawer } from "@/components/ui/Drawer";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { SearchInput } from "@/components/ui/SearchInput";
-import { Switch } from "@/components/ui/Switch";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useSearchParamValue } from "@/components/ui/useSearchParamValue";
 import { apiFetch } from "@/lib/client/api";
 import { isUnanswered } from "@/lib/unanswered";
@@ -26,8 +26,9 @@ export type Conversation = {
 };
 
 const when = (ts: number) => new Date(ts).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
-const answered = (c: Conversation) => c.status === 200;
-const result = (c: Conversation) =>
+const answered = (c: Conversation) => c.status != null && c.status < 400;
+/** Answered, not answered (the bot had no answer, see lib/unanswered.ts) or failed (an error, no reply). */
+export const conversationResult = (c: Conversation) =>
   isUnanswered(c) ? ({ label: "Not answered", tone: "warning" } as const)
   : answered(c) ? ({ label: "Answered", tone: "success" } as const)
   : ({ label: "Failed", tone: "danger" } as const);
@@ -40,7 +41,7 @@ const COLUMNS: Column<Conversation>[] = [
     key: "status",
     header: "Result",
     sortable: true,
-    cell: (c) => <Badge tone={result(c).tone}>{result(c).label}</Badge>,
+    cell: (c) => <Badge tone={conversationResult(c).tone}>{conversationResult(c).label}</Badge>,
   },
   { key: "latency_ms", header: "Reply time", align: "right", sortable: true, cell: (c) => <span className="tabular-nums">{c.latency_ms ?? 0} ms</span> },
 ];
@@ -52,31 +53,48 @@ const csvCell = (v: string) => `"${(/^[=+\-@\t\r]/.test(v) ? `'${v}` : v).replac
 export function conversationsCsv(rows: Conversation[]): string {
   const lines = [["Time", "Website", "Question", "Answer", "Result", "Reply time (ms)"]];
   for (const c of rows) {
-    lines.push([new Date(c.timestamp).toISOString(), c.origin ?? "", c.prompt_preview ?? "", c.response_preview ?? "", result(c).label, String(c.latency_ms ?? "")]);
+    lines.push([new Date(c.timestamp).toISOString(), c.origin ?? "", c.prompt_preview ?? "", c.response_preview ?? "", conversationResult(c).label, String(c.latency_ms ?? "")]);
   }
   return lines.map((l) => l.map(csvCell).join(",")).join("\r\n");
 }
 
-function download(rows: Conversation[]) {
+/** Saves the given conversations as a dated CSV file. */
+export function downloadConversations(rows: Conversation[]) {
   const url = URL.createObjectURL(new Blob([conversationsCsv(rows)], { type: "text/csv;charset=utf-8" }));
   const a = Object.assign(document.createElement("a"), { href: url, download: `visitor-conversations-${new Date().toISOString().slice(0, 10)}.csv` });
   a.click();
   URL.revokeObjectURL(url);
 }
 
+// Values match /api/customer/stats?show= and the page URL, so Home can link to `?show=unanswered`.
+const FILTERS = [
+  { value: "all", label: "All", described: "conversations" },
+  { value: "answered", label: "Answered", described: "answered questions" },
+  { value: "unanswered", label: "Not answered", described: "questions your chatbot couldn't answer" },
+  { value: "failed", label: "Failed", described: "requests that failed" },
+] as const;
+
+const EMPTY: Record<string, { title: string; description: string }> = {
+  answered: { title: "No answered questions", description: "None of your recent questions got an answer." },
+  unanswered: { title: "No unanswered questions", description: "Your chatbot answered every recent question it was asked." },
+  failed: { title: "No failed requests", description: "Every recent question got a reply." },
+};
+
 /**
- * Recent visitor conversations from /api/customer/stats, with search, details and CSV export.
- * `?show=unanswered` in the page URL turns on "Unanswered only" (Home links there); needs a <Suspense> parent.
+ * Recent visitor conversations from /api/customer/stats, with a result filter, search and details.
+ * The filter lives in `?show=` (answered, unanswered or failed); needs a <Suspense> parent.
+ * `onShownChange` gets the rows currently shown, for an Export button outside the card.
  */
-export function VisitorConversations() {
+export function VisitorConversations({ onShownChange }: { onShownChange?: (rows: Conversation[]) => void }) {
   const [rows, setRows] = useState<Conversation[]>([]);
   const [avgMs, setAvgMs] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState<Conversation | null>(null);
-  const [show, setShow] = useSearchParamValue("show", "all");
-  const unansweredOnly = show === "unanswered";
+  const [param, setShow] = useSearchParamValue("show", "all");
+  const filter = FILTERS.find((f) => f.value === param) ?? FILTERS[0];
+  const show = filter.value;
   const latest = useRef(0);
 
   const load = useCallback(async () => {
@@ -84,7 +102,7 @@ export function VisitorConversations() {
     setLoading(true);
     try {
       const data = await apiFetch<{ stats?: { logs?: Conversation[]; averageLatencyMs?: number } }>(
-        `/api/customer/stats${unansweredOnly ? "?unanswered=1" : ""}`,
+        `/api/customer/stats${show === "all" ? "" : `?show=${show}`}`,
       );
       if (call !== latest.current) return; // a newer load (filter flipped) owns the list
       setRows(data.stats?.logs ?? []);
@@ -95,7 +113,7 @@ export function VisitorConversations() {
     } finally {
       if (call === latest.current) setLoading(false);
     }
-  }, [unansweredOnly]);
+  }, [show]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- load on mount and when the filter changes
@@ -108,11 +126,13 @@ export function VisitorConversations() {
     return rows.filter((c) => [c.prompt_preview, c.response_preview, c.origin].some((v) => v?.toLowerCase().includes(q)));
   }, [rows, query]);
 
+  useEffect(() => onShownChange?.(error ? [] : shown), [onShownChange, shown, error]);
+
   return (
     <Card>
       <CardHeader
         title="Visitor conversations"
-        description={rows.length ? `Your latest ${rows.length} ${unansweredOnly ? "questions your chatbot couldn't answer" : "conversations"}${avgMs ? `, ${avgMs.toLocaleString()} ms average reply time` : ""}.` : "What visitors asked your chatbot."}
+        description={rows.length ? `Your latest ${rows.length} ${filter.described}${avgMs ? `, ${avgMs.toLocaleString()} ms average reply time` : ""}.` : "What visitors asked your chatbot."}
       />
       <CardBody className="grid gap-3">
         {error ? (
@@ -126,12 +146,9 @@ export function VisitorConversations() {
               <div className="w-full sm:w-auto sm:min-w-48 sm:flex-1">
                 <SearchInput aria-label="Search conversations" placeholder="Search conversations" value={query} onChange={(e) => setQuery(e.target.value)} />
               </div>
-              <Switch label="Unanswered only" checked={unansweredOnly} onCheckedChange={(on) => setShow(on ? "unanswered" : "all")} />
+              <SegmentedControl label="Show" options={FILTERS} value={show} onValueChange={setShow} />
               <Button variant="secondary" onClick={load} loading={loading} leftIcon={<RefreshCw aria-hidden className="size-4" />}>
                 Refresh
-              </Button>
-              <Button variant="secondary" onClick={() => download(shown)} disabled={shown.length === 0} leftIcon={<Download aria-hidden className="size-4" />}>
-                Export CSV
               </Button>
             </div>
             <DataTable
@@ -142,11 +159,11 @@ export function VisitorConversations() {
               loading={loading && rows.length === 0}
               onRowClick={setOpen}
               empty={
-                rows.length === 0 && unansweredOnly ? (
+                rows.length === 0 && show !== "all" ? (
                   <EmptyState
                     icon={MessageCircleQuestion}
-                    title="No unanswered questions"
-                    description="Your chatbot answered every recent question it was asked."
+                    title={EMPTY[show].title}
+                    description={EMPTY[show].description}
                     action={<Button variant="secondary" onClick={() => setShow("all")}>Show all conversations</Button>}
                   />
                 ) : rows.length === 0 ? (
@@ -176,7 +193,7 @@ export function VisitorConversations() {
               <dd className="whitespace-pre-wrap break-words">{open.response_preview || (answered(open) ? "No answer text" : "The chatbot couldn't answer this one.")}</dd>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Badge tone={result(open).tone}>{result(open).label}</Badge>
+              <Badge tone={conversationResult(open).tone}>{conversationResult(open).label}</Badge>
               <Badge>{open.latency_ms ?? 0} ms reply time</Badge>
             </div>
           </dl>
