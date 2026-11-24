@@ -83,9 +83,9 @@ export default function ShellSection() {
         <ConsoleShell
           key={which}
           embedded
-          consoleLabel={admin ? "Admin console" : "User console"}
+          consoleLabel={admin ? "Admin" : "Customer"}
           nav={admin ? ADMIN_NAV : APP_NAV}
-          account={admin ? { name: "ZeroRoute admin", email: "admin@example.com", plan: "Admin" } : { name: "Brightpath Tutors", email: "hello@brightpath.example", plan: "Pro plan" }}
+          account={admin ? { name: "ZeroRoute admin", plan: "Admin" } : { name: "Brightpath Tutors", plan: "Pro plan" }}
           consoleSwitch={admin}
           paletteActions={[{ label: `Demo: switch to the ${admin ? "user" : "admin"} console`, icon: <Users className={icon} />, run: () => setWhich(admin ? "app" : "admin") }]}
         >

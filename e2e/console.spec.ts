@@ -19,7 +19,7 @@ async function signUp(page: Page) {
 }
 
 const openConsolePage = (page: Page, label: string) =>
-  page.getByRole("navigation", { name: "User console", exact: true }).getByRole("link", { name: label }).click();
+  page.getByRole("navigation", { name: "Customer console", exact: true }).getByRole("link", { name: label }).click();
 
 test("customer adds a text knowledge entry", async ({ page }) => {
   await openConsolePage(page, "Knowledge");

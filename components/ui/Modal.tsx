@@ -14,6 +14,8 @@ export type OverlayProps = {
   footer?: ReactNode;
   children?: ReactNode;
   className?: string;
+  /** Hide the header (the title stays for screen readers), for dialogs that open straight on a field. */
+  hideHeader?: boolean;
 };
 
 /**
@@ -22,7 +24,7 @@ export type OverlayProps = {
  * Known ceiling: toasts render below an open dialog's backdrop (top layer). Upgrade path: render the
  * toast region as a manual popover and re-show it after each modal opens.
  */
-export function Overlay({ open, onClose, title, description, footer, children, className }: OverlayProps) {
+export function Overlay({ open, onClose, title, description, footer, children, className, hideHeader }: OverlayProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const descriptionId = useId();
@@ -77,14 +79,14 @@ export function Overlay({ open, onClose, title, description, footer, children, c
         className,
       )}
     >
-      <header className="flex items-start gap-3 px-5 pt-5 pb-3">
+      <header className={hideHeader ? "sr-only" : "flex items-start gap-3 px-5 pt-5 pb-3"}>
         <div className="min-w-0 flex-1">
           <h2 id={titleId} className="text-title font-semibold">{title}</h2>
           {description && <p id={descriptionId} className="mt-1 text-text-muted">{description}</p>}
         </div>
-        <IconButton label="Close" icon={<X className="size-4" aria-hidden />} onClick={onClose} className="-mt-1 -mr-2" />
+        {!hideHeader && <IconButton label="Close" icon={<X className="size-4" aria-hidden />} onClick={onClose} className="-mt-1 -mr-2" />}
       </header>
-      <div className="flex-1 overflow-y-auto px-5 pb-5">{children}</div>
+      <div className={cn("flex-1 overflow-y-auto px-5 pb-5", hideHeader && "pt-5")}>{children}</div>
       {footer && (
         <footer className="flex flex-wrap justify-end gap-2 border-t border-border bg-surface-sunken px-5 py-3.5">
           {footer}
@@ -94,7 +96,7 @@ export function Overlay({ open, onClose, title, description, footer, children, c
   );
 }
 
-const SIZES = { sm: "max-w-sm", md: "max-w-lg", lg: "max-w-2xl" } as const;
+const SIZES = { sm: "max-w-sm", md: "max-w-120", lg: "max-w-2xl" } as const; // md = 480px
 
 export type ModalProps = OverlayProps & { size?: keyof typeof SIZES };
 
