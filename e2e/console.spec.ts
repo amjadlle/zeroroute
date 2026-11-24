@@ -15,7 +15,8 @@ async function signUp(page: Page) {
   await page.getByLabel("Email").fill(`e2e-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.test`);
   await page.getByRole("textbox", { name: "Password", exact: true }).fill("correct-horse-battery");
   await page.locator("form").getByRole("button", { name: "Create account" }).click();
-  await expect(page).toHaveURL("/app");
+  await expect(page).toHaveURL("/onboarding");
+  await page.goto("/app");
 }
 
 const openConsolePage = (page: Page, label: string) =>

@@ -4,7 +4,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { OnboardingWizard } from "./OnboardingWizard";
 
 const PROFILE = {
-  id: "c1", key: "zr_live_secret_1234", email: "hi@example.com", name: "Sub", company: "", website: "", bot_title: "Helper",
+  id: "c1", key: "zr_live_secret_1234", email: "hi@example.com", name: "hi", company: "", website: "", bot_title: "Helper",
   bot_role: "", tone: "", greeting: "Hi!", prompts: ["What do you sell?"], persona: "", status: "active", days_remaining: 0,
   monthly_requests: 0, monthly_limit: 500, bot_id: "bot_abc", knowledge_docs_count: 0,
 };
@@ -12,10 +12,12 @@ const PROFILE = {
 type Call = { url: string; method: string; body?: Record<string, unknown> };
 let calls: Call[];
 let failNext: string | null;
+let profile: Record<string, unknown>;
 
 beforeEach(() => {
   calls = [];
   failNext = null;
+  profile = PROFILE;
   vi.stubGlobal("fetch", vi.fn(async (url: string, init: RequestInit = {}) => {
     const method = init.method ?? "GET";
     calls.push({ url, method, body: init.body ? JSON.parse(String(init.body)) : undefined });
@@ -23,7 +25,7 @@ beforeEach(() => {
       failNext = null;
       return new Response(JSON.stringify({ error: "Database is busy." }), { status: 500 });
     }
-    if (url === "/api/customer/profile") return new Response(JSON.stringify({ customer: PROFILE }));
+    if (url === "/api/customer/profile") return new Response(JSON.stringify({ customer: profile }));
     if (url === "/api/knowledge") return new Response(JSON.stringify({ documents: [] }));
     return new Response(JSON.stringify({ success: true }));
   }));
@@ -84,4 +86,22 @@ it("saves the chatbot with its brand colour, skips knowledge and finishes withou
   // Only the two step saves wrote anything; no request carries the key or email in its URL.
   expect(calls.filter((c) => c.method === "POST").map((c) => c.url)).toEqual(["/api/onboarding/setup", "/api/customer/persona"]);
   expect(calls.every((c) => !c.url.includes("?"))).toBe(true);
+});
+
+it("pre-fills the company from the signup name and suggests it as the chatbot's name", async () => {
+  profile = { ...PROFILE, name: "Ann's Bakery", bot_title: "ZeroRoute AI" };
+  const user = userEvent.setup();
+  render(<OnboardingWizard />);
+  expect(await screen.findByLabelText(/Company or project name/)).toHaveValue("Ann's Bakery");
+  await user.click(screen.getByRole("button", { name: "Save and continue" }));
+  expect(await screen.findByRole("heading", { name: "Your chatbot" })).toBeInTheDocument();
+  await user.click(screen.getByRole("button", { name: "Save and continue" }));
+  expect(await screen.findByRole("heading", { name: "Knowledge" })).toBeInTheDocument();
+  // A non-default name is what Home's "Name your chatbot" step looks for.
+  expect(posts("/api/customer/persona")[0].body).toMatchObject({ bot_title: "Ann's Bakery" });
+});
+
+it("does not use the email-prefix stand-in as the company", async () => {
+  render(<OnboardingWizard />);
+  expect(await screen.findByLabelText(/Company or project name/)).toHaveValue("");
 });

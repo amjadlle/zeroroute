@@ -50,7 +50,19 @@ test("customer: sign up, console pages, theme, no admin, sign out", async ({ pag
   await page.getByRole("textbox", { name: "Password", exact: true }).fill("correct-horse-battery");
   await page.locator("form").getByRole("button", { name: "Create account" }).click();
 
+  // New accounts land in the setup wizard, with the signup name as the company.
+  await expect(page).toHaveURL("/onboarding");
+  await expect(page.getByLabel(/Company or project name/)).toHaveValue("E2E Shop");
+  await page.getByLabel("Website").fill("https://e2e-shop.example/home");
+  await page.getByRole("button", { name: "Save and continue" }).click();
+  await expect(page.getByRole("textbox", { name: /^Name/ })).toHaveValue("E2E Shop");
+  await page.getByRole("button", { name: "Save and continue" }).click();
+  await page.getByRole("button", { name: "Skip for now" }).click();
+  await page.getByRole("link", { name: "Go to your console" }).click();
   await expect(page).toHaveURL("/app");
+  // Onboarding counts on Home: the name is set and the website is an allowed domain.
+  await expect(page.getByText("Name your chatbot (done)")).toBeAttached();
+  await expect(page.getByText("Put it on your website (done)")).toBeAttached();
   await expect(page.getByRole("navigation", { name: "User console", exact: true })).toBeVisible();
   await expect(h1(page)).toHaveText(/^(Welcome to ZeroRoute|Home)$/);
   await expect(page.getByRole("navigation", { name: "Switch console" })).toHaveCount(0);

@@ -5,8 +5,9 @@ import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { Meter } from "@/components/ui/Meter";
 import { cn } from "@/lib/cn";
 
-// Name every new account gets at signup (app/api/auth/signup/route.ts).
-const DEFAULT_BOT_NAME = "ZeroRoute AI";
+// Name every new account gets at signup (app/api/auth/signup/route.ts). Onboarding swaps it for the
+// company name, so finishing onboarding (or saving any other name) counts as "Name your chatbot" done.
+export const DEFAULT_BOT_NAME = "ZeroRoute AI";
 
 export type SetupStep = {
   title: string;
