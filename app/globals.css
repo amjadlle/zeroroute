@@ -172,18 +172,14 @@
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
-    overflow-x: hidden;
-    width: 100%;
+    /* clip, not hidden: hidden on html + body made body a scroll container, so sticky headers scrolled away (#116). */
+    overflow-x: clip;
     scroll-behavior: smooth;
   }
 
   body {
-    overflow-x: hidden;
-    width: 100%;
-    background-color: var(--color-dark-bg);
-    background-image:
-      radial-gradient(ellipse 80% 40% at 50% -20%, rgba(239, 68, 68, 0.06), transparent),
-      radial-gradient(ellipse 50% 50% at 80% 80%, rgba(255, 255, 255, 0.02), transparent);
+    background-color: var(--color-bg);
+    color: var(--color-text);
     touch-action: manipulation;
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -246,18 +242,38 @@
   animation-play-state: paused;
 }
 
-::-webkit-scrollbar {
+/* Landing page only (app/page.tsx wraps itself in .landing). The consoles keep the browser's own
+   scrollbar and background, which follow the theme. */
+.landing {
+  background-color: var(--color-landing-bg);
+  background-image:
+    radial-gradient(ellipse 80% 40% at 50% -20%, rgba(239, 68, 68, 0.06), transparent),
+    radial-gradient(ellipse 50% 50% at 80% 80%, rgba(255, 255, 255, 0.02), transparent);
+}
+html:has(.landing) {
+  background-color: var(--color-landing-bg);
+}
+/* The demo chatbot (/widget.js) stays in the DOM after a client-side jump from the landing page; hide it elsewhere.
+   Not display: the widget's own :host sets display: block !important, which outranks page styles. */
+html:not(:has(.landing)) #zeroroute-widget-root {
+  content-visibility: hidden;
+}
+html:has(.landing)::-webkit-scrollbar,
+.landing ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
-::-webkit-scrollbar-track {
-  background: var(--color-dark-bg);
+html:has(.landing)::-webkit-scrollbar-track,
+.landing ::-webkit-scrollbar-track {
+  background: var(--color-landing-bg);
 }
-::-webkit-scrollbar-thumb {
-  background: var(--color-dark-border);
+html:has(.landing)::-webkit-scrollbar-thumb,
+.landing ::-webkit-scrollbar-thumb {
+  background: var(--color-landing-border);
   border-radius: 4px;
 }
-::-webkit-scrollbar-thumb:hover {
+html:has(.landing)::-webkit-scrollbar-thumb:hover,
+.landing ::-webkit-scrollbar-thumb:hover {
   background: var(--color-brand-500);
 }
 
